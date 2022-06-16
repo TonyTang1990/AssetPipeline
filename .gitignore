@@ -1,0 +1,11 @@
+# 文件以及目录过滤
+# 过滤library目录
+AssetPipeline/Library/
+# 过滤.vs目录
+AssetPipeline/.vs/
+# 过滤Temp目录
+AssetPipeline/Temp/
+# 过滤obj目录
+AssetPipeline/obj/
+# 过滤Log目录
+AssetPipeline/Logs/
