@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             AssetCheckConfigData.cs
+ * Description:             AssetCheckGlobalData.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/17
  */
@@ -11,10 +11,10 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AssetCheckConfigData.cs
-    /// Asset检查配置数据
+    /// AssetCheckGlobalData.cs
+    /// Asset检查全局数据
     /// </summary>
-    public class AssetCheckConfigData
+    public class AssetCheckGlobalData : ScriptableObject
     {
 
     }

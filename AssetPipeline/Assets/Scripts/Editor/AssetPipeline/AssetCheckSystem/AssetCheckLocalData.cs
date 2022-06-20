@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             AssetCheckSettingData.cs
+ * Description:             AssetCheckLocalData.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/17
  */
@@ -11,10 +11,10 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AssetCheckSettingData.cs
-    /// Asset检查设置数据
+    /// AssetCheckConfigData.cs
+    /// Asset检查局部数据
     /// </summary>
-    public class AssetCheckSettingData
+    public class AssetCheckLocalData : ScriptableObject
     {
 
     }

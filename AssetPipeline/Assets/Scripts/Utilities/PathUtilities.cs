@@ -55,7 +55,17 @@ public static class PathUtilities
     }
 
     /// <summary>
-    /// 获取Asset的全路径
+    /// 获取工程Asset的全路径
+    /// </summary>
+    /// <param name="assetpath">Asset相对路径</param>
+    /// <returns></returns>
+    public static string GetAssetFullPath()
+    {
+        return Path.GetFullPath(Application.dataPath);
+    }
+
+    /// <summary>
+    /// 获取指定Asset路径的全路径
     /// </summary>
     /// <param name="assetpath">Asset相对路径</param>
     /// <returns></returns>
