@@ -26,6 +26,11 @@ namespace TAssetPipeline
             get;
         }
 
+        /// <summary>
+        /// 自定义描述(方便同类型添加自定义介绍)
+        /// </summary>
+        [Header("自定义描述")]
+        public string CustomDes;
 
         /// <summary>
         /// 目标Asset类型(子类重定义指定)
@@ -33,6 +38,17 @@ namespace TAssetPipeline
         public abstract AssetType TargetAssetType
         {
             get;
+        }
+
+        /// <summary>
+        /// 检查器类型名
+        /// </summary>
+        public string TypeName
+        {
+            get
+            {
+                return this.name;
+            }
         }
     }
 }

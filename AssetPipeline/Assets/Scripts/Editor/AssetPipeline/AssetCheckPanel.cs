@@ -114,6 +114,7 @@ namespace TAssetPipeline
             base.SaveData();
             SaveAssetCheckPrefDatas();
             SaveAssetCheckData();
+            Debug.Log($"保存Asset检查器数据完成!");
         }
 
         /// <summary>

@@ -31,7 +31,7 @@ public static class PathUtilities
     public static string GetFolderName(string path)
     {
         var directoryInfo = new DirectoryInfo(Path.GetDirectoryName(path));
-        return directoryInfo.Name;
+        return GetRegularPath(directoryInfo.Name);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public static class PathUtilities
         if (folderfullpath.StartsWith(projectpathprefix))
         {
             var relativefolderpath = folderfullpath.Replace(projectpathprefix, string.Empty);
-            return relativefolderpath;
+            return GetRegularPath(relativefolderpath);
         }
         else
         {
@@ -61,7 +61,18 @@ public static class PathUtilities
     /// <returns></returns>
     public static string GetAssetFullPath()
     {
-        return Path.GetFullPath(Application.dataPath);
+        return GetRegularPath(Path.GetFullPath(Application.dataPath));
+    }
+
+    /// <summary>
+    /// 是否属于Asset目录
+    /// </summary>
+    /// <param name="path">相对Asset路径</param>
+    /// <returns></returns>
+    public static bool IsUnderAssetPath(string path)
+    {
+        var regularPath = GetRegularPath(path);
+        return regularPath.StartsWith("Assets");
     }
 
     /// <summary>
@@ -73,7 +84,7 @@ public static class PathUtilities
     {
         var index = Application.dataPath.LastIndexOf("Assets");
         var assetfullpath = Application.dataPath.Substring(0, index) + assetpath;
-        return assetfullpath;
+        return GetRegularPath(assetfullpath);
     }
 
     /// <summary>
@@ -95,6 +106,6 @@ public static class PathUtilities
             return path;
         }
         var postFixIndex = path.LastIndexOf(postFix);
-        return path.Substring(0, postFixIndex);
+        return GetRegularPath(path.Substring(0, postFixIndex));
     }
 }

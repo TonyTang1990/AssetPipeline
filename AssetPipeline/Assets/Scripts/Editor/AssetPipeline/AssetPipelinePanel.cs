@@ -161,6 +161,7 @@ namespace TAssetPipeline
             base.SaveData();
             SaveAssetPipelineData();
             SaveAssetPipelinePrefDatas();
+            Debug.Log($"保存Asset管线数据完成!");
         }
 
         /// <summary>
@@ -222,12 +223,29 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawAssetPipelineContentArea()
         {
-            DrawResourceFolderArea();
             DrawConfigStrategyArea();
+            DrawResourceFolderArea();
             EditorGUILayout.Space();
             DrawStrategyArea();
             EditorGUILayout.Space();
             DrawPlatformStrategyArea();
+            DrawOtherArea();
+        }
+
+        /// <summary>
+        /// 绘制策略配置区域
+        /// </summary>
+        private void DrawConfigStrategyArea()
+        {
+            GUILayout.BeginHorizontal("box");
+            EditorGUILayout.LabelField("切换配置策略:", GUILayout.Width(100.0f));
+            EditorGUI.BeginChangeCheck();
+            mCurrentConfigStrategyIndex = EditorGUILayout.Popup(mCurrentConfigStrategyIndex, mAllStrategyNames, GUILayout.ExpandWidth(true));
+            if (EditorGUI.EndChangeCheck())
+            {
+                UpdateConfigStrategy(mAllStrategyNames[mCurrentConfigStrategyIndex]);
+            }
+            GUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -250,22 +268,6 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 绘制策略配置区域
-        /// </summary>
-        private void DrawConfigStrategyArea()
-        {
-            GUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("切换配置策略:", GUILayout.Width(100.0f));
-            EditorGUI.BeginChangeCheck();
-            mCurrentConfigStrategyIndex = EditorGUILayout.Popup(mCurrentConfigStrategyIndex, mAllStrategyNames, GUILayout.ExpandWidth(true));
-            if(EditorGUI.EndChangeCheck())
-            {
-                UpdateConfigStrategy(mAllStrategyNames[mCurrentConfigStrategyIndex]);
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        /// <summary>
         /// 绘制策略区域
         /// </summary>
         private void DrawStrategyArea()
@@ -278,14 +280,40 @@ namespace TAssetPipeline
                 DrawOneStartegyByIndex(mSettingData.StrategyList, i);
             }
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("新增策略名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("新增策略名:", GUILayout.Width(100f));
             mStrategyAdded = EditorGUILayout.TextField(mStrategyAdded, GUILayout.ExpandWidth(true));
-            if(GUILayout.Button("+", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f)))
+            if(GUILayout.Button("+", GUILayout.Width(100f)))
             {
                 AddStrategy(mStrategyAdded);
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制平台策略区域
+        /// </summary>
+        private void DrawPlatformStrategyArea()
+        {
+            GUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField("平台策略配置", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            DrawPlatformStrategyTitleArea();
+            for (int i = 0, length = mSettingData.PlatformStrategyDataList.Count; i < length; i++)
+            {
+                DrawOnePlatformStartegy(mSettingData.PlatformStrategyDataList[i]);
+            }
+            GUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制其他UI区域
+        /// </summary>
+        private void DrawOtherArea()
+        {
+            if(GUILayout.Button("保存Asset管线数据", GUILayout.ExpandWidth(true)))
+            {
+                GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllDatas();
+            }
         }
 
         /// <summary>
@@ -310,33 +338,18 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(strategyList[index], AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
-            if(!string.Equals(strategyList[index], AssetPipelineConst.DEFAULT_STRATEGY_NAME))
+            if (!string.Equals(strategyList[index], AssetPipelineConst.DEFAULT_STRATEGY_NAME))
             {
-                if (GUILayout.Button("-", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f)))
+                if (GUILayout.Button("-", GUILayout.Width(100f)))
                 {
                     RemoveStrategyByIndex(index);
                 }
             }
             else
             {
-                EditorGUILayout.LabelField(string.Empty, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+                EditorGUILayout.LabelField(string.Empty, GUILayout.Width(100f));
             }
             EditorGUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// 绘制平台策略区域
-        /// </summary>
-        private void DrawPlatformStrategyArea()
-        {
-            GUILayout.BeginVertical("box");
-            EditorGUILayout.LabelField("平台策略配置", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
-            DrawPlatformStrategyTitleArea();
-            for (int i = 0, length = mSettingData.PlatformStrategyDataList.Count; i < length; i++)
-            {
-                DrawOnePlatformStartegy(mSettingData.PlatformStrategyDataList[i]);
-            }
-            GUILayout.EndVertical();
         }
 
         /// <summary>

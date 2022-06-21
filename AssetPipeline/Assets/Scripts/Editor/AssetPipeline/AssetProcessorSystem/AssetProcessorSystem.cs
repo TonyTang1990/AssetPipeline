@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using static TAssetPipeline.AssetProcessorLocalData;
 
 namespace TAssetPipeline
 {
@@ -39,6 +40,51 @@ namespace TAssetPipeline
         private static AssetProcessorLocalData LocalData;
 
         /// <summary>
+        /// 所有处理器列表
+        /// </summary>
+        private static List<BaseProcessor> AllProcessors;
+
+        /// <summary>
+        /// 全局预处理器映射Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        private static Dictionary<AssetType, List<BaseProcessor>> GlobalPreProcessorMap;
+
+        /// <summary>
+        /// 全局后处理器映射Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        private static Dictionary<AssetType, List<BaseProcessor>> GlobalPostProcessorMap;
+
+        /// <summary>
+        /// 全局移动处理器映射Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        private static Dictionary<AssetType, List<BaseProcessor>> GlobalMovedProcessorMap;
+
+        /// <summary>
+        /// 全局删除处理器映射Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        private static Dictionary<AssetType, List<BaseProcessor>> GlobalDeletedProcessorMap;
+
+        /// <summary>
+        /// 局部预处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalPreProcessorMap;
+
+        /// <summary>
+        /// 局部后处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalPostProcessorMap;
+
+        /// <summary>
+        /// 局部移动处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalMovedProcessorMap;
+
+        /// <summary>
+        /// 局部删除处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalDeletedProcessorMap;
+
+        /// <summary>
         /// 初始化
         /// </summary>
         public static void Init()
@@ -49,6 +95,9 @@ namespace TAssetPipeline
             var activeStrategyName = AssetPipelineSystem.GetActiveTargetStrategyName();
             GlobalData = LoadGlobalDataByStrategy(activeStrategyName);
             LocalData = LoadLocalDataByStrategy(activeStrategyName);
+            InitAllProcessors();
+            InitGlobalProcessorData();
+            InitLocalProcessorData();
         }
 
         /// <summary>
@@ -71,13 +120,184 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 初始化所有处理器
+        /// </summary>
+        private static void InitAllProcessors()
+        {
+            AllProcessors = GetAllProcessors();
+        }
+
+        /// <summary>
+        /// 获取所有处理器
+        /// </summary>
+        /// <returns></returns>
+        public static List<BaseProcessor> GetAllProcessors()
+        {
+            List<BaseProcessor> allProcessorList = new List<BaseProcessor>();
+            var processorSaveRelativePath = GetProcessorSaveRelativePath();
+            var allProcessorsGuids = AssetDatabase.FindAssets($"t:{AssetPipelineConst.BASE_PROCESSOR_TYPE}", new[] { processorSaveRelativePath });
+            foreach(var processGuid in allProcessorsGuids)
+            {
+                var processorAssetPath = AssetDatabase.GUIDToAssetPath(processGuid);
+                var processorAsset = AssetDatabase.LoadAssetAtPath<BaseProcessor>(processorAssetPath);
+                allProcessorList.Add(processorAsset);
+            }
+            return allProcessorList;
+        }
+
+        /// <summary>
+        /// 初始化所有全局处理器信息
+        /// </summary>
+        private static void InitGlobalProcessorData()
+        {
+            GlobalPreProcessorMap = GetGlobalPreProcessorMap();
+            GlobalPostProcessorMap = GetGlobalPostProcessorMap();
+            GlobalMovedProcessorMap = GetGlobalMovedProcessorMap();
+            GlobalDeletedProcessorMap = GetGlobalDeletedProcessorMap();
+        }
+
+        /// <summary>
+        /// 获取全局预处理器Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<AssetType, List<BaseProcessor>> GetGlobalPreProcessorMap()
+        {
+            return GetGlobalProcessorMap(GlobalData.PreProcessorData.ProcessorList);
+        }
+
+        /// <summary>
+        /// 获取全局后处理器Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<AssetType, List<BaseProcessor>> GetGlobalPostProcessorMap()
+        {
+            return GetGlobalProcessorMap(GlobalData.PostProcessorData.ProcessorList);
+        }
+
+        /// <summary>
+        /// 获取全局移动处理器Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<AssetType, List<BaseProcessor>> GetGlobalMovedProcessorMap()
+        {
+            return GetGlobalProcessorMap(GlobalData.MovedProcessorData.ProcessorList);
+        }
+
+        /// <summary>
+        /// 获取全局删除处理器Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<AssetType, List<BaseProcessor>> GetGlobalDeletedProcessorMap()
+        {
+            return GetGlobalProcessorMap(GlobalData.DeletedProcessorData.ProcessorList);
+        }
+
+        /// <summary>
+        /// 获取全局指定处理器的Map<目标Asset类型, 处理器列表>
+        /// </summary>
+        /// <param name="processorList"></param>
+        /// <returns></returns>
+        private static Dictionary<AssetType, List<BaseProcessor>> GetGlobalProcessorMap(List<BaseProcessor> processorList)
+        {
+            Dictionary<AssetType, List<BaseProcessor>> globalProcessorMap = new Dictionary<AssetType, List<BaseProcessor>>();
+            foreach(var processor in processorList)
+            {
+                List<BaseProcessor> assetTypeProcessorList;
+                if(!globalProcessorMap.TryGetValue(processor.TargetAssetType, out assetTypeProcessorList))
+                {
+                    assetTypeProcessorList = new List<BaseProcessor>();
+                    globalProcessorMap.Add(processor.TargetAssetType, assetTypeProcessorList);
+                }
+                assetTypeProcessorList.Add(processor);
+            }
+            return globalProcessorMap;
+        }
+
+        /// <summary>
+        /// 初始化所有局部处理器信息
+        /// </summary>
+        private static void InitLocalProcessorData()
+        {
+            LocalPreProcessorMap = GetLocalPreProcessorMap();
+            LocalPostProcessorMap = GetLocalPostProcessorMap();
+            LocalMovedProcessorMap = GetLocalMovedProcessorMap();
+            LocalDeletedProcessorMap = GetLocalDeletedProcessorMap();
+        }
+
+        /// <summary>
+        /// 获取局部预处理器Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string ,Dictionary<AssetType, List<BaseProcessor>>> GetLocalPreProcessorMap()
+        {
+            return GetLocalProcessorMap(LocalData.PreProcessorDataList);
+        }
+
+        /// <summary>
+        /// 获取局部后处理器Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalPostProcessorMap()
+        {
+            return GetLocalProcessorMap(LocalData.PostProcessorDataList);
+        }
+
+        /// <summary>
+        /// 获取局部移动处理器Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalMovedProcessorMap()
+        {
+            return GetLocalProcessorMap(LocalData.MovedProcessorDataList);
+        }
+
+        /// <summary>
+        /// 获取局部删除处理器Map<目标目录, <目标Asset类型, 处理器列表>>
+        /// </summary>
+        /// <returns></returns>
+        public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalDeletedProcessorMap()
+        {
+            return GetLocalProcessorMap(LocalData.DeletedProcessorDataList);
+        }
+
+        /// <summary>
+        /// 获取局部指定处理器的Map<目标目录, </目标目录>目标Asset类型, 处理器列表>>
+        /// </summary>
+        /// <param name="processorList"></param>
+        /// <returns></returns>
+        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalProcessorMap(List<ProcessorLocalData> processorLocalDataList)
+        {
+            Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap = new Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>>();
+            foreach (var processorLocalData in processorLocalDataList)
+            {
+                Dictionary<AssetType, List<BaseProcessor>> assetTypeProcessorMap;
+                if (!localProcessorMap.TryGetValue(processorLocalData.FolderPath, out assetTypeProcessorMap))
+                {
+                    assetTypeProcessorMap = new Dictionary<AssetType, List<BaseProcessor>>();
+                    localProcessorMap.Add(processorLocalData.FolderPath, assetTypeProcessorMap);
+                }
+                foreach(var processor in processorLocalData.ProcessorList)
+                {
+                    List<BaseProcessor> assetTypeProcessorList;
+                    if (!assetTypeProcessorMap.TryGetValue(processor.TargetAssetType, out assetTypeProcessorList))
+                    {
+                        assetTypeProcessorList = new List<BaseProcessor>();
+                        assetTypeProcessorMap.Add(processor.TargetAssetType, assetTypeProcessorList);
+                    }
+                    assetTypeProcessorList.Add(processor);
+                }
+            }
+            return localProcessorMap;
+        }
+
+        /// <summary>
         /// 获取自定义Asset处理器存储相对路径
         /// </summary>
         /// <returns></returns>
         private static string GetProcessorSaveRelativePath()
         {
             var saveFolderRelativePath = AssetPipelineSystem.GetSaveFolderRelativePath();
-            return $"{saveFolderRelativePath}/AssetProcessors";
+            return PathUtilities.GetRegularPath($"{saveFolderRelativePath}/AssetProcessors");
         }
 
         /// <summary>
@@ -88,7 +308,7 @@ namespace TAssetPipeline
         public static string GetDataSaveFolderByStrategy(string strategyName)
         {
             var strategyDataFolderRelativePath = $"{AssetPipelineSystem.GetSaveFolderRelativePath()}/{strategyName}/AssetProcessor";
-            return strategyDataFolderRelativePath;
+            return PathUtilities.GetRegularPath(strategyDataFolderRelativePath);
         }
 
         /// <summary>

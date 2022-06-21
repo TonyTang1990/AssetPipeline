@@ -18,51 +18,45 @@ namespace TAssetPipeline
     public class AssetProcessorGlobalData : ScriptableObject
     {
         /// <summary>
-        /// 预处理器列表
+        /// Asset处理器全局数据
         /// </summary>
-        [Header("预处理器列表")]
-        public List<BaseProcessor> PreProcessorList;
+        [Serializable]
+        public class ProcessorGlobalData
+        {
+            /// <summary>
+            /// 处理器设置列表
+            /// </summary>
+            public List<BaseProcessor> ProcessorList = new List<BaseProcessor>();
+
+            /// <summary>
+            /// 处理器选择列表(只使用第一个)
+            /// </summary>
+            [NonSerialized]
+            public List<BaseProcessor> ProcessorChosenList = new List<BaseProcessor>(1) { null };
+        }
 
         /// <summary>
-        /// 后处理器列表
+        /// 预处理器数据
         /// </summary>
-        [Header("后处理器列表")]
-        public List<BaseProcessor> PostProcessorList;
+        [Header("预处理器数据")]
+        public ProcessorGlobalData PreProcessorData = new ProcessorGlobalData();
 
         /// <summary>
-        /// 移动处理器列表
+        /// 后处理器数据
         /// </summary>
-        [Header("移动处理器列表")]
-        public List<BaseProcessor> MovedProcessorList;
+        [Header("后处理器数据")]
+        public ProcessorGlobalData PostProcessorData = new ProcessorGlobalData();
 
         /// <summary>
-        /// 删除处理器列表
+        /// 移动处理器数据
         /// </summary>
-        [Header("删除处理器列表")]
-        public List<BaseProcessor> DeletedProcessorList;
+        [Header("移动处理器数据")]
+        public ProcessorGlobalData MovedProcessorData = new ProcessorGlobalData();
 
         /// <summary>
-        /// 预处理器选择列表(只使用第一个)
+        /// 删除处理器数据
         /// </summary>
-        [NonSerialized]
-        public List<BaseProcessor> PreProcessorChosenList = new List<BaseProcessor>(1) { null };
-
-        /// <summary>
-        /// 后处理器选择列表(只使用第一个)
-        /// </summary>
-        [NonSerialized]
-        public List<BaseProcessor> PostProcessorChosenList = new List<BaseProcessor>(1) { null };
-
-        /// <summary>
-        /// 移动处理器选择列表(只使用第一个)
-        /// </summary>
-        [NonSerialized]
-        public List<BaseProcessor> MovedProcessorChosenList = new List<BaseProcessor>(1) { null };
-
-        /// <summary>
-        /// 删除处理器选择列表(只使用第一个)
-        /// </summary>
-        [NonSerialized]
-        public List<BaseProcessor> DeletedProcessorChosenList = new List<BaseProcessor>(1) { null };
+        [Header("删除处理器数据")]
+        public ProcessorGlobalData DeletedProcessorData = new ProcessorGlobalData();
     }
 }

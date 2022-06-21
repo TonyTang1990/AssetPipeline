@@ -101,6 +101,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 保存所有数据
+        /// </summary>
+        public void SaveAllDatas()
+        {
+            AssetPipelinePanel.SaveData();
+            AssetProcessorPanel.SaveData();
+            AssetCheckPanel.SaveData();
+            Debug.Log($"保存所有Asset管线数据完成!");
+        }
+
+        /// <summary>
         /// 窗口绘制
         /// </summary>
         private void OnGUI()

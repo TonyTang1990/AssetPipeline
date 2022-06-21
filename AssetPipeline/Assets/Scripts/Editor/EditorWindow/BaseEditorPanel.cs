@@ -95,7 +95,7 @@ public abstract class BaseEditorPanel
     /// </summary>
     public virtual void InitData()
     {
-        Debug.Log($"PanelName:{PanelName} InitData()");
+
     }
 
     /// <summary>
@@ -103,7 +103,7 @@ public abstract class BaseEditorPanel
     /// </summary>
     public virtual void SaveData()
     {
-        Debug.Log($"PanelName:{PanelName} SaveData()");
+
     }
 
     /// <summary>
