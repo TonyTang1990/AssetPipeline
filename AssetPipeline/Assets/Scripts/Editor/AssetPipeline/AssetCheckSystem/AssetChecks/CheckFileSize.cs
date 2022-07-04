@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -37,6 +38,24 @@ namespace TAssetPipeline
             {
                 return AssetType.Object;
             }
+        }
+
+        /// <summary>
+        /// 执行检查器处理
+        /// </summary>
+        /// <param name="assetPostProcessor"></param>
+        protected override bool DoCheck(AssetPostprocessor assetPostProcessor)
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// 执行指定路径的检查器处理
+        /// </summary>
+        /// <param name="assetPath"></param>
+        protected override bool DoCheckByPath(string assetPath)
+        {
+            return true;
         }
     }
 }

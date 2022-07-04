@@ -531,13 +531,17 @@ namespace TAssetPipeline
                     }
                     else
                     {
-                        var relativePath = PathUtilities.GetAssetsRelativeFolderPath(processorLocalData.FolderPath);
+                        var newFolderPath = $"{processorLocalData.FolderPath}/";
+                        var relativePath = PathUtilities.GetAssetsRelativeFolderPath(newFolderPath);
                         if (string.IsNullOrEmpty(relativePath))
                         {
                             Debug.LogError($"选择的目录:{processorLocalData.FolderPath}不在Asset目录下，设置目录失败!");
                             processorLocalData.FolderPath = preFolderPath;
                         }
-                        processorLocalData.FolderPath = relativePath;
+                        else
+                        {
+                            processorLocalData.FolderPath = relativePath;
+                        }
                     }
                 }
                 EditorGUILayout.EndHorizontal();

@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 
@@ -50,5 +51,69 @@ namespace TAssetPipeline
                 return this.name;
             }
         }
+
+        /// <summary>
+        /// 是否是目标处理Asset类型
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <returns></returns>
+        protected bool IsValideAssetType(AssetType assetType)
+        {
+            return TargetAssetType == assetType;
+        }
+
+        /// <summary>
+        /// 指定Asset路径是否是目标处理Asset类型
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        protected bool IsValideAssetByPath(string assetPath)
+        {
+            var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
+            if (!IsValideAssetType(assetType))
+            {
+                Debug.LogError($"检查器:{Name}不支持的Asset类型:{assetType},Asset:{assetPath}不应该进入这里!");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 执行检查器检查
+        /// </summary>
+        /// <param name="assetPostProcessor"></param>
+        public bool ExecuteCheck(AssetPostprocessor assetPostProcessor)
+        {
+            if (!IsValideAssetByPath(assetPostProcessor.assetPath))
+            {
+                return false;
+            }
+            return DoCheck(assetPostProcessor);
+        }
+
+        /// <summary>
+        /// 执行指定Asset路径检查器检查
+        /// </summary>
+        /// <param name="assetPath"></param>
+        public bool ExecuteCheckByPath(string assetPath)
+        {
+            if (!IsValideAssetByPath(assetPath))
+            {
+                return false;
+            }
+            return DoCheckByPath(assetPath);
+        }
+
+        /// <summary>
+        /// 执行检查器处理(子类重写实现自定义检查器)
+        /// </summary>
+        /// <param name="assetPostProcessor"></param>
+        protected abstract bool DoCheck(AssetPostprocessor assetPostProcessor);
+
+        /// <summary>
+        /// 执行指定路径的检查器处理(子类重写实现自定义检查器)
+        /// </summary>
+        /// <param name="assetPath"></param>
+        protected abstract bool DoCheckByPath(string assetPath);
     }
 }

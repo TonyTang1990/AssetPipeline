@@ -89,7 +89,7 @@ namespace TAssetPipeline
         /// </summary>
         public static void Init()
         {
-            Debug.Log($"AssetProcessorSystem :Init()");
+            Debug.Log($"Asset处理器系统初始化".WithColor(Color.red));
             MakeSureProcessorSaveFolderExit();
             MakeSureStrategyFolderExist();
             var activeStrategyName = AssetPipelineSystem.GetActiveTargetStrategyName();
@@ -291,6 +291,26 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 获取指定Asset处理器Map里的指定Asset类型的处理器列表
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <param name="processorMap"></param>
+        /// <returns></returns>
+        private static List<BaseProcessor> GetProcessorListByAssetType(AssetType assetType, Dictionary<AssetType, List<BaseProcessor>> processorMap)
+        {
+            if(processorMap == null)
+            {
+                return null;
+            }
+            List<BaseProcessor> processorList;
+            if(!processorMap.TryGetValue(assetType, out processorList))
+            {
+                return null;
+            }
+            return processorList;
+        }
+
+        /// <summary>
         /// 获取自定义Asset处理器存储相对路径
         /// </summary>
         /// <returns></returns>
@@ -377,5 +397,112 @@ namespace TAssetPipeline
             }
             return localData;
         }
+
+        #region Asset管线处理器处理部分
+        // 处理器触发规则:
+        // 1. 优先全局配置
+        // 2. 后触发局部配置
+        // 3. 局部配置由外到内触发所有满足条件处理器
+
+        /// <summary>
+        /// 预处理指定Asset类型
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <param name="assetPostProcessor"></param>
+        public static void OnPreprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
+        {
+            ExecuteGlobalProcessorMapByAssetType(GlobalPreProcessorMap, assetType, assetPostProcessor);
+            ExecuteLocalProcessorMapByAssetType(LocalPreProcessorMap, assetType, assetPostProcessor);
+        }
+
+        /// <summary>
+        /// 后处理导入指定Asset类型
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <param name="assetPostProcessor"></param>
+        public static void OnPostprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
+        {
+            ExecuteGlobalProcessorMapByAssetType(GlobalPostProcessorMap, assetType, assetPostProcessor);
+            ExecuteLocalProcessorMapByAssetType(LocalPostProcessorMap, assetType, assetPostProcessor);
+        }
+
+        /// <summary>
+        /// 后处理导入指定Asset路径
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <param name="assetPath"></param>
+        public static void OnPostprocessByAssetPath(AssetType assetType, string assetPath)
+        {
+            ExecuteGlobalProcessorMapByAssetPath(GlobalPostProcessorMap, assetPath);
+            ExecuteLocalProcessorMapByAssetPath(LocalPostProcessorMap, assetPath);
+        }
+
+        /// <summary>
+        /// 后处理删除指定Asset路径
+        /// </summary>
+        /// <param name="assetPath"></param>
+        public static void OnPostprocessDeletedByAssetPath(string assetPath)
+        {
+            ExecuteGlobalProcessorMapByAssetPath(GlobalDeletedProcessorMap, assetPath);
+            ExecuteLocalProcessorMapByAssetPath(LocalDeletedProcessorMap, assetPath);
+        }
+
+        /// <summary>
+        /// 执行指定全局处理器Map指定Asset类型的处理器
+        /// </summary>
+        /// <param name="processorMap"></param>
+        /// <param name="assetType"></param>
+        /// <param name="assetPostProcessor"></param>
+        private static void ExecuteGlobalProcessorMapByAssetType(Dictionary<AssetType, List<BaseProcessor>> processorMap, AssetType assetType, AssetPostprocessor assetPostProcessor)
+        {
+            var processorList = GetProcessorListByAssetType(assetType, processorMap);
+            if (processorList != null)
+            {
+                foreach (var processor in processorList)
+                {
+                    processor.ExecuteProcessor(assetPostProcessor);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 执行指定全局处理器Map指定Asset路径的处理器
+        /// </summary>
+        /// <param name="processorMap"></param>
+        /// <param name="assetPath"></param>
+        private static void ExecuteGlobalProcessorMapByAssetPath(Dictionary<AssetType, List<BaseProcessor>> processorMap, string assetPath)
+        {
+            var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
+            var processorList = GetProcessorListByAssetType(assetType, processorMap);
+            if (processorList != null)
+            {
+                foreach (var processor in processorList)
+                {
+                    processor.ExecuteProcessorByPath(assetPath);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 执行指定局部处理器Map指定Asset类型的处理器
+        /// </summary>
+        /// <param name="localProcessorMap"></param>
+        /// <param name="assetType"></param>
+        /// <param name="assetPostProcessor"></param>
+        private static void ExecuteLocalProcessorMapByAssetType(Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap, AssetType assetType, AssetPostprocessor assetPostProcessor)
+        {
+
+        }
+
+        /// <summary>
+        /// 执行指定局部处理器Map指定Asset路径的处理器
+        /// </summary>
+        /// <param name="localProcessorMap"></param>
+        /// <param name="assetPath"></param>
+        private static void ExecuteLocalProcessorMapByAssetPath(Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap, string assetPath)
+        {
+            var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
+        }
+        #endregion
     }
 }

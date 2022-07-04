@@ -21,41 +21,46 @@ namespace TAssetPipeline
         /// <summary>
         /// 预处理所有Asset
         /// </summary>
-        private static void OnPreprocessAsset()
+        private void OnPreprocessAsset()
         {
-            Debug.Log($"AssetPipeline:OnPreprocessAsset()");
+            AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAsset()");
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.Object, this);
         }
 
         /// <summary>
         /// 预处理Asset
         /// </summary>
-        private static void OnPreprocessAnimation()
+        private void OnPreprocessAnimation()
         {
-            Debug.Log($"AssetPipeline:OnPreprocessAnimation()");
+            AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAnimation()");
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.AnimationClip, this);
         }
 
         /// <summary>
         /// 预处理音效Asset
         /// </summary>
-        private static void OnPreprocessAudio()
+        private void OnPreprocessAudio()
         {
-            Debug.Log($"AssetPipeline:OnPreprocessAudio()");
+            AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAudio()");
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.AudioClip, this);
         }
 
         /// <summary>
         /// 预处理模型Asset
         /// </summary>
-        private static void OnPreprocessModel()
+        private void OnPreprocessModel()
         {
-            Debug.Log($"AssetPipeline:OnPreprocessModel()");
+            AssetPipelineLog.Log($"AssetPipeline:OnPreprocessModel()");
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.FBX, this);
         }
 
         /// <summary>
         /// 预处理纹理Asset
         /// </summary>
-        private static void OnPreprocessTexture()
+        private void OnPreprocessTexture()
         {
-            Debug.Log($"AssetPipeline:OnPreprocessTexture()");
+            AssetPipelineLog.Log($"AssetPipeline:OnPreprocessTexture()");
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.Texture, this);
         }
 
         /// <summary>
@@ -67,21 +72,8 @@ namespace TAssetPipeline
         /// <param name="movedFromAssetPaths"></param>
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessAllAssets()");
-            foreach (string str in importedAssets)
-            {
-                Debug.Log("Reimported Asset: " + str);
-            }
-            foreach (string str in deletedAssets)
-            {
-                Debug.Log("Deleted Asset: " + str);
-            }
-
-            for (int i = 0; i < movedAssets.Length; i++)
-            {
-                Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
-            }
-
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAllAssets()");
+            AssetPipelineSystem.OnPostprocessAllAssets(importedAssets, deletedAssets, movedAssets, movedFromAssetPaths);
         }
 
         /// <summary>
@@ -89,54 +81,60 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="">go</param>
         /// <param name="">clip</param>
-        private static void OnPostprocessAnimation(GameObject go, AnimationClip animClip)
+        private void OnPostprocessAnimation(GameObject go, AnimationClip animClip)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessAnimation({go.name}, {animClip.name})");
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAnimation({go.name}, {animClip.name})");
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.AnimationClip, this);
         }
 
         /// <summary>
         /// 后处理模型
         /// </summary>
         /// <param name="go"></param>
-        private static void OnPostprocessModel(GameObject go)
+        private void OnPostprocessModel(GameObject go)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessModel({go.name})");
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessModel({go.name})");
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.FBX, this);
         }
 
         /// <summary>
         /// 后处理材质
         /// </summary>
         /// <param name="mat"></param>
-        private static void OnPostprocessMaterial(Material mat)
+        private void OnPostprocessMaterial(Material mat)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessMaterial({mat.name})");
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessMaterial({mat.name})");
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.Material, this);
         }
 
         /// <summary>
         /// 后处理预制件
         /// </summary>
         /// <param name="root"></param>
-        private static void OnPostprocessPrefab(GameObject root)
+        private void OnPostprocessPrefab(GameObject root)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessPrefab({root.name})");
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessPrefab({root.name})");
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.Prefab, this);
         }
 
         /// <summary>
         /// 后处理纹理
         /// </summary>
         /// <param name="texture"></param>
-        private static void OnPostprocessTexture(Texture2D texture)
+        private void OnPostprocessTexture(Texture2D texture)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessTexture({texture.name})");
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessTexture({texture.name})");
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.Texture, this);
         }
 
         /// <summary>
         /// 后处理音效
         /// </summary>
         /// <param name="audioClip"></param>
-        private static void OnPostprocessAudio(AudioClip audioClip)
+        private void OnPostprocessAudio(AudioClip audioClip)
         {
-            Debug.Log($"AssetPipeline:OnPostprocessAudio({audioClip.name})");
+            AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAudio({audioClip.name})");
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.AudioClip, this);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace TAssetPipeline
         /// <summary>
         /// 全局Asset检查器子页签名字
         /// </summary>
-        private string[] mGlobalSubTagNames = new string[2] { "预处理器", "后处理器" };
+        private string[] mGlobalSubTagNames = new string[2] { "预检查器", "后检查器" };
 
         /// <summary>
         /// 全局当前选择子页签索引
@@ -49,7 +49,7 @@ namespace TAssetPipeline
         /// <summary>
         /// 局部Asset检查器子页签名字
         /// </summary>
-        private string[] mLocalSubTagNames = new string[2] { "预处理器", "后处理器" };
+        private string[] mLocalSubTagNames = new string[2] { "预检查器", "后检查器" };
 
         /// <summary>
         /// 局部当前选择子页签索引

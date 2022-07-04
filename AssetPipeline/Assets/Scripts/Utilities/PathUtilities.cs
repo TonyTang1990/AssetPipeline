@@ -65,17 +65,6 @@ public static class PathUtilities
     }
 
     /// <summary>
-    /// 是否属于Asset目录
-    /// </summary>
-    /// <param name="path">相对Asset路径</param>
-    /// <returns></returns>
-    public static bool IsUnderAssetPath(string path)
-    {
-        var regularPath = GetRegularPath(path);
-        return regularPath.StartsWith("Assets");
-    }
-
-    /// <summary>
     /// 获取指定Asset路径的全路径
     /// </summary>
     /// <param name="assetpath">Asset相对路径</param>

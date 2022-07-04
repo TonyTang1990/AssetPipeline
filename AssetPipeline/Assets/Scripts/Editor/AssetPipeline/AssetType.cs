@@ -32,5 +32,7 @@ namespace TAssetPipeline
         AnimationClip,          // 动画文件
         Mesh,                   // Mesh文件
         Script,                 // 脚本(e.g. cs, dll等)
+        Folder,                 // 文件夹
+        Other,                  // 其他
     }
 }

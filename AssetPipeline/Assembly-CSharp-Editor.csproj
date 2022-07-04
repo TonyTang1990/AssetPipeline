@@ -94,6 +94,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\TightSet.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AlphaFromSourceSet.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\MipmapSet.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineLog.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: AssetPipelineSettingData
   m_EditorClassIdentifier: 
   ResourceFolder: G:\Projects\GitHubProjects\AssetPipeline\AssetPipeline\Assets
+  Switch: 1
+  LogSwitch: 1
   StrategyList:
   - Default
   PlatformStrategyDataList:

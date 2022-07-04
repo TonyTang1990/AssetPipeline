@@ -50,6 +50,18 @@ namespace TAssetPipeline
         public string ResourceFolder;
 
         /// <summary>
+        /// Asset管线开关
+        /// </summary>
+        [Header("Asset管线开关")]
+        public bool Switch = true;
+
+        /// <summary>
+        /// Asset管线Log开关
+        /// </summary>
+        [Header("Asset管线Log开关")]
+        public bool LogSwitch = true; 
+
+        /// <summary>
         /// 可配置策略列表
         /// </summary>
         [Header("可配置策略列表")]

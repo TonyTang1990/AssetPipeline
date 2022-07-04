@@ -51,7 +51,7 @@ namespace TAssetPipeline
         /// <summary>
         /// 存储相对路径(相对Application.dataPath)
         /// </summary>
-        private const string SAVE_FOLDER_RELATIVE_PATH = "Assets/Editor/AssetPipeline";
+        private const string SAVE_FOLDER_RELATIVE_PATH = "Assets/Editor/AssetPipeline/Config";
 
         /// <summary>
         /// Asset管线数据文件名
@@ -63,20 +63,59 @@ namespace TAssetPipeline
         /// </summary>
         private static AssetPipelineSettingData SettingData;
 
+        /// <summary>
+        /// Asset管线开关
+        /// </summary>
+        public static bool Switch
+        {
+            get
+            {
+                return SettingData.Switch;
+            }
+        }
+
+        /// <summary>
+        /// Asset黑名单Map<Asset路径, 是否在黑名单>
+        /// </summary>
+        private static Dictionary<string, bool> BlackListAssetPathMap = new Dictionary<string, bool>
+        {
+            { GetSettingDataRelativePath(), true },
+        };
+
         // 存储目录结构展示:
         // -- Assets
         //    -- Editor
         //        -- AssetPipeline(AssetPipeline存储根目录)
-        //            -- AssetPipelineSettingData.asset(Asset管线设置数据)
-        //            -- Strategy(配置对应平台策略名)
-        //                -- AssetProcessor(策略Asset处理器数据保存目录)
-        //                    -- AssetProcessorGlobalData.asset(策略Asset处理器全局数据)
-        //                    -- AssetProcessorLocalData.asset(策略Asset处理器局部数据)
-        //                -- AssetCheck(策略Asset检查器数据保存目录)
-        //                    -- AssetCheckGlobalData.asset(策略Asset检查器全局数据)
-        //                    -- AssetCheckLocalData.asset(策略Asset检查器局部数据)
-        //            -- AssetProcessors(自定处理器ScriptableObject数据)
-        //            -- AssetChecks(自定检查器ScriptableObject数据)
+        //            -- Config
+        //                -- AssetPipelineSettingData.asset(Asset管线设置数据)
+        //                -- Strategy(配置对应平台策略名)
+        //                    -- AssetProcessor(策略Asset处理器数据保存目录)
+        //                        -- AssetProcessorGlobalData.asset(策略Asset处理器全局数据)
+        //                        -- AssetProcessorLocalData.asset(策略Asset处理器局部数据)
+        //                    -- AssetCheck(策略Asset检查器数据保存目录)
+        //                        -- AssetCheckGlobalData.asset(策略Asset检查器全局数据)
+        //                        -- AssetCheckLocalData.asset(策略Asset检查器局部数据)
+        //                -- AssetProcessors(自定处理器ScriptableObject数据)
+        //                -- AssetChecks(自定检查器ScriptableObject数据)
+
+        // Asset管线流程:
+        // 1. Asset管线初始化(Unity启动时)
+        // 2. 初始化Asset管线系统(Asset处理器系统和Asset检查系统)
+        // 3. Asset导入,移动或删除等操作
+        // 4. 触发Asset导入全局预检查(先触发Object类型,后触发非Obejct类型)
+        // 5. 触发Asset导入局部预检查(先触发Object类型,后触发非Obejct类型)
+        // 6. 触发Asset导入全局预处理(先触发Object类型,后触发非Obejct类型)
+        // 7. 触发Asset导入局部预处理(先触发Object类型,后触发非Obejct类型)
+        // 8. 触发Asset导入全局后处理(先触发非Object类型,后触发Object类型)
+        // 9. 触发Asset导入局部后处理(先触发非Object类型,后触发Object类型)
+        // 10. 触发Asset导入全局后检查(先触发Object类型,后触发非Obejct类型)
+        // 11. 触发Asset导入局部后检查(先触发Object类型,后触发非Obejct类型)
+
+        // Note:
+        // 1. Asset管线默认不支持处理脚本Asset
+        // 2. Asset管线先执行全局后局部,局部Asset处理由外到内执行(覆盖关系)
+        // 3. Asset管线移动Asset当做重新导入Asset处理，确保Asset移动后得到正确的Asset管线处理
+        // 4. Asset管线不满足条件的不会触发(比如: 1. 不在目标资源目录下 2. 是脚本Asset 3. 在黑名单列表里)
 
         static AssetPipelineSystem()
         {
@@ -87,11 +126,17 @@ namespace TAssetPipeline
         /// <summary>
         /// 初始化
         /// </summary>
-        private static void Init()
+        public static void Init()
         {
-            Debug.Log($"AssetPipelineSystem:Init()");
+            Debug.Log($"Asset管线系统初始化".WithColor(Color.red));
             MakeSureSaveFolderExist();
             SettingData = LoadSettingData();
+            var activeTarget = EditorUserBuildSettings.activeBuildTarget;
+            var strategyName = GetActiveTargetStrategyName();
+            Debug.Log($"Asset管线开关:{SettingData.Switch}".WithColor(Color.red));
+            Debug.Log($"Asset管线Log开关:{SettingData.LogSwitch}".WithColor(Color.red));
+            Debug.Log($"加载当前激活平台:{activeTarget}的Asset管线策略:{strategyName}".WithColor(Color.red));
+            AssetPipelineLog.Switch = SettingData.LogSwitch;
             MakeActiveTargetStrategyFolderExist();
             AssetProcessorSystem.Init();
             AssetCheckSystem.Init();
@@ -121,7 +166,8 @@ namespace TAssetPipeline
             {
                 return assetType;
             }
-            Debug.LogError($"找不到后缀:{postFix}的Asset类型!");
+            // 找不到默认当做Object类型处理
+            Debug.LogWarning($"找不到后缀:{postFix}的Asset类型!");
             return AssetType.None;
         }
 
@@ -189,6 +235,58 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 指定Asset相对路径是否有效
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        private static bool IsValideByAssetPath(string assetPath)
+        {
+            if(string.IsNullOrEmpty(assetPath))
+            {
+                return false;
+            }
+            if(!IsUnderResoruceFolder(assetPath))
+            {
+                return false;
+            }
+            var assetType = GetAssetTypeByPath(assetPath);
+            if(assetType == AssetType.Script)
+            {
+                return false;
+            }
+            if(IsAssetPathInBlackList(assetPath))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 指定Asset相对路径是否在黑名单列表
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        private static bool IsAssetPathInBlackList(string assetPath)
+        {
+            bool result;
+            if (!BlackListAssetPathMap.TryGetValue(assetPath, out result))
+            {
+                return false;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// 指定Asset路径是否在目标资源目录下
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        private static bool IsUnderResoruceFolder(string assetPath)
+        {
+            return assetPath.StartsWith(SettingData.ResourceFolder);
+        }
+
+        /// <summary>
         /// 获取当前激活平台配置策略名
         /// </summary>
         /// <returns></returns>
@@ -220,5 +318,93 @@ namespace TAssetPipeline
             var strategyFolderFullPath = Path.GetFullPath(strategyFolderRelativePath);
             FolderUtilities.CheckAndCreateSpecificFolder(strategyFolderFullPath);
         }
-    }
+
+        #region Asset管线流程
+        /// <summary>
+        /// 指定Asset类型预处理
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <param name="assetPostProcessor"></param>
+        public static void OnPreprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
+        {
+            AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
+            if(!IsValideByAssetPath(assetPostProcessor.assetPath))
+            {
+                // 预处理先执行Asset检查系统，后执行Asset处理系统
+                AssetCheckSystem.OnPreCheckByAssetType(assetType, assetPostProcessor);
+                AssetProcessorSystem.OnPreprocessByAssetType(assetType, assetPostProcessor);
+            }
+        }
+
+        /// <summary>
+        /// 后处理所有Asset
+        /// </summary>
+        /// <param name="importedAssets"></param>
+        /// <param name="deletedAssets"></param>
+        /// <param name="movedAssets"></param>
+        /// <param name="movedFromAssetPaths"></param>
+        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        {
+            AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessAllAssets()");
+            for (int i = 0, length = importedAssets.Length; i < length; i++)
+            {
+                AssetPipelineLog.Log("Imported Asset: " + importedAssets[i]);
+                if(Switch)
+                {
+                    if (!IsValideByAssetPath(importedAssets[i]))
+                    {
+                        // 后处理先执行Asset处理系统，后执行Asset检查系统
+                        // 导入后统一当做Object类型触发，其他专有类型由对应后处理接口触发
+                        // TODO: 未来支持后处理接口没有的类型在这里扩展
+                        AssetProcessorSystem.OnPostprocessByAssetPath(AssetType.Object, importedAssets[i]);
+                        AssetCheckSystem.OnPostCheckByAssetPath(AssetType.Object, importedAssets[i]);
+                    }
+                }
+            }
+
+            for(int i = 0, length = deletedAssets.Length; i < length; i++)
+            {
+                AssetPipelineLog.Log("Deleted Asset: " + deletedAssets[i]);
+                if(Switch)
+                {
+                    if (!IsValideByAssetPath(deletedAssets[i]))
+                    {
+                        // 删除后统根据Asset路径对应类型来触发
+                        AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAssets[i]);
+                    }
+                }
+            }
+
+            for (int i = 0, length = movedAssets.Length; i < length; i++)
+            {
+                AssetPipelineLog.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
+                if(Switch)
+                {
+                    if (!IsValideByAssetPath(movedAssets[i]))
+                    {
+                        // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
+                        AssetDatabase.ImportAsset(movedAssets[i]);
+                    }
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 后处理动画
+        /// </summary>
+        /// <param name="">assetType</param>
+        /// <param name="">assetPostProcessor</param>
+        public static void OnPostprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
+        {
+            AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessByAssetType({assetType})");
+            if (!IsValideByAssetPath(assetPostProcessor.assetPath))
+            {
+                // 后处理先执行Asset处理系统，后执行Asset检查系统
+                AssetProcessorSystem.OnPostprocessByAssetType(assetType, assetPostProcessor);
+                AssetCheckSystem.OnPostCheckByAssetType(assetType, assetPostProcessor);
+            }
+        }
+            #endregion
+        }
 }
