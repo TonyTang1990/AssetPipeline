@@ -328,7 +328,7 @@ namespace TAssetPipeline
         public static void OnPreprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
-            if(!IsValideByAssetPath(assetPostProcessor.assetPath))
+            if(IsValideByAssetPath(assetPostProcessor.assetPath))
             {
                 // 预处理先执行Asset检查系统，后执行Asset处理系统
                 AssetCheckSystem.OnPreCheckByAssetType(assetType, assetPostProcessor);
@@ -351,7 +351,7 @@ namespace TAssetPipeline
                 AssetPipelineLog.Log("Imported Asset: " + importedAssets[i]);
                 if(Switch)
                 {
-                    if (!IsValideByAssetPath(importedAssets[i]))
+                    if (IsValideByAssetPath(importedAssets[i]))
                     {
                         // 后处理先执行Asset处理系统，后执行Asset检查系统
                         // 导入后统一当做Object类型触发，其他专有类型由对应后处理接口触发
@@ -367,7 +367,7 @@ namespace TAssetPipeline
                 AssetPipelineLog.Log("Deleted Asset: " + deletedAssets[i]);
                 if(Switch)
                 {
-                    if (!IsValideByAssetPath(deletedAssets[i]))
+                    if (IsValideByAssetPath(deletedAssets[i]))
                     {
                         // 删除后统根据Asset路径对应类型来触发
                         AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAssets[i]);
@@ -380,7 +380,7 @@ namespace TAssetPipeline
                 AssetPipelineLog.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
                 if(Switch)
                 {
-                    if (!IsValideByAssetPath(movedAssets[i]))
+                    if (IsValideByAssetPath(movedAssets[i]))
                     {
                         // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
                         AssetDatabase.ImportAsset(movedAssets[i]);
@@ -398,7 +398,7 @@ namespace TAssetPipeline
         public static void OnPostprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessByAssetType({assetType})");
-            if (!IsValideByAssetPath(assetPostProcessor.assetPath))
+            if (IsValideByAssetPath(assetPostProcessor.assetPath))
             {
                 // 后处理先执行Asset处理系统，后执行Asset检查系统
                 AssetProcessorSystem.OnPostprocessByAssetType(assetType, assetPostProcessor);

@@ -230,7 +230,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static Dictionary<string ,Dictionary<AssetType, List<BaseProcessor>>> GetLocalPreProcessorMap()
         {
-            return GetLocalProcessorMap(LocalData.PreProcessorDataList);
+            return GetLocalProcessorMap(LocalData.PreProcessorDataList, "预");
         }
 
         /// <summary>
@@ -239,7 +239,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalPostProcessorMap()
         {
-            return GetLocalProcessorMap(LocalData.PostProcessorDataList);
+            return GetLocalProcessorMap(LocalData.PostProcessorDataList, "后");
         }
 
         /// <summary>
@@ -264,8 +264,9 @@ namespace TAssetPipeline
         /// 获取局部指定处理器的Map<目标目录, </目标目录>目标Asset类型, 处理器列表>>
         /// </summary>
         /// <param name="processorList"></param>
+        /// <param name="tip"></param>
         /// <returns></returns>
-        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalProcessorMap(List<ProcessorLocalData> processorLocalDataList)
+        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalProcessorMap(List<ProcessorLocalData> processorLocalDataList, string tip = "")
         {
             Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap = new Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>>();
             foreach (var processorLocalData in processorLocalDataList)
@@ -285,6 +286,7 @@ namespace TAssetPipeline
                         assetTypeProcessorMap.Add(processor.TargetAssetType, assetTypeProcessorList);
                     }
                     assetTypeProcessorList.Add(processor);
+                    AssetPipelineLog.Log($"添加局部{tip}处理器:{processor.Name}!".WithColor(Color.yellow));
                 }
             }
             return localProcessorMap;

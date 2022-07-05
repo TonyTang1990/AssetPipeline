@@ -507,7 +507,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginVertical("box");
             if (string.IsNullOrEmpty(processorLocalData.FolderPath))
             {
-                processorLocalData.FolderPath = "Assets";
+                processorLocalData.FolderPath = "Assets/";
             }
             EditorGUILayout.BeginHorizontal();
             processorLocalData.IsUnFold = EditorGUILayout.Foldout(processorLocalData.IsUnFold, processorLocalData.FolderPath, true);
