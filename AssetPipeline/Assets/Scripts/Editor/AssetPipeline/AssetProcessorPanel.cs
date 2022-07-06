@@ -34,7 +34,7 @@ namespace TAssetPipeline
         /// </summary>
         public enum AssetProcessorGlobalTag
         {
-            PreProcesser = 0,           // 预处理器
+            PreProcessor = 0,           // 预处理器
             PostProcessor,              // 后处理器
             MovedProcessor,             // 移动处理器
             DeletedProcessor,           // 删除处理器
@@ -45,7 +45,7 @@ namespace TAssetPipeline
         /// </summary>
         public enum AssetProcessorLocalTag
         {
-            PreProcesser = 0,           // 预处理器
+            PreProcessor = 0,           // 预处理器
             PostProcessor,              // 后处理器
             MovedProcessor,             // 移动处理器
             DeletedProcessor,           // 删除处理器
@@ -227,11 +227,19 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 绘制全局Asset处理器页签区域
+        /// </summary>
+        private void DrawGlobalTagArea()
+        {
+            mGlobalSelectedSubTagIndex = GUILayout.SelectionGrid(mGlobalSelectedSubTagIndex, mGlobalSubTagNames, mGlobalSubTagNames.Length);
+        }
+
+        /// <summary>
         /// 绘制全局Asset处理器内容区域
         /// </summary>
         private void DrawGlobalProcessorContentArea()
         {
-            if (mGlobalSelectedSubTagIndex == (int)AssetProcessorGlobalTag.PreProcesser)
+            if (mGlobalSelectedSubTagIndex == (int)AssetProcessorGlobalTag.PreProcessor)
             {
                 DrawGlobalPreProcessorArea();
             }
@@ -282,14 +290,6 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 绘制全局Asset处理器页签区域
-        /// </summary>
-        private void DrawGlobalTagArea()
-        {
-            mGlobalSelectedSubTagIndex = GUILayout.SelectionGrid(mGlobalSelectedSubTagIndex, mGlobalSubTagNames, mGlobalSubTagNames.Length);
-        }
-
-        /// <summary>
         /// 绘制局部Asset处理器区域
         /// </summary>
         private void DrawLocalAssetProcessorArea()
@@ -311,7 +311,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalProcessorContentArea()
         {
-            if (mLocalSelectedSubTagIndex == (int)AssetProcessorLocalTag.PreProcesser)
+            if (mLocalSelectedSubTagIndex == (int)AssetProcessorLocalTag.PreProcessor)
             {
                 DrawLocalPreProcessorArea();
             }
@@ -376,16 +376,15 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 绘制处理器标题区域
+        /// 绘制预览处理器标题区域
         /// </summary>
-        private void DrawProcessorTitleArea()
+        private void DrawPreviewProcessorTitleArea()
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
-            EditorGUILayout.LabelField("操作", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -422,12 +421,27 @@ namespace TAssetPipeline
                     else
                     {
                         processorList.Add(chosenList[0]);
+                        processorList.Sort(SortProcessor);
                         Debug.Log($"添加处理器;{chosenList[0].Name}成功!");
                     }
                 }
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制处理器标题区域
+        /// </summary>
+        private void DrawProcessorTitleArea()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField("操作", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -447,19 +461,6 @@ namespace TAssetPipeline
             {
                 processorsList.RemoveAt(index);
             }
-            EditorGUILayout.EndHorizontal();
-        }
-
-        /// <summary>
-        /// 绘制预览处理器标题区域
-        /// </summary>
-        private void DrawPreviewProcessorTitleArea()
-        {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -488,10 +489,15 @@ namespace TAssetPipeline
             {
                 DrawOneLocalProcessorsByIndex(processorLocalDataList, i);
             }
-            if (GUILayout.Button("+", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
                 processorLocalDataList.Add(new ProcessorLocalData());
+                processorLocalDataList.Sort(SortLocalProcesorData);
                 Debug.Log($"添加局部处理器数据成功!");
+            }
+            if (GUILayout.Button("折叠所有", GUILayout.ExpandWidth(true)))
+            {
+                FoldAllLocalProcessorData(processorLocalDataList);
             }
             EditorGUILayout.EndVertical();
         }
@@ -523,31 +529,78 @@ namespace TAssetPipeline
                 EditorGUILayout.TextField(processorLocalData.FolderPath, GUILayout.ExpandWidth(true));
                 if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
                 {
-                    var preFolderPath = processorLocalData.FolderPath;
-                    processorLocalData.FolderPath = EditorUtility.OpenFolderPanel("目录路径", "请选择目录路径!", processorLocalData.FolderPath);
-                    if(string.IsNullOrEmpty(processorLocalData.FolderPath))
+                    var newFolderPath = EditorUtilities.ChoosenProjectFolder(processorLocalData.FolderPath);
+                    if(!newFolderPath.Equals(processorLocalData.FolderPath) &&
+                        !CheckFolderPathExist(processorLocalDataList, newFolderPath))
                     {
-                        processorLocalData.FolderPath = preFolderPath;
+                        processorLocalData.FolderPath = newFolderPath;
+                        processorLocalDataList.Sort(SortLocalProcesorData);
                     }
                     else
                     {
-                        var newFolderPath = $"{processorLocalData.FolderPath}/";
-                        var relativePath = PathUtilities.GetAssetsRelativeFolderPath(newFolderPath);
-                        if (string.IsNullOrEmpty(relativePath))
-                        {
-                            Debug.LogError($"选择的目录:{processorLocalData.FolderPath}不在Asset目录下，设置目录失败!");
-                            processorLocalData.FolderPath = preFolderPath;
-                        }
-                        else
-                        {
-                            processorLocalData.FolderPath = relativePath;
-                        }
+                        Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
                     }
                 }
                 EditorGUILayout.EndHorizontal();
                 DrawProcessorsArea(processorLocalData.ProcessorList, processorLocalData.ProcessorChosenList);
             }
             EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 折叠所有本地处理器数据配置
+        /// </summary>
+        /// <param name="processorLocalDataList"></param>
+        private void FoldAllLocalProcessorData(List<ProcessorLocalData> processorLocalDataList)
+        {
+            foreach(var processorLocalData in processorLocalDataList)
+            {
+                processorLocalData.IsUnFold = false;
+            }
+        }
+
+        /// <summary>
+        /// 本地处理器数据排序
+        /// </summary>
+        /// <param name="localData1"></param>
+        /// <param name="localData2"></param>
+        /// <returns></returns>
+        private int SortLocalProcesorData(ProcessorLocalData localData1, ProcessorLocalData localData2)
+        {
+            return localData1.FolderPath.CompareTo(localData2.FolderPath);
+        }
+
+        /// <summary>
+        /// 处理器排序
+        /// </summary>
+        /// <param name="processor1"></param>
+        /// <param name="processor2"></param>
+        /// <returns></returns>
+        private int SortProcessor(BaseProcessor processor1, BaseProcessor processor2)
+        {
+            return processor1.TargetAssetType.CompareTo(processor2.TargetAssetType);
+        }
+
+        /// <summary>
+        /// 检查指定局部目录配置是否已存在
+        /// </summary>
+        /// <param name="processorLocalDataList"></param>
+        /// <param name="newFolderPath"></param>
+        /// <returns></returns>
+        private bool CheckFolderPathExist(List<ProcessorLocalData> processorLocalDataList, string newFolderPath)
+        {
+            if(processorLocalDataList == null)
+            {
+                return false;
+            }
+            foreach(var processorLocalData in processorLocalDataList)
+            {
+                if(processorLocalData.FolderPath.Equals(newFolderPath))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

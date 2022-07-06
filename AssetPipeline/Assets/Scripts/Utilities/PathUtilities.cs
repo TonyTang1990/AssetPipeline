@@ -35,13 +35,23 @@ public static class PathUtilities
     }
 
     /// <summary>
-    /// 获取资源Asset相对路径
+    /// 获取项目目录全路径
+    /// </summary>
+    /// <returns></returns>
+    public static string GetProjectFullPath()
+    {
+        var dataPath = Application.dataPath;
+        return GetRegularPath(dataPath.Substring(0, dataPath.LastIndexOf("Assets")));
+    }
+
+    /// <summary>
+    /// 获取资源相对工程目录路径
     /// </summary>
     /// <param name="folderfullpath"></param>
     /// <returns></returns>
-    public static string GetAssetsRelativeFolderPath(string folderfullpath)
+    public static string GetProjectRelativeFolderPath(string folderfullpath)
     {
-        var projectpathprefix = Application.dataPath.Replace("Assets", string.Empty);
+        var projectpathprefix = GetProjectFullPath();
         if (folderfullpath.StartsWith(projectpathprefix))
         {
             var relativefolderpath = folderfullpath.Replace(projectpathprefix, string.Empty);
@@ -71,9 +81,8 @@ public static class PathUtilities
     /// <returns></returns>
     public static string GetAssetFullPath(string assetpath)
     {
-        var index = Application.dataPath.LastIndexOf("Assets");
-        var assetfullpath = Application.dataPath.Substring(0, index) + assetpath;
-        return GetRegularPath(assetfullpath);
+        var projectFullPath = GetProjectFullPath();
+        return GetRegularPath($"{projectFullPath}{assetpath}");
     }
 
     /// <summary>

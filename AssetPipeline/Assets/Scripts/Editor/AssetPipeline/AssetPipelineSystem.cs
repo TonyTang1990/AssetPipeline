@@ -108,8 +108,8 @@ namespace TAssetPipeline
         // 7. 触发Asset导入局部预处理(先触发Object类型,后触发非Obejct类型)
         // 8. 触发Asset导入全局后处理(先触发非Object类型,后触发Object类型)
         // 9. 触发Asset导入局部后处理(先触发非Object类型,后触发Object类型)
-        // 10. 触发Asset导入全局后检查(先触发Object类型,后触发非Obejct类型)
-        // 11. 触发Asset导入局部后检查(先触发Object类型,后触发非Obejct类型)
+        // 10. 触发Asset导入全局后检查(先触发非Object类型,后触发Object类型)
+        // 11. 触发Asset导入局部后检查(先触发非Object类型,后触发Object类型)
 
         // Note:
         // 1. Asset管线默认不支持处理脚本Asset
@@ -356,8 +356,8 @@ namespace TAssetPipeline
                         // 后处理先执行Asset处理系统，后执行Asset检查系统
                         // 导入后统一当做Object类型触发，其他专有类型由对应后处理接口触发
                         // TODO: 未来支持后处理接口没有的类型在这里扩展
-                        AssetProcessorSystem.OnPostprocessByAssetPath(AssetType.Object, importedAssets[i]);
-                        AssetCheckSystem.OnPostCheckByAssetPath(AssetType.Object, importedAssets[i]);
+                        AssetProcessorSystem.OnPostprocessByAssetType2(AssetType.Object, importedAssets[i]);
+                        AssetCheckSystem.OnPostCheckByAssetType2(AssetType.Object, importedAssets[i]);
                     }
                 }
             }
@@ -382,6 +382,8 @@ namespace TAssetPipeline
                 {
                     if (IsValideByAssetPath(movedAssets[i]))
                     {
+                        // 移动后统根据Asset路径对应类型来触发
+                        AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAssets[i]);
                         // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
                         AssetDatabase.ImportAsset(movedAssets[i]);
                     }
@@ -391,7 +393,7 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 后处理动画
+        /// 后处理指定Asset类型的AssetPostprocessor
         /// </summary>
         /// <param name="">assetType</param>
         /// <param name="">assetPostProcessor</param>

@@ -59,6 +59,10 @@ namespace TAssetPipeline
         /// <returns></returns>
         protected bool IsValideAssetType(AssetType assetType)
         {
+            if (TargetAssetType == AssetType.Object && assetType != AssetType.None)
+            {
+                return true;
+            }
             return TargetAssetType == assetType;
         }
 
@@ -88,6 +92,7 @@ namespace TAssetPipeline
             {
                 return false;
             }
+            AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行检查器:{Name}!".WithColor(Color.green));
             return DoCheck(assetPostProcessor);
         }
 
@@ -101,6 +106,7 @@ namespace TAssetPipeline
             {
                 return false;
             }
+            AssetPipelineLog.Log($"@Asset:{assetPath}执行检查器:{Name}!".WithColor(Color.green));
             return DoCheckByPath(assetPath);
         }
 

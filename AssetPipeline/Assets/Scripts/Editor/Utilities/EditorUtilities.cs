@@ -33,58 +33,6 @@ public static class EditorUtilities
         }
     }
 
-    #region 路径相关
-    /// <summary>
-    /// 获取项目工程路径
-    /// </summary>
-    public static string GetProjectPath()
-    {
-        string projectPath = Path.GetDirectoryName(Application.dataPath);
-        return PathUtilities.GetRegularPath(projectPath);
-    }
-
-    /// <summary>
-    /// 获取项目Asset相对路径
-    /// </summary>
-    /// <param name="fullPath"></param>
-    /// <returns></returns>
-    public static string GetAssetRelativePath(string fullPath)
-    {
-        fullPath = PathUtilities.GetRegularPath(fullPath);
-        var projectPath = GetProjectPath();
-        if(!fullPath.StartsWith(projectPath))
-        {
-            Debug.LogError($"全路径:{fullPath}没有在项目目录下:{projectPath},获取相对路径失败!");
-            return fullPath;
-        }
-        return fullPath.Substring(projectPath.Length, fullPath.Length - projectPath.Length);
-    }
-
-    /// <summary>
-    /// 清空文件夹
-    /// </summary>
-    /// <param name="folderPath">要清理的文件夹路径</param>
-    public static void ClearFolder(string directoryPath)
-    {
-        if (Directory.Exists(directoryPath) == false)
-            return;
-
-        // 删除文件
-        string[] allFiles = Directory.GetFiles(directoryPath);
-        for (int i = 0; i < allFiles.Length; i++)
-        {
-            File.Delete(allFiles[i]);
-        }
-
-        // 删除文件夹
-        string[] allFolders = Directory.GetDirectories(directoryPath);
-        for (int i = 0; i < allFolders.Length; i++)
-        {
-            Directory.Delete(allFolders[i], true);
-        }
-    }
-    #endregion
-
     #region 平台相关
     /// <summary>
     /// 平台类型和平台名映射Map
@@ -132,4 +80,29 @@ public static class EditorUtilities
         string pattern = @"^\d*$";
         return Regex.IsMatch(content, pattern);
     }
+
+    #region Editor GUI相关
+    /// <summary>
+    /// 选择一个项目目录下的目录
+    /// </summary>
+    /// <param name="originalFolderPath"></param>
+    /// <returns>返回相对工程目录并以/结尾的相对目录(e.g. Assets/)</returns>
+    public static string ChoosenProjectFolder(string originalFolderPath)
+    {
+        var preFolderPath = originalFolderPath;
+        var newFolderPath = EditorUtility.OpenFolderPanel("目录路径", "请选择目录路径!", originalFolderPath);
+        if (string.IsNullOrEmpty(newFolderPath))
+        {
+            return preFolderPath;
+        }
+        newFolderPath = $"{newFolderPath}/";
+        var relativePath = PathUtilities.GetProjectRelativeFolderPath(newFolderPath);
+        if (string.IsNullOrEmpty(relativePath))
+        {
+            Debug.LogError($"选择的目录:{newFolderPath}不在项目目录下，设置目录失败!");
+            return preFolderPath;
+        }
+        return relativePath;
+    }
+    #endregion
 }

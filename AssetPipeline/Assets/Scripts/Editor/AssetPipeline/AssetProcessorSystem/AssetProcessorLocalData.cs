@@ -27,7 +27,7 @@ namespace TAssetPipeline
             /// 目录路径
             /// </summary>
             [Header("目录路径")]
-            public string FolderPath;
+            public string FolderPath = "Assets/";
 
             /// <summary>
             /// 处理器设置列表

@@ -116,7 +116,7 @@ namespace TAssetPipeline
         {
             List<BaseCheck> allCheckList = new List<BaseCheck>();
             var checkSaveRelativePath = GetCheckSaveRelativePath();
-            var allCheckGuids = AssetDatabase.FindAssets($"t:{AssetPipelineConst.BASE_PROCESSOR_TYPE}", new[] { checkSaveRelativePath });
+            var allCheckGuids = AssetDatabase.FindAssets($"t:{AssetPipelineConst.BASE_CHECK_TYPE}", new[] { checkSaveRelativePath });
             foreach (var checkGuid in allCheckGuids)
             {
                 var checkAssetPath = AssetDatabase.GUIDToAssetPath(checkGuid);
@@ -352,11 +352,13 @@ namespace TAssetPipeline
         /// <param name="assetPostProcessor"></param>
         public static bool OnPreCheckByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
-            if(!ExecuteGlobalCheckMapByAssetType(GlobalPreCheckMap, assetType, assetPostProcessor))
+            AssetPipelineLog.Log($"开始执行预检查全局处理器:".WithColor(Color.yellow));
+            if (!ExecuteGlobalCheckMapByAssetType(GlobalPreCheckMap, assetType, assetPostProcessor))
             {
                 return false;
             }
-            if(!ExecuteLocalCheckMapByAssetType(LocalPreCheckMap, assetType, assetPostProcessor))
+            AssetPipelineLog.Log($"开始执行预检查全局处理器:".WithColor(Color.yellow));
+            if (!ExecuteLocalCheckMapByAssetType(LocalData.PreCheckDataList, LocalPreCheckMap, assetType, assetPostProcessor))
             {
                 return false;
             }
@@ -370,11 +372,13 @@ namespace TAssetPipeline
         /// <param name="assetPostProcessor"></param>
         public static bool OnPostCheckByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
-            if(!ExecuteGlobalCheckMapByAssetType(GlobalPostCheckMap, assetType, assetPostProcessor))
+            AssetPipelineLog.Log($"开始执行后处理assetPostProcessor全局处理器:".WithColor(Color.yellow));
+            if (!ExecuteGlobalCheckMapByAssetType(GlobalPostCheckMap, assetType, assetPostProcessor))
             {
                 return false;
             }
-            if(ExecuteLocalCheckMapByAssetType(LocalPostCheckMap, assetType, assetPostProcessor))
+            AssetPipelineLog.Log($"开始执行后处理assetPostProcessor局部处理器:".WithColor(Color.yellow));
+            if (ExecuteLocalCheckMapByAssetType(LocalData.PostCheckDataList, LocalPostCheckMap, assetType, assetPostProcessor))
             {
                 return false;
             }
@@ -382,17 +386,19 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 后处理导入指定Asset路径
+        /// 后处理导入指定Asset类型和指定Asset路径
         /// </summary>
         /// <param name="assetType"></param>
         /// <param name="assetPath"></param>
-        public static bool OnPostCheckByAssetPath(AssetType assetType, string assetPath)
+        public static bool OnPostCheckByAssetType2(AssetType assetType, string assetPath)
         {
-            if(!ExecuteGlobalCheckMapByAssetPath(GlobalPostCheckMap, assetPath))
+            AssetPipelineLog.Log($"开始执行后处理assetPath全局处理器:".WithColor(Color.yellow));
+            if (!ExecuteGlobalCheckMapByAssetType2(GlobalPostCheckMap, assetType, assetPath))
             {
                 return false;
             }
-            if(!ExecuteLocalCheckMapByAssetPath(LocalPostCheckMap, assetPath))
+            AssetPipelineLog.Log($"开始执行后处理assetPath局部处理器:".WithColor(Color.yellow));
+            if (!ExecuteLocalCheckMapByAssetType2(LocalData.PostCheckDataList, LocalPostCheckMap, assetType, assetPath))
             {
                 return false;
             }
@@ -408,60 +414,136 @@ namespace TAssetPipeline
         private static bool ExecuteGlobalCheckMapByAssetType(Dictionary<AssetType, List<BaseCheck>> checkMap, AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
             var checkList = GetCheckListByAssetType(assetType, checkMap);
-            if (checkList != null)
-            {
-                foreach (var check in checkList)
-                {
-                    if(!check.ExecuteCheck(assetPostProcessor))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return ExecuteChecksByAssetPostprocessor(checkList, assetPostProcessor);
         }
 
         /// <summary>
-        /// 执行指定全局检查器Map指定Asset路径的检查器
+        /// 执行指定全局检查器Map指定Asset类型和指定Asset路径的检查器
         /// </summary>
         /// <param name="checkMap"></param>
+        /// <param name="assetType"></param>
         /// <param name="assetPath"></param>
-        private static bool ExecuteGlobalCheckMapByAssetPath(Dictionary<AssetType, List<BaseCheck>> checkMap, string assetPath)
+        private static bool ExecuteGlobalCheckMapByAssetType2(Dictionary<AssetType, List<BaseCheck>> checkMap, AssetType assetType, string assetPath)
         {
-            var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
             var checkList = GetCheckListByAssetType(assetType, checkMap);
-            if (checkList != null)
-            {
-                foreach (var check in checkList)
-                {
-                    if(!check.ExecuteCheckByPath(assetPath))
-                    {
-                        return false;
-                    }
-                }
-            }
-            return true;
+            return ExecuteChecksByAssetPath(checkList, assetPath);
         }
+
+        // 局部检查器触发规则:
+        // 1. 由外往内寻找符合目标目录设置的局部检查器配置触发
 
         /// <summary>
         /// 执行指定局部检查器Map指定Asset类型的检查器
         /// </summary>
+        /// <param name="checkLocalDataList"></param>
         /// <param name="localCheckMap"></param>
         /// <param name="assetType"></param>
         /// <param name="assetPostProcessor"></param>
-        private static bool ExecuteLocalCheckMapByAssetType(Dictionary<string, Dictionary<AssetType, List<BaseCheck>>> localCheckMap, AssetType assetType, AssetPostprocessor assetPostProcessor)
+        private static bool ExecuteLocalCheckMapByAssetType(List<CheckLocalData> checkLocalDataList, Dictionary<string, Dictionary<AssetType, List<BaseCheck>>> localCheckMap, AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
+            var assetPath = assetPostProcessor.assetPath;
+            foreach (var checkLocalData in checkLocalDataList)
+            {
+                if (assetPath.StartsWith(checkLocalData.FolderPath))
+                {
+                    Dictionary<AssetType, List<BaseCheck>> assetTypeCheckMap;
+                    if (localCheckMap.TryGetValue(checkLocalData.FolderPath, out assetTypeCheckMap))
+                    {
+                        List<BaseCheck> checkList;
+                        if (assetTypeCheckMap.TryGetValue(assetType, out checkList))
+                        {
+                            if(!ExecuteChecksByAssetPostprocessor(checkList, assetPostProcessor))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 执行指定局部检查器Map指定Asset类型和指定Asset路径的检查器
+        /// </summary>
+        /// <param name="checkLocalDataList"></param>
+        /// <param name="localCheckMap"></param>
+        /// <param name="assetType"></param>
+        /// <param name="assetPath"></param>
+        private static bool ExecuteLocalCheckMapByAssetType2(List<CheckLocalData> checkLocalDataList, Dictionary<string, Dictionary<AssetType, List<BaseCheck>>> localCheckMap, AssetType assetType, string assetPath)
+        {
+            foreach (var checkLocalData in checkLocalDataList)
+            {
+                if (assetPath.StartsWith(checkLocalData.FolderPath))
+                {
+                    Dictionary<AssetType, List<BaseCheck>> assetTypeCheckMap;
+                    if (localCheckMap.TryGetValue(checkLocalData.FolderPath, out assetTypeCheckMap))
+                    {
+                        List<BaseCheck> checkList;
+                        if (assetTypeCheckMap.TryGetValue(assetType, out checkList))
+                        {
+                            if(!ExecuteChecksByAssetPath(checkList, assetPath))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+                }
+            }
             return true;
         }
 
         /// <summary>
         /// 执行指定局部检查器Map指定Asset路径的检查器
         /// </summary>
+        /// <param name="checkLocalDataList"></param>
         /// <param name="localCheckMap"></param>
         /// <param name="assetPath"></param>
-        private static bool ExecuteLocalCheckMapByAssetPath(Dictionary<string, Dictionary<AssetType, List<BaseCheck>>> localCheckMap, string assetPath)
+        private static bool ExecuteLocalCheckMapByAssetPath(List<CheckLocalData> checkLocalDataList, Dictionary<string, Dictionary<AssetType, List<BaseCheck>>> localCheckMap, string assetPath)
         {
             var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
+            return ExecuteLocalCheckMapByAssetType2(checkLocalDataList, localCheckMap, assetType, assetPath);
+        }
+
+        /// <summary>
+        /// 触发指定Asset路径检查器
+        /// </summary>
+        /// <param name="checkList"></param>
+        /// <param name="assetPath"></param>
+        private static bool ExecuteChecksByAssetPath(List<BaseCheck> checkList, string assetPath)
+        {
+            if (checkList != null && !string.IsNullOrEmpty(assetPath))
+            {
+                foreach (var check in checkList)
+                {
+                    if (!check.ExecuteCheckByPath(assetPath))
+                    {
+                        // 未来支持检查不满足就返回的情况可以打开这里
+                        //return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 触发指定Asset路径的检查器
+        /// </summary>
+        /// <param name="checkList"></param>
+        /// <param name="assetPath"></param>
+        private static bool ExecuteChecksByAssetPostprocessor(List<BaseCheck> checkList, AssetPostprocessor assetPostProcessor)
+        {
+            if (checkList != null && assetPostProcessor != null)
+            {
+                foreach (var check in checkList)
+                {
+                    if(!check.ExecuteCheck(assetPostProcessor))
+                    {
+                        // 未来支持检查不满足就返回的情况可以打开这里
+                        //return false;
+                    }
+                }
+            }
             return true;
         }
         #endregion

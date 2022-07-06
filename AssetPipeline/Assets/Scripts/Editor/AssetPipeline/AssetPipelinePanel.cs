@@ -264,26 +264,7 @@ namespace TAssetPipeline
             EditorGUILayout.TextField(mSettingData.ResourceFolder, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("选择资源目录", GUILayout.Width(150.0f)))
             {
-                var preResourcePath = mSettingData.ResourceFolder;
-                mSettingData.ResourceFolder = EditorUtility.OpenFolderPanel("资源目录", "请选择资源目录!", "");
-                if (string.IsNullOrEmpty(mSettingData.ResourceFolder))
-                {
-                    mSettingData.ResourceFolder = preResourcePath;
-                }
-                else
-                {
-                    var newResourceFolder = $"{mSettingData.ResourceFolder}/";
-                    var relativePath = PathUtilities.GetAssetsRelativeFolderPath(newResourceFolder);
-                    if (string.IsNullOrEmpty(relativePath))
-                    {
-                        Debug.LogError($"选择的目录:{mSettingData.ResourceFolder}不在Asset目录下，设置目录失败!");
-                        mSettingData.ResourceFolder = preResourcePath;
-                    }
-                    else
-                    {
-                        mSettingData.ResourceFolder = relativePath;
-                    }
-                }
+                mSettingData.ResourceFolder = EditorUtilities.ChoosenProjectFolder(mSettingData.ResourceFolder);
             }
             EditorGUILayout.EndHorizontal();
         }
