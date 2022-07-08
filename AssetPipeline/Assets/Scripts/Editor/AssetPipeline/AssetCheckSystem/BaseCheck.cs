@@ -53,6 +53,22 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// Asset路径
+        /// </summary>
+        public string AssetPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(mAssetPath))
+                {
+                    mAssetPath = AssetDatabase.GetAssetPath(this);
+                }
+                return mAssetPath;
+            }
+        }
+        private string mAssetPath;
+
+        /// <summary>
         /// 是否是目标处理Asset类型
         /// </summary>
         /// <param name="assetType"></param>

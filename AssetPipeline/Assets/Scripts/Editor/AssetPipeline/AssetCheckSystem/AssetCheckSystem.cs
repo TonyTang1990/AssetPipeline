@@ -217,15 +217,19 @@ namespace TAssetPipeline
                     assetTypeCheckMap = new Dictionary<AssetType, List<BaseCheck>>();
                     localCheckMap.Add(checkLocalData.FolderPath, assetTypeCheckMap);
                 }
-                foreach (var check in checkLocalData.CheckList)
+                foreach (var check in checkLocalData.CheckDataList)
                 {
+                    if(check.Check == null)
+                    {
+                        continue;
+                    }
                     List<BaseCheck> assetTypeCheckList;
-                    if (!assetTypeCheckMap.TryGetValue(check.TargetAssetType, out assetTypeCheckList))
+                    if (!assetTypeCheckMap.TryGetValue(check.Check.TargetAssetType, out assetTypeCheckList))
                     {
                         assetTypeCheckList = new List<BaseCheck>();
-                        assetTypeCheckMap.Add(check.TargetAssetType, assetTypeCheckList);
+                        assetTypeCheckMap.Add(check.Check.TargetAssetType, assetTypeCheckList);
                     }
-                    assetTypeCheckList.Add(check);
+                    assetTypeCheckList.Add(check.Check);
                 }
             }
             return localCheckMap;

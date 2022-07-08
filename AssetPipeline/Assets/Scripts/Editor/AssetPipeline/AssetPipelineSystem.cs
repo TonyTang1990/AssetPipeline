@@ -49,6 +49,29 @@ namespace TAssetPipeline
         };
 
         /// <summary>
+        /// Asset类型和GUI Icon映射Map<Asset类型, GUI Icon>
+        /// </summary>
+        private static Dictionary<AssetType, GUIContent> AssetTypeGUIIconMap = new Dictionary<AssetType, GUIContent>
+        {
+            { AssetType.Object, AssetPipelineGUIContent.FavoriteIcon },
+            { AssetType.Texture, AssetPipelineGUIContent.Texture2DIcon },
+            { AssetType.Material, AssetPipelineGUIContent.MaterialIcon },
+            { AssetType.SpriteAtlas, AssetPipelineGUIContent.SpriteAtlasIcon },
+            { AssetType.FBX, AssetPipelineGUIContent.FBXIcon },
+            { AssetType.AudioClip, AssetPipelineGUIContent.AudioClipIcon },
+            { AssetType.Font, AssetPipelineGUIContent.FontIcon },
+            { AssetType.Shader, AssetPipelineGUIContent.ShaderIcon },
+            { AssetType.Prefab, AssetPipelineGUIContent.PrefabIcon },
+            { AssetType.ScriptableObject, AssetPipelineGUIContent.ScriptableObjectIocn },
+            { AssetType.TextAsset, AssetPipelineGUIContent.TextAssetIcon },
+            { AssetType.Scene, AssetPipelineGUIContent.SceneIcon },
+            { AssetType.AnimationClip, AssetPipelineGUIContent.AnimationClipIcon },
+            { AssetType.Mesh, AssetPipelineGUIContent.MeshIcon },
+            { AssetType.Script, AssetPipelineGUIContent.ScriptIcon },
+            { AssetType.Other, AssetPipelineGUIContent.HelpIcon },
+        };
+
+        /// <summary>
         /// 存储相对路径(相对Application.dataPath)
         /// </summary>
         private const string SAVE_FOLDER_RELATIVE_PATH = "Assets/Editor/AssetPipeline/Config";
@@ -172,6 +195,21 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 获取指定Asset类型的Asset icon
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <returns></returns>
+        public static GUIContent GetAssetIconByAssetType(AssetType assetType)
+        {
+            GUIContent guiContent;
+            if(AssetTypeGUIIconMap.TryGetValue(assetType, out guiContent))
+            {
+                return guiContent;
+            }
+            return AssetPipelineGUIContent.HelpIcon;
+        }
+
+        /// <summary>
         /// 获取保存目录相对路径
         /// </summary>
         /// <returns></returns>
@@ -245,7 +283,7 @@ namespace TAssetPipeline
             {
                 return false;
             }
-            if(!IsUnderResoruceFolder(assetPath))
+            if(!IsUnderResourceFolder(assetPath))
             {
                 return false;
             }
@@ -281,7 +319,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="assetPath"></param>
         /// <returns></returns>
-        private static bool IsUnderResoruceFolder(string assetPath)
+        private static bool IsUnderResourceFolder(string assetPath)
         {
             return assetPath.StartsWith(SettingData.ResourceFolder);
         }

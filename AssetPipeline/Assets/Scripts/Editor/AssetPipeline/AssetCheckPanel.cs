@@ -142,6 +142,7 @@ namespace TAssetPipeline
             AssetCheckSystem.MakeSureStrategyFolderExistByStrategy(currentConfigStrategy);
             mGlobalData = AssetCheckSystem.LoadGlobalDataByStrategy(currentConfigStrategy);
             mLocalData = AssetCheckSystem.LoadLocalDataByStrategy(currentConfigStrategy);
+            mLocalData.UpdateAllCheckIconDatas();
             mAllChecks = AssetCheckSystem.GetAllChecks();
         }
 
@@ -383,12 +384,9 @@ namespace TAssetPipeline
         {
             var checkLocalData = checkLocalDataList[index];
             EditorGUILayout.BeginVertical("box");
-            if (string.IsNullOrEmpty(checkLocalData.FolderPath))
-            {
-                checkLocalData.FolderPath = "Assets/";
-            }
             EditorGUILayout.BeginHorizontal();
             checkLocalData.IsUnFold = EditorGUILayout.Foldout(checkLocalData.IsUnFold, checkLocalData.FolderPath, true);
+            DrawCheckLocalDataIcons(checkLocalData);
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 checkLocalDataList.RemoveAt(index);
@@ -414,23 +412,21 @@ namespace TAssetPipeline
                     }
                 }
                 EditorGUILayout.EndHorizontal();
-                DrawChecksArea(checkLocalData.CheckList, checkLocalData.CheckChosenList);
+                DrawCheckLocalDatasArea(checkLocalData, checkLocalData.CheckChosenList);
             }
             EditorGUILayout.EndVertical();
         }
 
         /// <summary>
-        /// 绘制检查器标题区域
+        /// 绘制本地检查器数据所有Icon
         /// </summary>
-        private void DrawCheckTitleArea()
+        /// <param name="checkLocalData"></param>
+        private void DrawCheckLocalDataIcons(CheckLocalData checkLocalData)
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
-            EditorGUILayout.LabelField("操作", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.EndHorizontal();
+            for (int i = 0; i < checkLocalData.CheckIconList.Count; i++)
+            {
+                EditorGUILayout.LabelField(checkLocalData.CheckIconList[i], GUILayout.Width(20f));
+            }
         }
 
         /// <summary>
@@ -466,7 +462,7 @@ namespace TAssetPipeline
                     else
                     {
                         checkList.Add(chosenList[0]);
-                        checkList.Sort(SortCheck);
+                        checkList.Sort(AssetPipelineUtilities.SortCheck);
                         Debug.Log($"添加检查器;{chosenList[0].Name}成功!");
                     }
                 }
@@ -476,21 +472,101 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 绘制指定检查器本地数据列表
+        /// </summary>
+        /// <param name="checkLocalData"></param>
+        /// <param name="chosenList"></param>
+        private void DrawCheckLocalDatasArea(CheckLocalData checkLocalData, List<BaseCheck> chosenList)
+        {
+            EditorGUILayout.BeginVertical("box");
+            DrawCheckTitleArea();
+            for (int i = 0; i < checkLocalData.CheckDataList.Count; i++)
+            {
+                DrawOneCheckLocalDataByIndex(checkLocalData, i);
+            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("检查器:", GUILayout.Width(100f));
+            chosenList[0] = (BaseCheck)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("+", GUILayout.Width(100f)))
+            {
+                if (chosenList[0] == null)
+                {
+                    Debug.LogError($"不允许添加空检查器,添加检查器失败!");
+                }
+                else
+                {
+                    var checkType = chosenList[0].GetType();
+                    var findCheckData = checkLocalData.CheckDataList.Find(checkData => checkData.Check != null && checkData.Check.TypeName.Equals(checkType.Name));
+                    if (findCheckData != null)
+                    {
+                        Debug.LogError($"不允许添加重复的检查器类型:{findCheckData.Check.TypeName},检查器名;{findCheckData.Check.Name},添加检查器失败!");
+                    }
+                    else
+                    {
+                        if(checkLocalData.AddCheckData(chosenList[0]))
+                        {
+                            Debug.Log($"添加检查器;{chosenList[0].Name}成功!");
+                        }
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制检查器标题区域
+        /// </summary>
+        private void DrawCheckTitleArea()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField("操作", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
         /// 绘制指定索引的单个检查器
         /// </summary>
         /// <param name="checkList"></param>
         /// <param name="index"></param>
         private void DrawOneCheckByIndex(List<BaseCheck> checkList, int index)
         {
-            var processor = checkList[index];
+            var check = checkList[index];
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField(processor.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.ExpandWidth(true));
-            if (GUILayout.Button("-", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f)))
+            EditorGUILayout.LabelField(check != null ? check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(check != null ? check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 checkList.RemoveAt(index);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定索引的单个检查数据
+        /// </summary>
+        /// <param name="checkLocalData"></param>
+        /// <param name="index"></param>
+        private void DrawOneCheckLocalDataByIndex(CheckLocalData checkLocalData, int index)
+        {
+            var checkData = checkLocalData.CheckDataList[index];
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(checkData.Check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("-", GUILayout.Width(100f)))
+            {
+                checkLocalData.RemoveCheckDataByIndex(index);
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -516,17 +592,6 @@ namespace TAssetPipeline
         private int SortLocalCheckData(CheckLocalData localData1, CheckLocalData localData2)
         {
             return localData1.FolderPath.CompareTo(localData2.FolderPath);
-        }
-
-        /// <summary>
-        /// 检查器排序
-        /// </summary>
-        /// <param name="check1"></param>
-        /// <param name="check2"></param>
-        /// <returns></returns>
-        private int SortCheck(BaseCheck check1, BaseCheck check2)
-        {
-            return check1.TargetAssetType.CompareTo(check2.TargetAssetType);
         }
 
         /// <summary>

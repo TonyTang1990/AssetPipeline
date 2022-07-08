@@ -56,15 +56,20 @@
     <Analyzer Include="G:\Software\VisualStudio\VS2019\Install\Common7\IDE\Extensions\Microsoft\Visual Studio Tools for Unity\Analyzers\Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AndroidASTCSet.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineLog.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetConfigData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineSystem.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineConst.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineWindow.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetProcesserHook\ScriptAutoProcess\ScriptKeywordProcesser.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\MipmapSet.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetChecks\CheckFileSize.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipeline.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\GenerateABName.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineSettingData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetCheckLocalData.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\TightSet.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetSystem.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\BaseProcessor.cs" />
     <Compile Include="Assets\Scripts\Editor\Utilities\EditorUtilities.cs" />
@@ -73,6 +78,8 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorSystem.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckPanel.cs" />
     <Compile Include="Assets\Scripts\Editor\EditorWindow\BaseEditorWindow.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AlphaFromSourceSet.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AndroidETC2Set.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetSettingData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\BaseCheck.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorGlobalData.cs" />
@@ -88,13 +95,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineUtilities.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelinePanel.cs" />
     <Compile Include="Assets\Scripts\Editor\Utilities\FolderUtilities.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\GenerateABName.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AndroidETC2Set.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AndroidASTCSet.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\TightSet.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AlphaFromSourceSet.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\MipmapSet.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineLog.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineGUIContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -147,6 +147,7 @@ namespace TAssetPipeline
             AssetProcessorSystem.MakeSureStrategyFolderExistByStrategy(currentConfigStrategy);
             mGlobalData = AssetProcessorSystem.LoadGlobalDataByStrategy(currentConfigStrategy);
             mLocalData = AssetProcessorSystem.LoadLocalDataByStrategy(currentConfigStrategy);
+            mLocalData.UpdateAllProcessorIconDatas();
             mAllProcessors = AssetProcessorSystem.GetAllProcessors();
         }
 
@@ -406,7 +407,7 @@ namespace TAssetPipeline
             chosenList[0] = (BaseProcessor)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("+", GUILayout.Width(100f)))
             {
-                if(chosenList[0] == null)
+                if (chosenList[0] == null)
                 {
                     Debug.LogError($"不允许添加空处理器,添加处理器失败!");
                 }
@@ -414,15 +415,58 @@ namespace TAssetPipeline
                 {
                     var processorType = chosenList[0].GetType();
                     var findProcessor = processorList.Find(processor => processor.GetType() == processorType);
-                    if(findProcessor != null)
+                    if (findProcessor != null)
                     {
                         Debug.LogError($"不允许添加重复的处理器类型:{findProcessor.GetType().Name},处理器名;{findProcessor.Name},添加处理器失败!");
                     }
                     else
                     {
                         processorList.Add(chosenList[0]);
-                        processorList.Sort(SortProcessor);
+                        processorList.Sort(AssetPipelineUtilities.SortProcessor);
                         Debug.Log($"添加处理器;{chosenList[0].Name}成功!");
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制指定处理器本地数据列表
+        /// </summary>
+        /// <param name="processorLocalData"></param>
+        /// <param name="chosenList"></param>
+        private void DrawProcessorsLocalDataArea(ProcessorLocalData processorLocalData, List<BaseProcessor> chosenList)
+        {
+            EditorGUILayout.BeginVertical("box");
+            DrawProcessorTitleArea(false);
+            for (int i = 0; i < processorLocalData.ProcessorDataList.Count; i++)
+            {
+                DrawOneProcessorLocalDataByIndex(processorLocalData, i);
+            }
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("处理器:", GUILayout.Width(100f));
+            chosenList[0] = (BaseProcessor)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("+", GUILayout.Width(100f)))
+            {
+                if(chosenList[0] == null)
+                {
+                    Debug.LogError($"不允许添加空处理器,添加处理器失败!");
+                }
+                else
+                {
+                    var processorType = chosenList[0].GetType();
+                    var findProcessorData = processorLocalData.ProcessorDataList.Find(processorData => processorData.Processor != null && processorData.Processor.TypeName.Equals(processorType.Name));
+                    if(findProcessorData != null)
+                    {
+                        Debug.LogError($"不允许添加重复的处理器类型:{findProcessorData.Processor.TypeName},处理器名;{findProcessorData.Processor.Name},添加处理器失败!");
+                    }
+                    else
+                    {
+                        if(processorLocalData.AddProcessorData(chosenList[0]))
+                        {
+                            Debug.Log($"添加处理器;{chosenList[0].Name}成功!");
+                        }
                     }
                 }
             }
@@ -433,13 +477,19 @@ namespace TAssetPipeline
         /// <summary>
         /// 绘制处理器标题区域
         /// </summary>
-        private void DrawProcessorTitleArea()
+        /// <param name="isGlobalProcessor">是否是全局处理器</param>
+        private void DrawProcessorTitleArea(bool isGlobalProcessor = true)
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if(!isGlobalProcessor)
+            {
+                EditorGUILayout.LabelField("黑名单目录", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150));
+            }
             EditorGUILayout.LabelField("操作", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.EndHorizontal();
         }
@@ -456,10 +506,37 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(processor.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.ExpandWidth(true));
-            if(GUILayout.Button("-", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f)))
+            EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 processorsList.RemoveAt(index);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制指定索引的单个处理器数据
+        /// </summary>
+        /// <param name="processorsLocalData"></param>
+        /// <param name="index"></param>
+        private void DrawOneProcessorLocalDataByIndex(ProcessorLocalData processorsLocalData, int index)
+        {
+            var processorData = processorsLocalData.ProcessorDataList[index];
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(processorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button($"数量({processorData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
+            {
+                // TODO: 黑名单目录编辑UI
+                Debug.Log($"待添加黑名单目录编辑UI!");
+            }
+            if (GUILayout.Button("-", GUILayout.Width(100f)))
+            {
+                processorsLocalData.RemoveProcessorDataByIndex(index);
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -511,12 +588,9 @@ namespace TAssetPipeline
         {
             var processorLocalData = processorLocalDataList[index];
             EditorGUILayout.BeginVertical("box");
-            if (string.IsNullOrEmpty(processorLocalData.FolderPath))
-            {
-                processorLocalData.FolderPath = "Assets/";
-            }
             EditorGUILayout.BeginHorizontal();
             processorLocalData.IsUnFold = EditorGUILayout.Foldout(processorLocalData.IsUnFold, processorLocalData.FolderPath, true);
+            DrawProcessorLocalDataIcons(processorLocalData);
             if(GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 processorLocalDataList.RemoveAt(index);
@@ -542,9 +616,21 @@ namespace TAssetPipeline
                     }
                 }
                 EditorGUILayout.EndHorizontal();
-                DrawProcessorsArea(processorLocalData.ProcessorList, processorLocalData.ProcessorChosenList);
+                DrawProcessorsLocalDataArea(processorLocalData, processorLocalData.ProcessorChosenList);
             }
             EditorGUILayout.EndVertical();
+        }
+
+        /// <summary>
+        /// 绘制本地处理器数据所有Icon
+        /// </summary>
+        /// <param name="processorLocalData"></param>
+        private void DrawProcessorLocalDataIcons(ProcessorLocalData processorLocalData)
+        {
+            for(int i = 0; i < processorLocalData.ProcessorIconList.Count; i++)
+            {
+                EditorGUILayout.LabelField(processorLocalData.ProcessorIconList[i], GUILayout.Width(20f));
+            }
         }
 
         /// <summary>
@@ -568,17 +654,6 @@ namespace TAssetPipeline
         private int SortLocalProcesorData(ProcessorLocalData localData1, ProcessorLocalData localData2)
         {
             return localData1.FolderPath.CompareTo(localData2.FolderPath);
-        }
-
-        /// <summary>
-        /// 处理器排序
-        /// </summary>
-        /// <param name="processor1"></param>
-        /// <param name="processor2"></param>
-        /// <returns></returns>
-        private int SortProcessor(BaseProcessor processor1, BaseProcessor processor2)
-        {
-            return processor1.TargetAssetType.CompareTo(processor2.TargetAssetType);
         }
 
         /// <summary>

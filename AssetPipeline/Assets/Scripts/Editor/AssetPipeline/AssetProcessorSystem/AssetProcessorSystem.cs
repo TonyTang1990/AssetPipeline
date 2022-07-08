@@ -279,16 +279,20 @@ namespace TAssetPipeline
                     assetTypeProcessorMap = new Dictionary<AssetType, List<BaseProcessor>>();
                     localProcessorMap.Add(processorLocalData.FolderPath, assetTypeProcessorMap);
                 }
-                foreach(var processor in processorLocalData.ProcessorList)
+                foreach(var processor in processorLocalData.ProcessorDataList)
                 {
+                    if(processor.Processor == null)
+                    {
+                        continue;
+                    }
                     List<BaseProcessor> assetTypeProcessorList;
-                    if (!assetTypeProcessorMap.TryGetValue(processor.TargetAssetType, out assetTypeProcessorList))
+                    if (!assetTypeProcessorMap.TryGetValue(processor.Processor.TargetAssetType, out assetTypeProcessorList))
                     {
                         assetTypeProcessorList = new List<BaseProcessor>();
-                        assetTypeProcessorMap.Add(processor.TargetAssetType, assetTypeProcessorList);
+                        assetTypeProcessorMap.Add(processor.Processor.TargetAssetType, assetTypeProcessorList);
                     }
-                    assetTypeProcessorList.Add(processor);
-                    AssetPipelineLog.Log($"添加局部目录:{processorLocalData.FolderPath}的{tip}处理器:{processor.Name}!".WithColor(Color.yellow));
+                    assetTypeProcessorList.Add(processor.Processor);
+                    AssetPipelineLog.Log($"添加局部目录:{processorLocalData.FolderPath}的{tip}处理器:{processor.Processor.Name}!".WithColor(Color.yellow));
                 }
             }
             return localProcessorMap;
