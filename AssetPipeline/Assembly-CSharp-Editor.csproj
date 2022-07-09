@@ -96,6 +96,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelinePanel.cs" />
     <Compile Include="Assets\Scripts\Editor\Utilities\FolderUtilities.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineGUIContent.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\LocalDetailWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -531,8 +531,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (GUILayout.Button($"数量({processorData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
             {
-                // TODO: 黑名单目录编辑UI
-                Debug.Log($"待添加黑名单目录编辑UI!");
+                LocalDetailWindow.ShowProcessorDetailWindow(processorData);
             }
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {

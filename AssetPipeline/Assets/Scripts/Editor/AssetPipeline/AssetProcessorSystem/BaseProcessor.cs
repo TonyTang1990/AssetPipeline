@@ -72,7 +72,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="assetType"></param>
         /// <returns></returns>
-        protected bool IsValideAssetType(AssetType assetType)
+        public bool IsValideAssetType(AssetType assetType)
         {
             if(TargetAssetType == AssetType.Object && assetType != AssetType.None)
             {

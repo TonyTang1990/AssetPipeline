@@ -189,9 +189,9 @@ namespace TAssetPipeline
             {
                 return assetType;
             }
-            // 找不到默认当做Object类型处理
+            // 找不到默认当做Other类型处理
             Debug.LogWarning($"找不到后缀:{postFix}的Asset类型!");
-            return AssetType.None;
+            return AssetType.Other;
         }
 
         /// <summary>

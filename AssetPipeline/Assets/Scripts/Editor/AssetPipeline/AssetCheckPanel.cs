@@ -479,7 +479,7 @@ namespace TAssetPipeline
         private void DrawCheckLocalDatasArea(CheckLocalData checkLocalData, List<BaseCheck> chosenList)
         {
             EditorGUILayout.BeginVertical("box");
-            DrawCheckTitleArea();
+            DrawCheckTitleArea(false);
             for (int i = 0; i < checkLocalData.CheckDataList.Count; i++)
             {
                 DrawOneCheckLocalDataByIndex(checkLocalData, i);
@@ -517,7 +517,8 @@ namespace TAssetPipeline
         /// <summary>
         /// 绘制检查器标题区域
         /// </summary>
-        private void DrawCheckTitleArea()
+        /// <param name="isGlobalProcessor">是否是全局检查器</param>
+        private void DrawCheckTitleArea(bool isGlobalCheck = true)
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
@@ -525,6 +526,10 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if (!isGlobalCheck)
+            {
+                EditorGUILayout.LabelField("黑名单目录", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150));
+            }
             EditorGUILayout.LabelField("操作", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.EndHorizontal();
         }
@@ -564,6 +569,10 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(checkData.Check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            if (GUILayout.Button($"数量({checkData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
+            {
+                LocalDetailWindow.ShowCheckDetailWindow(checkData);
+            }
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 checkLocalData.RemoveCheckDataByIndex(index);

@@ -88,11 +88,6 @@ namespace TAssetPipeline
         public static GUIContent ScriptIcon = EditorGUIUtility.IconContent("cs Script Icon");
 
         /// <summary>
-        /// 文件夹Icon
-        /// </summary>
-        public static GUIContent FolderIcon = EditorGUIUtility.IconContent("Folder Icon");
-
-        /// <summary>
         /// 帮助Icon
         /// </summary>
         public static GUIContent HelpIcon = EditorGUIUtility.IconContent("_Help@2x");

@@ -86,6 +86,38 @@ namespace TAssetPipeline
                 BlackListFolderPathList.RemoveAt(index);
                 return true;
             }
+
+            /// <summary>
+            /// 指定Asset路径是否在黑名单列表里
+            /// </summary>
+            /// <param name="assetPath"></param>
+            /// <returns></returns>
+            public bool IsInBlackList(string assetPath)
+            {
+                if (BlackListFolderPathList.Count == 0)
+                {
+                    return false;
+                }
+                foreach (var blackListFolderPath in BlackListFolderPathList)
+                {
+                    if (assetPath.StartsWith(blackListFolderPath))
+                    {
+                        AssetPipelineLog.Log(($"Asset:{assetPath}在检查器:{Check.Name}的黑名单目录列表里!").WithColor(Color.gray));
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// 是否是有效处理Asset类型
+            /// </summary>
+            /// <param name="assetType"></param>
+            /// <returns></returns>
+            public bool IsValideAssetType(AssetType assetType)
+            {
+                return Check.IsValideAssetType(assetType);
+            }
         }
 
         /// <summary>
@@ -202,6 +234,20 @@ namespace TAssetPipeline
                 CheckDataList.RemoveAt(index);
                 UpdaterCheckIcon();
                 return true;
+            }
+
+            /// <summary>
+            /// 指定Asset路径是否在目标目录下
+            /// </summary>
+            /// <param name="assetPath"></param>
+            /// <returns></returns>
+            public bool IsInTargetFolder(string assetPath)
+            {
+                if (string.IsNullOrEmpty(FolderPath) || string.IsNullOrEmpty(assetPath))
+                {
+                    return false;
+                }
+                return assetPath.StartsWith(FolderPath);
             }
         }
 

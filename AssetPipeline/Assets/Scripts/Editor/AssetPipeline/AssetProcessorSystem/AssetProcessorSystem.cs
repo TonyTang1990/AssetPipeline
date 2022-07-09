@@ -65,26 +65,6 @@ namespace TAssetPipeline
         private static Dictionary<AssetType, List<BaseProcessor>> GlobalDeletedProcessorMap;
 
         /// <summary>
-        /// 局部预处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalPreProcessorMap;
-
-        /// <summary>
-        /// 局部后处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalPostProcessorMap;
-
-        /// <summary>
-        /// 局部移动处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalMovedProcessorMap;
-
-        /// <summary>
-        /// 局部删除处理器映射Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> LocalDeletedProcessorMap;
-
-        /// <summary>
         /// 初始化
         /// </summary>
         public static void Init()
@@ -220,82 +200,7 @@ namespace TAssetPipeline
         /// </summary>
         private static void InitLocalProcessorData()
         {
-            LocalPreProcessorMap = GetLocalPreProcessorMap();
-            LocalPostProcessorMap = GetLocalPostProcessorMap();
-            LocalMovedProcessorMap = GetLocalMovedProcessorMap();
-            LocalDeletedProcessorMap = GetLocalDeletedProcessorMap();
-        }
 
-        /// <summary>
-        /// 获取局部预处理器Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        /// <returns></returns>
-        public static Dictionary<string ,Dictionary<AssetType, List<BaseProcessor>>> GetLocalPreProcessorMap()
-        {
-            return GetLocalProcessorMap(LocalData.PreProcessorDataList, "预");
-        }
-
-        /// <summary>
-        /// 获取局部后处理器Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        /// <returns></returns>
-        public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalPostProcessorMap()
-        {
-            return GetLocalProcessorMap(LocalData.PostProcessorDataList, "后");
-        }
-
-        /// <summary>
-        /// 获取局部移动处理器Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        /// <returns></returns>
-        public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalMovedProcessorMap()
-        {
-            return GetLocalProcessorMap(LocalData.MovedProcessorDataList, "移动");
-        }
-
-        /// <summary>
-        /// 获取局部删除处理器Map<目标目录, <目标Asset类型, 处理器列表>>
-        /// </summary>
-        /// <returns></returns>
-        public static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalDeletedProcessorMap()
-        {
-            return GetLocalProcessorMap(LocalData.DeletedProcessorDataList, "删除");
-        }
-
-        /// <summary>
-        /// 获取局部指定处理器的Map<目标目录, </目标目录>目标Asset类型, 处理器列表>>
-        /// </summary>
-        /// <param name="processorList"></param>
-        /// <param name="tip"></param>
-        /// <returns></returns>
-        private static Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> GetLocalProcessorMap(List<ProcessorLocalData> processorLocalDataList, string tip = "")
-        {
-            Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap = new Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>>();
-            foreach (var processorLocalData in processorLocalDataList)
-            {
-                Dictionary<AssetType, List<BaseProcessor>> assetTypeProcessorMap;
-                if (!localProcessorMap.TryGetValue(processorLocalData.FolderPath, out assetTypeProcessorMap))
-                {
-                    assetTypeProcessorMap = new Dictionary<AssetType, List<BaseProcessor>>();
-                    localProcessorMap.Add(processorLocalData.FolderPath, assetTypeProcessorMap);
-                }
-                foreach(var processor in processorLocalData.ProcessorDataList)
-                {
-                    if(processor.Processor == null)
-                    {
-                        continue;
-                    }
-                    List<BaseProcessor> assetTypeProcessorList;
-                    if (!assetTypeProcessorMap.TryGetValue(processor.Processor.TargetAssetType, out assetTypeProcessorList))
-                    {
-                        assetTypeProcessorList = new List<BaseProcessor>();
-                        assetTypeProcessorMap.Add(processor.Processor.TargetAssetType, assetTypeProcessorList);
-                    }
-                    assetTypeProcessorList.Add(processor.Processor);
-                    AssetPipelineLog.Log($"添加局部目录:{processorLocalData.FolderPath}的{tip}处理器:{processor.Processor.Name}!".WithColor(Color.yellow));
-                }
-            }
-            return localProcessorMap;
         }
 
         /// <summary>
@@ -422,7 +327,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"开始执行预处理全局处理器:".WithColor(Color.yellow));
             ExecuteGlobalProcessorMapByAssetType(GlobalPreProcessorMap, assetType, assetPostProcessor);
             AssetPipelineLog.Log($"开始执行预处理局部处理器:".WithColor(Color.yellow));
-            ExecuteLocalProcessorMapByAssetType(LocalData.PreProcessorDataList, LocalPreProcessorMap, assetType, assetPostProcessor);
+            ExecuteLocalProcessorMapByAssetType(LocalData.PreProcessorDataList, assetType, assetPostProcessor);
         }
 
         /// <summary>
@@ -435,7 +340,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"开始执行后处理assetPostProcessor全局处理器:".WithColor(Color.yellow));
             ExecuteGlobalProcessorMapByAssetType(GlobalPostProcessorMap, assetType, assetPostProcessor);
             AssetPipelineLog.Log($"开始执行后处理assetPostProcessor局部处理器:".WithColor(Color.yellow));
-            ExecuteLocalProcessorMapByAssetType(LocalData.PostProcessorDataList, LocalPostProcessorMap, assetType, assetPostProcessor);
+            ExecuteLocalProcessorMapByAssetType(LocalData.PostProcessorDataList, assetType, assetPostProcessor);
         }
 
         /// <summary>
@@ -448,7 +353,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"开始执行后处理assetPath全局处理器:".WithColor(Color.yellow));
             ExecuteGlobalProcessorMapByAssetType2(GlobalPostProcessorMap, assetType, assetPath);
             AssetPipelineLog.Log($"开始执行后处理assetPath局部处理器:".WithColor(Color.yellow));
-            ExecuteLocalProcessorMapByAssetType2(LocalData.PostProcessorDataList, LocalPostProcessorMap, assetType, assetPath);
+            ExecuteLocalProcessorMapByAssetType2(LocalData.PostProcessorDataList, assetType, assetPath);
         }
 
         /// <summary>
@@ -460,7 +365,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"开始执行后处理全局移动处理器:".WithColor(Color.yellow));
             ExecuteGlobalProcessorMapByAssetPath(GlobalMovedProcessorMap, assetPath);
             AssetPipelineLog.Log($"开始执行后处理局部移动处理器:".WithColor(Color.yellow));
-            ExecuteLocalProcessorMapByAssetPath(LocalData.MovedProcessorDataList, LocalMovedProcessorMap, assetPath);
+            ExecuteLocalProcessorMapByAssetPath(LocalData.MovedProcessorDataList, assetPath);
         }
 
         /// <summary>
@@ -472,7 +377,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"开始执行后处理全局删除移动处理器:".WithColor(Color.yellow));
             ExecuteGlobalProcessorMapByAssetPath(GlobalDeletedProcessorMap, assetPath);
             AssetPipelineLog.Log($"开始执行后处理局部删除处理器:".WithColor(Color.yellow));
-            ExecuteLocalProcessorMapByAssetPath(LocalData.DeletedProcessorDataList, LocalDeletedProcessorMap, assetPath);
+            ExecuteLocalProcessorMapByAssetPath(LocalData.DeletedProcessorDataList, assetPath);
         }
 
         /// <summary>
@@ -517,24 +422,22 @@ namespace TAssetPipeline
         /// 执行指定局部处理器Map指定Asset类型的处理器
         /// </summary>
         /// <param name="processorLocalDataList"></param>
-        /// <param name="localProcessorMap"></param>
         /// <param name="assetType"></param>
         /// <param name="assetPostProcessor"></param>
-        private static void ExecuteLocalProcessorMapByAssetType(List<ProcessorLocalData> processorLocalDataList, Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap, AssetType assetType, AssetPostprocessor assetPostProcessor)
+        private static void ExecuteLocalProcessorMapByAssetType(List<ProcessorLocalData> processorLocalDataList, AssetType assetType, AssetPostprocessor assetPostProcessor)
         {
             var assetPath = assetPostProcessor.assetPath;
             foreach (var processorLocalData in processorLocalDataList)
             {
-                if(assetPath.StartsWith(processorLocalData.FolderPath))
+                if (!processorLocalData.IsInTargetFolder(assetPath))
                 {
-                    Dictionary<AssetType, List<BaseProcessor>> assetTypeProcessorMap;
-                    if(localProcessorMap.TryGetValue(processorLocalData.FolderPath, out assetTypeProcessorMap))
+                    continue;
+                }
+                foreach(var processorData in processorLocalData.ProcessorDataList)
+                {
+                    if(processorData.IsValideAssetType(assetType) && !processorData.IsInBlackList(assetPath))
                     {
-                        List<BaseProcessor> processorList;
-                        if(assetTypeProcessorMap.TryGetValue(assetType, out processorList))
-                        {
-                            ExecuteProcessorsByAssetPostprocessor(processorList, assetPostProcessor);
-                        }
+                        ExecuteProcessorByAssetPostprocessor(processorData.Processor, assetPostProcessor);
                     }
                 }
             }
@@ -544,23 +447,21 @@ namespace TAssetPipeline
         /// 执行指定局部处理器Map指定Asset类型和指定Asset路径的处理器2
         /// </summary>
         /// <param name="processorLocalDataList"></param>
-        /// <param name="localProcessorMap"></param>
         /// <param name="assetType"></param>
         /// <param name="assetPath"></param>
-        private static void ExecuteLocalProcessorMapByAssetType2(List<ProcessorLocalData> processorLocalDataList, Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap, AssetType assetType, string assetPath)
+        private static void ExecuteLocalProcessorMapByAssetType2(List<ProcessorLocalData> processorLocalDataList, AssetType assetType, string assetPath)
         {
             foreach (var processorLocalData in processorLocalDataList)
             {
-                if (assetPath.StartsWith(processorLocalData.FolderPath))
+                if (!processorLocalData.IsInTargetFolder(assetPath))
                 {
-                    Dictionary<AssetType, List<BaseProcessor>> assetTypeProcessorMap;
-                    if (localProcessorMap.TryGetValue(processorLocalData.FolderPath, out assetTypeProcessorMap))
+                    continue;
+                }
+                foreach (var processorData in processorLocalData.ProcessorDataList)
+                {
+                    if (processorData.IsValideAssetType(assetType) && !processorData.IsInBlackList(assetPath))
                     {
-                        List<BaseProcessor> processorList;
-                        if (assetTypeProcessorMap.TryGetValue(assetType, out processorList))
-                        {
-                            ExecuteProcessorsByAssetPath(processorList, assetPath);
-                        }
+                        ExecuteProcessorByAssetPath(processorData.Processor, assetPath);
                     }
                 }
             }
@@ -570,16 +471,15 @@ namespace TAssetPipeline
         /// 执行指定局部处理器Map指定Asset路径的处理器
         /// </summary>
         /// <param name="processorLocalDataList"></param>
-        /// <param name="localProcessorMap"></param>
         /// <param name="assetPath"></param>
-        private static void ExecuteLocalProcessorMapByAssetPath(List<ProcessorLocalData> processorLocalDataList, Dictionary<string, Dictionary<AssetType, List<BaseProcessor>>> localProcessorMap, string assetPath)
+        private static void ExecuteLocalProcessorMapByAssetPath(List<ProcessorLocalData> processorLocalDataList, string assetPath)
         {
             var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
-            ExecuteLocalProcessorMapByAssetType2(processorLocalDataList, localProcessorMap, assetType, assetPath);
+            ExecuteLocalProcessorMapByAssetType2(processorLocalDataList, assetType, assetPath);
         }
 
         /// <summary>
-        /// 触发指定Asset路径的处理器
+        /// 指定Asset路径触发处理器列表
         /// </summary>
         /// <param name="processorList"></param>
         /// <param name="assetPath"></param>
@@ -595,7 +495,20 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 触发指定Asset路径的处理器
+        /// 指定Asset路径触发处理器
+        /// </summary>
+        /// <param name="processor"></param>
+        /// <param name="assetPath"></param>
+        private static void ExecuteProcessorByAssetPath(BaseProcessor processor, string assetPath)
+        {
+            if (processor != null && !string.IsNullOrEmpty(assetPath))
+            {
+                processor.ExecuteProcessorByPath(assetPath);
+            }
+        }
+
+        /// <summary>
+        /// 指定AssetPostprocessor触发处理器列表
         /// </summary>
         /// <param name="processorList"></param>
         /// <param name="assetPath"></param>
@@ -605,8 +518,21 @@ namespace TAssetPipeline
             {
                 foreach (var processor in processorList)
                 {
-                    processor.ExecuteProcessor(assetPostProcessor);
+                    ExecuteProcessorByAssetPostprocessor(processor, assetPostProcessor);
                 }
+            }
+        }
+
+        /// <summary>
+        /// 指定AssetPostprocessor触发处理器
+        /// </summary>
+        /// <param name="processor"></param>
+        /// <param name="assetPath"></param>
+        private static void ExecuteProcessorByAssetPostprocessor(BaseProcessor processor, AssetPostprocessor assetPostProcessor)
+        {
+            if (processor != null && assetPostProcessor != null)
+            {
+                processor.ExecuteProcessor(assetPostProcessor);
             }
         }
         #endregion

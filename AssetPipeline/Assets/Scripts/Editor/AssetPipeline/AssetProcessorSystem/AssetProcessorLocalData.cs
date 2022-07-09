@@ -86,6 +86,38 @@ namespace TAssetPipeline
                 BlackListFolderPathList.RemoveAt(index);
                 return true;
             }
+
+            /// <summary>
+            /// 指定Asset路径是否在黑名单列表里
+            /// </summary>
+            /// <param name="assetPath"></param>
+            /// <returns></returns>
+            public bool IsInBlackList(string assetPath)
+            {
+                if(BlackListFolderPathList.Count == 0)
+                {
+                    return false;
+                }
+                foreach(var blackListFolderPath in BlackListFolderPathList)
+                {
+                    if(assetPath.StartsWith(blackListFolderPath))
+                    {
+                        AssetPipelineLog.Log(($"Asset:{assetPath}在处理器:{Processor.Name}的黑名单目录列表里!").WithColor(Color.gray));
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /// <summary>
+            /// 是否是有效处理Asset类型
+            /// </summary>
+            /// <param name="assetType"></param>
+            /// <returns></returns>
+            public bool IsValideAssetType(AssetType assetType)
+            {
+                return Processor.IsValideAssetType(assetType);
+            }
         }
 
         /// <summary>
@@ -104,7 +136,7 @@ namespace TAssetPipeline
             /// 处理器设置数据列表
             /// </summary>
             public List<ProcessorSettingData> ProcessorDataList;
-            
+
             /// <summary>
             /// 处理器选择列表(只使用第一个)
             /// </summary>
@@ -147,9 +179,9 @@ namespace TAssetPipeline
             {
                 mProcessorAssetIconMap.Clear();
                 ProcessorIconList.Clear();
-                foreach(var processorData in ProcessorDataList)
+                foreach (var processorData in ProcessorDataList)
                 {
-                    if(processorData.Processor != null &&
+                    if (processorData.Processor != null &&
                         !mProcessorAssetIconMap.ContainsKey(processorData.Processor.TargetAssetType))
                     {
                         var targetAssetType = processorData.Processor.TargetAssetType;
@@ -180,16 +212,16 @@ namespace TAssetPipeline
             /// <param name="processor"></param>
             public bool AddProcessorData(BaseProcessor processor)
             {
-                if(processor == null)
+                if (processor == null)
                 {
                     Debug.LogError($"不允许添加空的处理器数据!");
                     return false;
                 }
-                var findProcessorData = ProcessorDataList.Find(delegate(ProcessorSettingData processorData)
+                var findProcessorData = ProcessorDataList.Find(delegate (ProcessorSettingData processorData)
                 {
                     return processorData.Processor != null && processorData.Processor.AssetPath.Equals(processor.AssetPath);
                 });
-                if(findProcessorData != null)
+                if (findProcessorData != null)
                 {
                     Debug.LogError($"不允许重复添加相同的处理器:{findProcessorData.Processor.AssetPath}数据!");
                     return false;
@@ -216,6 +248,20 @@ namespace TAssetPipeline
                 ProcessorDataList.RemoveAt(index);
                 UpdaterProcessorIcon();
                 return true;
+            }
+
+            /// <summary>
+            /// 指定Asset路径是否在目标目录下
+            /// </summary>
+            /// <param name="assetPath"></param>
+            /// <returns></returns>
+            public bool IsInTargetFolder(string assetPath)
+            {
+                if (string.IsNullOrEmpty(FolderPath) || string.IsNullOrEmpty(assetPath))
+                {
+                    return false;
+                }
+                return assetPath.StartsWith(FolderPath);
             }
         }
 
