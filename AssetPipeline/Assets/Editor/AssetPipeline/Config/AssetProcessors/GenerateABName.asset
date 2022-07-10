@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5764757537e8224e98e7e1058ee37cb, type: 3}
   m_Name: GenerateABName
   m_EditorClassIdentifier: 
+  CustomDes: "\u751F\u6210Asset\u7684AB\u540D"

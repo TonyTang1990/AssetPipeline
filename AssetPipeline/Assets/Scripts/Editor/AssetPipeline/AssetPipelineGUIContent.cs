@@ -88,6 +88,11 @@ namespace TAssetPipeline
         public static GUIContent ScriptIcon = EditorGUIUtility.IconContent("cs Script Icon");
 
         /// <summary>
+        /// 文件夹Icon
+        /// </summary>
+        public static GUIContent FolderIcon = EditorGUIUtility.IconContent("Folder Icon");
+
+        /// <summary>
         /// 帮助Icon
         /// </summary>
         public static GUIContent HelpIcon = EditorGUIUtility.IconContent("_Help@2x");
@@ -101,5 +106,10 @@ namespace TAssetPipeline
         /// 网格Icon
         /// </summary>
         public static GUIContent MeshIcon = EditorGUIUtility.IconContent("Mesh Icon");
+
+        /// <summary>
+        /// No I
+        /// </summary>
+        public static GUIContent NoIcon = EditorGUIUtility.IconContent("BuildSettings.Broadcom");
     }
 }

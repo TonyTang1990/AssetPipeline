@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eecc6ee8a334dfd488f86e37ebdfc046, type: 3}
   m_Name: AndroidASTCSet
   m_EditorClassIdentifier: 
+  CustomDes: "Android ASTC\u8BBE\u7F6E"

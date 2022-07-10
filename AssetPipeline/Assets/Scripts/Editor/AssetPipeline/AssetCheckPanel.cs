@@ -331,7 +331,7 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -345,7 +345,7 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(check.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check.TargetAssetType.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(check.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
             EditorGUILayout.ObjectField(check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -523,7 +523,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (!isGlobalCheck)
@@ -545,7 +545,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(check != null ? check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check != null ? check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(check != null ? check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
             EditorGUILayout.ObjectField(check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("-", GUILayout.Width(100f)))
@@ -566,12 +566,12 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
             EditorGUILayout.ObjectField(checkData.Check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (GUILayout.Button($"数量({checkData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
             {
-                LocalDetailWindow.ShowCheckDetailWindow(checkData);
+                LocalDetailWindow.ShowCheckDetailWindow(checkLocalData.FolderPath, checkData);
             }
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {

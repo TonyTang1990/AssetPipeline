@@ -19,12 +19,61 @@ namespace TAssetPipeline
     public class AssetPipeline : AssetPostprocessor
     {
         /// <summary>
+        /// 自定义默认支持的导入预处理Asset类型Map(避免同一Asset类型触发两次预处理)
+        /// </summary>
+        private static Dictionary<AssetType, bool> CustomSupportedPreAssetTypeMap = new Dictionary<AssetType, bool>
+        {
+            { AssetType.AnimationClip, true },
+            { AssetType.AudioClip, true },
+            { AssetType.FBX, true },
+            { AssetType.Texture, true },
+        };
+
+        /// <summary>
+        /// 自定义默认支持的导入后处理Asset类型Map(避免同一Asset类型触发两次后处理)
+        /// </summary>
+        private static Dictionary<AssetType, bool> CustomSupportedPostAssetTypeMap = new Dictionary<AssetType, bool>
+        {
+            { AssetType.AnimationClip, true },
+            { AssetType.FBX, true },
+            { AssetType.Material, true },
+            { AssetType.Prefab, true },
+            { AssetType.Texture, true },
+            { AssetType.AudioClip, true },
+        };
+
+        /// <summary>
+        /// 是否是自定义支持的导入预处理Asset类型
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <returns></returns>
+        private static bool IsComstomSupportedPreAssetType(AssetType assetType)
+        {
+            return CustomSupportedPreAssetTypeMap.ContainsKey(assetType);
+        }
+
+        /// <summary>
+        /// 是否是自定义支持的导入后处理Asset类型
+        /// </summary>
+        /// <param name="assetType"></param>
+        /// <returns></returns>
+        private static bool IsComstomSupportedPostAssetType(AssetType assetType)
+        {
+            return CustomSupportedPostAssetTypeMap.ContainsKey(assetType);
+        }
+
+        /// <summary>
         /// 预处理所有Asset
         /// </summary>
         private void OnPreprocessAsset()
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAsset()");
-            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.Object, this);
+            var assetType = AssetPipelineSystem.GetAssetTypeByPath(this.assetPath);
+            // 避免相同类型触发多次导入预处理
+            if(!IsComstomSupportedPreAssetType(assetType))
+            {
+                AssetPipelineSystem.OnPreprocessByAssetType(assetType, this);
+            }
         }
 
         /// <summary>
@@ -73,7 +122,28 @@ namespace TAssetPipeline
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAllAssets()");
-            AssetPipelineSystem.OnPostprocessAllAssets(importedAssets, deletedAssets, movedAssets, movedFromAssetPaths);
+            for (int i = 0, length = importedAssets.Length; i < length; i++)
+            {
+                AssetPipelineLog.Log("Imported Asset: " + importedAssets[i]);
+                // 避免相同类型触发多次导后预处理
+                var assetType = AssetPipelineSystem.GetAssetTypeByPath(importedAssets[i]);
+                if (!IsComstomSupportedPostAssetType(assetType))
+                {
+                    AssetPipelineSystem.OnPostprocessImportedAsset(importedAssets[i]);
+                }
+            }
+
+            for (int i = 0, length = deletedAssets.Length; i < length; i++)
+            {
+                AssetPipelineLog.Log("Deleted Asset: " + deletedAssets[i]);
+                AssetPipelineSystem.OnPostprocessDeletedAsset(importedAssets[i]);
+            }
+
+            for (int i = 0, length = movedAssets.Length; i < length; i++)
+            {
+                AssetPipelineLog.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
+                AssetPipelineSystem.OnPostprocessMovedAsset(importedAssets[i], movedFromAssetPaths[i]);
+            }
         }
 
         /// <summary>

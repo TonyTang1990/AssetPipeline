@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.Object;
+                return AssetType.All;
             }
         }
 
@@ -44,7 +44,8 @@ namespace TAssetPipeline
         /// 执行检查器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
-        protected override bool DoCheck(AssetPostprocessor assetPostProcessor)
+        /// <param name="paramList">不定长参数列表</param>
+        protected override bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             return true;
         }
@@ -53,7 +54,8 @@ namespace TAssetPipeline
         /// 执行指定路径的检查器处理
         /// </summary>
         /// <param name="assetPath"></param>
-        protected override bool DoCheckByPath(string assetPath)
+        /// <param name="paramList">不定长参数列表</param>
+        protected override bool DoCheckByPath(string assetPath, params object[] paramList)
         {
             return true;
         }

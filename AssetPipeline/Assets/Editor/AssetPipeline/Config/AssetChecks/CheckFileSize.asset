@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed97e0128fa16434bb62d3b2d5c8220b, type: 3}
   m_Name: CheckFileSize
   m_EditorClassIdentifier: 
+  CustomDes: "\u68C0\u67E5\u6587\u4EF6\u5927\u5C0F\u6709\u6548\u6027"

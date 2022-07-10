@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.Object;
+                return AssetPipelineSystem.GetAllCommonAssetType();
             }
         }
 
@@ -44,7 +44,8 @@ namespace TAssetPipeline
         /// 执行处理器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
-        protected override void DoProcessor(AssetPostprocessor assetPostProcessor)
+        /// <param name="paramList">不定长参数列表</param>
+        protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
 
         }
@@ -53,7 +54,8 @@ namespace TAssetPipeline
         /// 执行指定路径的处理器处理
         /// </summary>
         /// <param name="assetPath"></param>
-        protected override void DoProcessorByPath(string assetPath)
+        /// <param name="paramList">不定长参数列表</param>
+        protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
 
         }

@@ -53,7 +53,7 @@ namespace TAssetPipeline
         /// </summary>
         private static Dictionary<AssetType, GUIContent> AssetTypeGUIIconMap = new Dictionary<AssetType, GUIContent>
         {
-            { AssetType.Object, AssetPipelineGUIContent.FavoriteIcon },
+            { AssetType.None, AssetPipelineGUIContent.FavoriteIcon },
             { AssetType.Texture, AssetPipelineGUIContent.Texture2DIcon },
             { AssetType.Material, AssetPipelineGUIContent.MaterialIcon },
             { AssetType.SpriteAtlas, AssetPipelineGUIContent.SpriteAtlasIcon },
@@ -68,6 +68,7 @@ namespace TAssetPipeline
             { AssetType.AnimationClip, AssetPipelineGUIContent.AnimationClipIcon },
             { AssetType.Mesh, AssetPipelineGUIContent.MeshIcon },
             { AssetType.Script, AssetPipelineGUIContent.ScriptIcon },
+            { AssetType.Folder, AssetPipelineGUIContent.FolderIcon },
             { AssetType.Other, AssetPipelineGUIContent.HelpIcon },
         };
 
@@ -173,6 +174,12 @@ namespace TAssetPipeline
         public static AssetType GetAssetTypeByPath(string assetPath)
         {
             var postFix = Path.GetExtension(assetPath);
+            // Note:
+            // 文件目录删除时判定不出正确的目录类型
+            if (AssetDatabase.IsValidFolder(assetPath))
+            {
+                return AssetType.Folder;
+            }
             return GetAssetTypeByPostFix(postFix);
         }
 
@@ -181,10 +188,10 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="postFix"></param>
         /// <returns></returns>
-        public static AssetType GetAssetTypeByPostFix(string postFix)
+        private static AssetType GetAssetTypeByPostFix(string postFix)
         {
             postFix = postFix.ToLower();
-            AssetType assetType = AssetType.None;
+            AssetType assetType;
             if (PostFixAssetTypeMap.TryGetValue(postFix, out assetType))
             {
                 return assetType;
@@ -202,11 +209,24 @@ namespace TAssetPipeline
         public static GUIContent GetAssetIconByAssetType(AssetType assetType)
         {
             GUIContent guiContent;
-            if(AssetTypeGUIIconMap.TryGetValue(assetType, out guiContent))
+            if (AssetTypeGUIIconMap.TryGetValue(assetType, out guiContent))
             {
                 return guiContent;
             }
             return AssetPipelineGUIContent.HelpIcon;
+        }
+
+        /// <summary>
+        /// 获取所有通用的Asset类型组合
+        /// </summary>
+        /// <returns></returns>
+        public static AssetType GetAllCommonAssetType()
+        {
+            return AssetType.Texture | AssetType.Material | AssetType.SpriteAtlas |
+                       AssetType.FBX | AssetType.AudioClip | AssetType.Font |
+                       AssetType.Shader | AssetType.Prefab | AssetType.ScriptableObject |
+                       AssetType.TextAsset | AssetType.Scene | AssetType.AnimationClip |
+                       AssetType.Mesh;
         }
 
         /// <summary>
@@ -256,6 +276,7 @@ namespace TAssetPipeline
             var settingData = AssetDatabase.LoadAssetAtPath<AssetPipelineSettingData>(settingDataRelativePath);
             if(settingData == null)
             {
+                Debug.Log($"创建新的Asset管线配置数据!".WithColor(Color.green));
                 settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
                 AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
             }
@@ -363,71 +384,70 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="assetType"></param>
         /// <param name="assetPostProcessor"></param>
-        public static void OnPreprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
+        /// <param name="paramList">不定长参数列表</param>
+        public static void OnPreprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
             if(IsValideByAssetPath(assetPostProcessor.assetPath))
             {
                 // 预处理先执行Asset检查系统，后执行Asset处理系统
-                AssetCheckSystem.OnPreCheckByAssetType(assetType, assetPostProcessor);
-                AssetProcessorSystem.OnPreprocessByAssetType(assetType, assetPostProcessor);
+                AssetCheckSystem.OnPreCheckByAssetType(assetType, assetPostProcessor, paramList);
+                AssetProcessorSystem.OnPreprocessByAssetType(assetType, assetPostProcessor, paramList);
             }
         }
 
         /// <summary>
-        /// 后处理所有Asset
+        /// 后处理导入Asset
         /// </summary>
-        /// <param name="importedAssets"></param>
-        /// <param name="deletedAssets"></param>
-        /// <param name="movedAssets"></param>
-        /// <param name="movedFromAssetPaths"></param>
-        public static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+        /// <param name="importedAsset"></param>
+        public static void OnPostprocessImportedAsset(string importedAsset)
         {
-            AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessAllAssets()");
-            for (int i = 0, length = importedAssets.Length; i < length; i++)
+            AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessImportedAsset()");
+            if (Switch)
             {
-                AssetPipelineLog.Log("Imported Asset: " + importedAssets[i]);
-                if(Switch)
+                if (IsValideByAssetPath(importedAsset))
                 {
-                    if (IsValideByAssetPath(importedAssets[i]))
-                    {
-                        // 后处理先执行Asset处理系统，后执行Asset检查系统
-                        // 导入后统一当做Object类型触发，其他专有类型由对应后处理接口触发
-                        // TODO: 未来支持后处理接口没有的类型在这里扩展
-                        AssetProcessorSystem.OnPostprocessByAssetType2(AssetType.Object, importedAssets[i]);
-                        AssetCheckSystem.OnPostCheckByAssetType2(AssetType.Object, importedAssets[i]);
-                    }
+                    // 后处理先执行Asset处理系统，后执行Asset检查系统
+                    var assetType = AssetPipelineSystem.GetAssetTypeByPath(importedAsset);
+                    AssetProcessorSystem.OnPostprocessByAssetType2(assetType, importedAsset);
+                    AssetCheckSystem.OnPostCheckByAssetType2(assetType, importedAsset);
                 }
             }
+        }
 
-            for(int i = 0, length = deletedAssets.Length; i < length; i++)
+        /// 后处理移除Asset
+        /// </summary>
+        /// <param name="deletedAsset"></param>
+        public static void OnPostprocessDeletedAsset(string deletedAsset)
+        {
+            AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessDeletedAsset()");
+            if (Switch)
             {
-                AssetPipelineLog.Log("Deleted Asset: " + deletedAssets[i]);
-                if(Switch)
+                if (IsValideByAssetPath(deletedAsset))
                 {
-                    if (IsValideByAssetPath(deletedAssets[i]))
-                    {
-                        // 删除后统根据Asset路径对应类型来触发
-                        AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAssets[i]);
-                    }
+                    // 删除后统根据Asset路径对应类型来触发
+                    AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAsset);
                 }
             }
+        }
 
-            for (int i = 0, length = movedAssets.Length; i < length; i++)
+        /// 后处理移动Asset
+        /// </summary>
+        /// <param name="movedAsset">
+        /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
+        public static void OnPostprocessMovedAsset(string movedAsset, params object[] paramList)
+        {
+            AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessMovedAsset()");
+            if (Switch)
             {
-                AssetPipelineLog.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
-                if(Switch)
+                if (IsValideByAssetPath(movedAsset))
                 {
-                    if (IsValideByAssetPath(movedAssets[i]))
-                    {
-                        // 移动后统根据Asset路径对应类型来触发
-                        AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAssets[i]);
-                        // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
-                        AssetDatabase.ImportAsset(movedAssets[i]);
-                    }
+                    // 移动后统根据Asset路径对应类型来触发
+                    AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAsset, paramList);
+                    // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
+                    AssetDatabase.ImportAsset(movedAsset);
                 }
             }
-
         }
 
         /// <summary>
@@ -435,16 +455,17 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="">assetType</param>
         /// <param name="">assetPostProcessor</param>
-        public static void OnPostprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor)
+        /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
+        public static void OnPostprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessByAssetType({assetType})");
             if (IsValideByAssetPath(assetPostProcessor.assetPath))
             {
                 // 后处理先执行Asset处理系统，后执行Asset检查系统
-                AssetProcessorSystem.OnPostprocessByAssetType(assetType, assetPostProcessor);
-                AssetCheckSystem.OnPostCheckByAssetType(assetType, assetPostProcessor);
+                AssetProcessorSystem.OnPostprocessByAssetType(assetType, assetPostProcessor, paramList);
+                AssetCheckSystem.OnPostCheckByAssetType(assetType, assetPostProcessor, paramList);
             }
         }
-            #endregion
-        }
+        #endregion
+    }
 }

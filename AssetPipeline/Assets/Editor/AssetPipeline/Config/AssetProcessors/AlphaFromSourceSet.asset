@@ -12,3 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 51f9d8e61e74b654e83da395c7e7c59e, type: 3}
   m_Name: AlphaFromSourceSet
   m_EditorClassIdentifier: 
+  CustomDes: "AlphaFromSource\u8BBE\u7F6E(\u6839\u636E\u900F\u660E\u4FE1\u606F\u9009\u62E9)"

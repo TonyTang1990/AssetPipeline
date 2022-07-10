@@ -32,25 +32,28 @@ namespace TAssetPipeline
         /// <summary>
         /// Asset管线处理器局部数据详情配置窗口
         /// </summary>
+        /// <param name="folderPath">目标目录</param>
         /// <param name="processorData"></param>
         /// <returns></returns>
-        public static void ShowProcessorDetailWindow(ProcessorSettingData processorData)
+        public static void ShowProcessorDetailWindow(string folderPath, ProcessorSettingData processorData)
         {
             var localDetailWindow = EditorWindow.GetWindow<LocalDetailWindow>(false, "局部数据详情配置窗口");
             localDetailWindow.Show();
-            localDetailWindow.SetProcessorData(processorData);
+            localDetailWindow.SetProcessorData(folderPath, processorData);
         }
 
         /// <summary>
         /// Asset管线检查器局部数据详情配置窗口
         /// </summary>
+        /// <param name="folderPath">目标目录</param>
         /// <param name="checkData"></param>
+        /// <param name="extraDes">额外描述</param>
         /// <returns></returns>
-        public static void ShowCheckDetailWindow(CheckSettingData checkData)
+        public static void ShowCheckDetailWindow(string folderPath, CheckSettingData checkData)
         {
             var localDetailWindow = EditorWindow.GetWindow<LocalDetailWindow>(false, "局部数据详情配置窗口");
             localDetailWindow.Show();
-            localDetailWindow.SetCheckData(checkData);
+            localDetailWindow.SetCheckData(folderPath, checkData);
         }
 
         /// <summary>
@@ -68,17 +71,22 @@ namespace TAssetPipeline
         /// <summary>
         /// 局部数据详情类型
         /// </summary>
-        private LocalDetailType LocalType = LocalDetailType.None;
+        private LocalDetailType mLocalType = LocalDetailType.None;
+
+        /// <summary>
+        /// 目标目录
+        /// </summary>
+        private string mFolderPath;
 
         /// <summary>
         /// 当前处理数据
         /// </summary>
-        private ProcessorSettingData ProcessorData;
+        private ProcessorSettingData mProcessorData;
 
         /// <summary>
         /// 当前检查数据
         /// </summary>
-        private CheckSettingData CheckData;
+        private CheckSettingData mCheckData;
 
         /// <summary>
         /// UI滚动位置
@@ -91,35 +99,50 @@ namespace TAssetPipeline
         private string mNewFolerPath = string.Empty;
 
         /// <summary>
+        /// 局部详情类型标题Map<局部详情类型, 标题文本>
+        /// </summary>
+        private static Dictionary<LocalDetailType, string> LocalDetailTypeTitleMap = new Dictionary<LocalDetailType, string>()
+        {
+            { LocalDetailType.None, "无" },
+            { LocalDetailType.ProcessorLocalDetail, "处理器" },
+            { LocalDetailType.CheckLocalDetail, "检查器" },
+        };
+
+        /// <summary>
         /// 重置数据
         /// </summary>
         private void ResetData()
         {
-            LocalType = LocalDetailType.None;
-            ProcessorData = null;
+            mFolderPath = string.Empty;
+            mLocalType = LocalDetailType.None;
+            mProcessorData = null;
             mNewFolerPath = string.Empty;
         }
 
         /// <summary>
         /// 设置处理器数据
         /// </summary>
+        /// <param name="folderPath">目标目录</param>
         /// <param name="processorData"></param>
-        private void SetProcessorData(ProcessorSettingData processorData)
+        private void SetProcessorData(string folderPath, ProcessorSettingData processorData)
         {
             ResetData();
-            LocalType = LocalDetailType.ProcessorLocalDetail;
-            ProcessorData = processorData;
+            mFolderPath = folderPath;
+            mLocalType = LocalDetailType.ProcessorLocalDetail;
+            mProcessorData = processorData;
         }
 
         /// <summary>
         /// 设置检查器数据
         /// </summary>
+        /// <param name="folderPath">目标目录</param>
         /// <param name="checkData"></param>
-        private void SetCheckData(CheckSettingData checkData)
+        private void SetCheckData(string folderPath, CheckSettingData checkData)
         {
             ResetData();
-            LocalType = LocalDetailType.CheckLocalDetail;
-            CheckData = checkData;
+            mFolderPath = folderPath;
+            mLocalType = LocalDetailType.CheckLocalDetail;
+            mCheckData = checkData;
         }
 
         /// <summary>
@@ -140,7 +163,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawTitleArea()
         {
-            EditorGUILayout.LabelField($"当前选择局部详情类型:{LocalType}", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField($"{LocalDetailTypeTitleMap[mLocalType]}", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
         }
 
         /// <summary>
@@ -148,16 +171,18 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawContentArea()
         {
-            if (LocalType == LocalDetailType.None)
+            if (mLocalType == LocalDetailType.None)
             {
                 DrawNoneContentArea();
             }
-            else if (LocalType == LocalDetailType.ProcessorLocalDetail)
+            else if (mLocalType == LocalDetailType.ProcessorLocalDetail)
             {
+                DrawCommonInfoArea();
                 DrawProcessorContentArea();
             }
-            else if (LocalType == LocalDetailType.CheckLocalDetail)
+            else if (mLocalType == LocalDetailType.CheckLocalDetail)
             {
+                DrawCommonInfoArea();
                 DrawCheckContentArea();
             }
         }
@@ -168,6 +193,17 @@ namespace TAssetPipeline
         private void DrawNoneContentArea()
         {
             EditorGUILayout.LabelField($"未选中有效局部数据对象!", GUILayout.ExpandWidth(true));
+        }
+
+        /// <summary>
+        /// 绘制公共信息区域
+        /// </summary>
+        private void DrawCommonInfoArea()
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.LabelField("目录路径:", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField(mFolderPath, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -197,7 +233,7 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -209,12 +245,12 @@ namespace TAssetPipeline
         private void DrawProcessorLocalDataArea()
         {
             EditorGUILayout.BeginHorizontal();
-            if (ProcessorData != null)
+            if (mProcessorData != null)
             {
-                EditorGUILayout.LabelField(ProcessorData.Processor != null ? ProcessorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(ProcessorData.Processor != null ? ProcessorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.ObjectField(ProcessorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(ProcessorData.Processor != null ? ProcessorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+                EditorGUILayout.ObjectField(mProcessorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
             else
             {
@@ -228,7 +264,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawProcessorBlackListArea()
         {
-            DrawBlackListFolderArea(ProcessorData.BlackListFolderPathList);
+            DrawBlackListFolderArea(mProcessorData.BlackListFolderPathList);
         }
 
         /// <summary>
@@ -250,12 +286,12 @@ namespace TAssetPipeline
         private void DrawCheckLocalDataArea()
         {
             EditorGUILayout.BeginHorizontal();
-            if (CheckData != null)
+            if (mCheckData != null)
             {
-                EditorGUILayout.LabelField(CheckData.Check != null ? CheckData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(CheckData.Check != null ? CheckData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.ObjectField(CheckData.Check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(CheckData.Check != null ? CheckData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+                EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+                EditorGUILayout.ObjectField(mCheckData.Check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
+                EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
             else
             {
@@ -269,7 +305,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawCheckBlackListArea()
         {
-            DrawBlackListFolderArea(CheckData.BlackListFolderPathList);
+            DrawBlackListFolderArea(mCheckData.BlackListFolderPathList);
         }
 
         /// <summary>
@@ -278,12 +314,18 @@ namespace TAssetPipeline
         /// <param name="blackListFolderPathList"></param>
         private void DrawBlackListFolderArea(List<string> blackListFolderPathList)
         {
-            EditorGUILayout.BeginVertical();
-            EditorGUILayout.LabelField($"黑名单目录", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.BeginVertical("box");
             DrawBlackListTitleArea();
-            for (int i = 0; i < blackListFolderPathList.Count; i++)
+            if(blackListFolderPathList.Count > 0)
             {
-                DrawOneBlackListFolder(blackListFolderPathList, i);
+                for (int i = 0; i < blackListFolderPathList.Count; i++)
+                {
+                    DrawOneBlackListFolder(blackListFolderPathList, i);
+                }
+            }
+            else
+            {
+                EditorGUILayout.LabelField("无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("目录路径:", GUILayout.Width(100f));

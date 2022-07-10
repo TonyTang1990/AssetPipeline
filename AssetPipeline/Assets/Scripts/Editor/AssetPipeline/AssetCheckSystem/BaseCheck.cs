@@ -75,11 +75,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public bool IsValideAssetType(AssetType assetType)
         {
-            if (TargetAssetType == AssetType.Object && assetType != AssetType.None)
-            {
-                return true;
-            }
-            return TargetAssetType == assetType;
+            return (TargetAssetType & assetType) != AssetType.None;
         }
 
         /// <summary>
@@ -102,40 +98,44 @@ namespace TAssetPipeline
         /// 执行检查器检查
         /// </summary>
         /// <param name="assetPostProcessor"></param>
-        public bool ExecuteCheck(AssetPostprocessor assetPostProcessor)
+        /// <param name="paramList">不定长参数列表</param>
+        public bool ExecuteCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             if (!IsValideAssetByPath(assetPostProcessor.assetPath))
             {
                 return false;
             }
             AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行检查器:{Name}!".WithColor(Color.green));
-            return DoCheck(assetPostProcessor);
+            return DoCheck(assetPostProcessor, paramList);
         }
 
         /// <summary>
         /// 执行指定Asset路径检查器检查
         /// </summary>
         /// <param name="assetPath"></param>
-        public bool ExecuteCheckByPath(string assetPath)
+        /// <param name="paramList">不定长参数列表</param>
+        public bool ExecuteCheckByPath(string assetPath, params object[] paramList)
         {
             if (!IsValideAssetByPath(assetPath))
             {
                 return false;
             }
             AssetPipelineLog.Log($"@Asset:{assetPath}执行检查器:{Name}!".WithColor(Color.green));
-            return DoCheckByPath(assetPath);
+            return DoCheckByPath(assetPath, paramList);
         }
 
         /// <summary>
         /// 执行检查器处理(子类重写实现自定义检查器)
         /// </summary>
         /// <param name="assetPostProcessor"></param>
-        protected abstract bool DoCheck(AssetPostprocessor assetPostProcessor);
+        /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
+        protected abstract bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList);
 
         /// <summary>
         /// 执行指定路径的检查器处理(子类重写实现自定义检查器)
         /// </summary>
         /// <param name="assetPath"></param>
-        protected abstract bool DoCheckByPath(string assetPath);
+        /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
+        protected abstract bool DoCheckByPath(string assetPath, params object[] paramList);
     }
 }
