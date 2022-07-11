@@ -118,6 +118,17 @@ namespace TAssetPipeline
             {
                 return Processor.IsValideAssetType(assetType);
             }
+
+            /// <summary>
+            /// 打印所有黑名单目录
+            /// </summary>
+            public void PrintAllBlackListFolder()
+            {
+                foreach (var blackListFolderPath in BlackListFolderPathList)
+                {
+                    AssetPipelineLog.Log($"黑名单目录:{blackListFolderPath}".WithColor(Color.yellow));
+                }
+            }
         }
 
         /// <summary>

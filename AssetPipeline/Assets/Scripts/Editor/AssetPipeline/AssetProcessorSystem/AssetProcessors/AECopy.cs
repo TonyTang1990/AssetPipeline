@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             AndroidETC2Set.cs
+ * Description:             AECopy.cs
  * Author:                  TONYTANG
- * Create Date:             2022/06/19
+ * Create Date:             2022/07/10
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AndroidETC2Set.cs
-    /// Android ETC2设置
+    /// AECopy.cs
+    /// AE目录拷贝处理器
     /// </summary>
-    [CreateAssetMenu(fileName = "AndroidETC2Set", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AndroidETC2Set", order = 1002)]
-    public class AndroidETC2Set : BaseProcessor
+    [CreateAssetMenu(fileName = "AECopy", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AECopy", order = 1007)]
+    public class AECopy : BaseProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "Android ETC2设置";
+                return "AE目录拷贝";
             }
         }
 
@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.Texture;
+                return AssetType.All;
             }
         }
 
@@ -47,7 +47,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-
+            DoAECopy(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -57,7 +57,18 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
+            DoAECopy(assetPath);
+        }
 
+        /// <summary>
+        /// 执行AE拷贝
+        /// </summary>
+        /// <param name="assetPath"></param>
+        private void DoAECopy(string assetPath)
+        {
+            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
+            AssetDatabase.CopyAsset(assetPath, targetAssetPath);
+            AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
         }
     }
 }

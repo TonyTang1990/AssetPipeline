@@ -47,7 +47,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-
+            MarkAssetBundleName(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -57,7 +57,26 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
+            MarkAssetBundleName(assetPath);
+        }
 
+        /// <summary>
+        /// 标记指定Asset路径的AB名
+        /// </summary>
+        /// <param name="assetPath"></param>
+        private void MarkAssetBundleName(string assetPath)
+        {
+            string md5 = null;
+            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
+            if(asset == null)
+            {
+                Debug.LogError($"AssetPath:{assetPath}的Asset不存在,标记AB名失败!");
+                return;
+            }
+            md5 = FileUtilities.GetFilePathMD5(assetPath);
+            var assetImporter = AssetImporter.GetAtPath(assetPath);
+            assetImporter.assetBundleName = md5;
+            AssetPipelineLog.Log($"标记AssetPath:{assetPath} MD5:{md5}".WithColor(Color.yellow));
         }
     }
 }

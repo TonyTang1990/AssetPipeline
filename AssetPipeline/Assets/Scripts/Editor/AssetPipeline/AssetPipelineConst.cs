@@ -23,6 +23,11 @@ namespace TAssetPipeline
         public const string DEFAULT_STRATEGY_NAME = "Default";
 
         /// <summary>
+        /// AssetType类型
+        /// </summary>
+        public static Type ASSET_TYPE = typeof(AssetType);
+
+        /// <summary>
         /// 处理器基类类型
         /// </summary>
         public static Type BASE_PROCESSOR_TYPE = typeof(BaseProcessor);
@@ -32,6 +37,19 @@ namespace TAssetPipeline
         /// </summary>
         public static Type BASE_CHECK_TYPE = typeof(BaseCheck);
 
+        /// <summary>
+        /// A资源目录名
+        /// </summary>
+        public static string A_FOLDER_NAME = "a";
 
+        /// <summary>
+        /// E资源目录名
+        /// </summary>
+        public static string E_FOLDER_NAME = "e";
+
+        /// <summary>
+        /// AssetType所有值
+        /// </summary>
+        public static Array ASSET_TYPE_VALUES = Enum.GetValues(AssetPipelineConst.ASSET_TYPE);
     }
 }

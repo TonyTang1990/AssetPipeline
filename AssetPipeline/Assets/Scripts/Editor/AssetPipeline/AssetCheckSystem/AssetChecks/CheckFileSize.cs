@@ -6,6 +6,7 @@
 
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -41,13 +42,19 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 文件大小限制
+        /// </summary>
+        [Header("文件大小限制")]
+        public int FileSizeLimit = 1024 * 1024 * 8;
+
+        /// <summary>
         /// 执行检查器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
         /// <param name="paramList">不定长参数</param>
         protected override bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            return true;
+            return DoCheckFileSize(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -56,7 +63,22 @@ namespace TAssetPipeline
         /// <param name="assetPath"></param>
         protected override bool DoCheckByPath(string assetPath, params object[] paramList)
         {
-            return true;
+            return DoCheckFileSize(assetPath);
+        }
+
+        /// <summary>
+        /// 执行文件大小检查
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        private bool DoCheckFileSize(string assetPath)
+        {
+            var assetFullPath = PathUtilities.GetAssetFullPath(assetPath);
+            using(FileStream fs = File.Open(assetFullPath, FileMode.Open))
+            {
+                AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024 / 1024}M,限制大小:{FileSizeLimit / 1024 / 1024}M".WithColor(Color.yellow));
+                return fs.Length <= FileSizeLimit;
+            }
         }
     }
 }

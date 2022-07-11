@@ -47,7 +47,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-
+            DoAlphaFromSourceSet(assetPostProcessor.assetImporter);
         }
 
         /// <summary>
@@ -57,7 +57,22 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
+            var assetImporter = AssetImporter.GetAtPath(assetPath);
+            DoAlphaFromSourceSet(assetImporter);
+        }
 
+        /// <summary>
+        /// 执行AlphaFromSource设置
+        /// </summary>
+        /// <param name="assetImporter"></param>
+        private void DoAlphaFromSourceSet(AssetImporter assetImporter)
+        {
+            var textureImporter = assetImporter as TextureImporter;
+            var hasAlpha = textureImporter.DoesSourceTextureHaveAlpha() ? true : false;
+            textureImporter.alphaIsTransparency = hasAlpha;
+            var alphaSource = hasAlpha ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
+            textureImporter.alphaSource = alphaSource;
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath} alphaIsTransparency:{hasAlpha} alphaSource:{alphaSource}".WithColor(Color.yellow));
         }
     }
 }

@@ -41,13 +41,19 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 是否打开MipMap
+        /// </summary>
+        [Header("是否打开MipMap")]
+        public bool EnableMipMap = false;
+
+        /// <summary>
         /// 执行处理器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-
+            DoMipMapSet(assetPostProcessor.assetImporter);
         }
 
         /// <summary>
@@ -57,7 +63,19 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
+            var assetImporter = AssetImporter.GetAtPath(assetPath);
+            DoMipMapSet(assetImporter);
+        }
 
+        /// <summary>
+        /// 执行MipMap设置
+        /// </summary>
+        /// <param name="assetImporter"></param>
+        private void DoMipMapSet(AssetImporter assetImporter)
+        {
+            var textureImporter = assetImporter as TextureImporter;
+            textureImporter.mipmapEnabled = EnableMipMap;
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}mipmapEnabled:{EnableMipMap}".WithColor(Color.yellow));
         }
     }
 }

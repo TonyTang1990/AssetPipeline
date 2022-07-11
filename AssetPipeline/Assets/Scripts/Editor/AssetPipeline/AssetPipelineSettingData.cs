@@ -47,7 +47,7 @@ namespace TAssetPipeline
         /// 资源目录
         /// </summary
         [Header("资源目录")]
-        public string ResourceFolder;
+        public string ResourceFolder = "Assets/";
 
         /// <summary>
         /// Asset管线开关

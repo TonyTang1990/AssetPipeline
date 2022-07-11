@@ -379,7 +379,7 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField(blackListFolderPathList[index], AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(blackListFolderPathList[index], AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 blackListFolderPathList.RemoveAt(index);

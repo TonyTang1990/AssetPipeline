@@ -154,14 +154,21 @@ namespace TAssetPipeline
             Dictionary<AssetType, List<BaseCheck>> globalCheckMap = new Dictionary<AssetType, List<BaseCheck>>();
             foreach (var check in checkList)
             {
-                List<BaseCheck> assetTypeCheckList;
-                if (!globalCheckMap.TryGetValue(check.TargetAssetType, out assetTypeCheckList))
+                foreach (var assetTypeValue in AssetPipelineConst.ASSET_TYPE_VALUES)
                 {
-                    assetTypeCheckList = new List<BaseCheck>();
-                    globalCheckMap.Add(check.TargetAssetType, assetTypeCheckList);
+                    var assetType = (AssetType)assetTypeValue;
+                    if ((check.TargetAssetType & assetType) != AssetType.None)
+                    {
+                        List<BaseCheck> assetTypeCheckList;
+                        if (!globalCheckMap.TryGetValue(assetType, out assetTypeCheckList))
+                        {
+                            assetTypeCheckList = new List<BaseCheck>();
+                            globalCheckMap.Add(assetType, assetTypeCheckList);
+                        }
+                        assetTypeCheckList.Add(check);
+                        AssetPipelineLog.Log($"添加Asset类型:{assetType}的全局{tip}检查器:{check.Name}!".WithColor(Color.yellow));
+                    }
                 }
-                assetTypeCheckList.Add(check);
-                AssetPipelineLog.Log($"添加全局{tip}检查器:{check.Name}!".WithColor(Color.yellow));
             }
             return globalCheckMap;
         }

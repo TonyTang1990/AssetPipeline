@@ -4,6 +4,7 @@
  * Create Date:             2021//12/26
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -23,12 +24,17 @@ public static class FileUtilities
     private static StringBuilder mCacheStringBuilder = new StringBuilder();
 
     /// <summary>
+    /// MD5生成算法
+    /// </summary>
+    public static SHA256 MD5SHA256 = SHA256.Create();
+
+    /// <summary>
     /// 获取指定文件的MD5值(文件不能存在返回null)
     /// </summary>
     /// <param name="filePath">文件路径</param>
     /// <param name="md5Hash">MD5算法</param>
     /// <returns></returns>
-    public static string GetFileMD5(string filePath, MD5 md5Hash = null)
+    public static string GetFileMD5(string filePath, SHA256 md5Hash = null)
     {
         if(!File.Exists(filePath))
         {
@@ -37,7 +43,7 @@ public static class FileUtilities
         }
         if(md5Hash == null)
         {
-            md5Hash = MD5.Create();
+            md5Hash = MD5SHA256;
         }
         mCacheStringBuilder.Clear();
         using (var fileFS = File.OpenRead(filePath))
@@ -49,6 +55,19 @@ public static class FileUtilities
             }
         }
         return mCacheStringBuilder.ToString();
+    }
+
+    /// <summary>
+    /// 获取指定文件路径的MD5
+    /// </summary>
+    /// <param name="filePath"></param>
+    /// <param name="md5Hash"></param>
+    /// <returns></returns>
+    public static string GetFilePathMD5(string filePath, SHA256 md5Hash = null)
+    {
+        var bytes = Encoding.UTF8.GetBytes(filePath);
+        var md5 = BitConverter.ToString(MD5SHA256.ComputeHash(bytes)).Replace("-", string.Empty);
+        return md5;
     }
 
     /// <summary>

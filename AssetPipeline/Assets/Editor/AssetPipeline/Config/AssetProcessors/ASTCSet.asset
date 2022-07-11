@@ -9,7 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78850943a2b3d4b459257ef5fd4f2aba, type: 3}
-  m_Name: AndroidETC2Set
+  m_Script: {fileID: 11500000, guid: eecc6ee8a334dfd488f86e37ebdfc046, type: 3}
+  m_Name: ASTCSet
   m_EditorClassIdentifier: 
-  CustomDes: "Android ETC2\u8BBE\u7F6E(\u6839\u636E\u900F\u660E\u4FE1\u606F\u9009\u62E9)"
+  CustomDes: "ASTC\u8BBE\u7F6E"
+  TargetTextureFormat: 48

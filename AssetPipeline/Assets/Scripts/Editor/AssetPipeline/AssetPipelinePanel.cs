@@ -257,10 +257,6 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal("box");
             EditorGUILayout.LabelField("资源目录:", GUILayout.Width(100.0f));
-            if(string.IsNullOrEmpty(mSettingData.ResourceFolder))
-            {
-                mSettingData.ResourceFolder = "Assets/";
-            }
             EditorGUILayout.TextField(mSettingData.ResourceFolder, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("选择资源目录", GUILayout.Width(150.0f)))
             {

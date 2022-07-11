@@ -17,7 +17,6 @@ namespace TAssetPipeline
     /// AssetPipelineSystem.cs
     /// Asset管线系统
     /// </summary>
-    [InitializeOnLoad]
     public static class AssetPipelineSystem
     {
         /// <summary>
@@ -141,15 +140,10 @@ namespace TAssetPipeline
         // 3. Asset管线移动Asset当做重新导入Asset处理，确保Asset移动后得到正确的Asset管线处理
         // 4. Asset管线不满足条件的不会触发(比如: 1. 不在目标资源目录下 2. 是脚本Asset 3. 在黑名单列表里)
 
-        static AssetPipelineSystem()
-        {
-            Debug.Log($"AssetPipelineSystem()");
-            Init();
-        }
-
         /// <summary>
         /// 初始化
         /// </summary>
+        [InitializeOnLoadMethodAttribute]
         public static void Init()
         {
             Debug.Log($"Asset管线系统初始化".WithColor(Color.red));
@@ -390,6 +384,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
             if(IsValideByAssetPath(assetPostProcessor.assetPath))
             {
+                AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetType:{assetType}".WithColor(Color.red));
                 // 预处理先执行Asset检查系统，后执行Asset处理系统
                 AssetCheckSystem.OnPreCheckByAssetType(assetType, assetPostProcessor, paramList);
                 AssetProcessorSystem.OnPreprocessByAssetType(assetType, assetPostProcessor, paramList);
@@ -407,8 +402,9 @@ namespace TAssetPipeline
             {
                 if (IsValideByAssetPath(importedAsset))
                 {
-                    // 后处理先执行Asset处理系统，后执行Asset检查系统
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(importedAsset);
+                    AssetPipelineLog.Log($"AssetPath:{importedAsset} AssetType:{assetType}".WithColor(Color.red));
+                    // 后处理先执行Asset处理系统，后执行Asset检查系统
                     AssetProcessorSystem.OnPostprocessByAssetType2(assetType, importedAsset);
                     AssetCheckSystem.OnPostCheckByAssetType2(assetType, importedAsset);
                 }
@@ -425,6 +421,8 @@ namespace TAssetPipeline
             {
                 if (IsValideByAssetPath(deletedAsset))
                 {
+                    var assetType = AssetPipelineSystem.GetAssetTypeByPath(deletedAsset);
+                    AssetPipelineLog.Log($"AssetPath:{deletedAsset} AssetType:{assetType}".WithColor(Color.red));
                     // 删除后统根据Asset路径对应类型来触发
                     AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAsset);
                 }
@@ -442,6 +440,8 @@ namespace TAssetPipeline
             {
                 if (IsValideByAssetPath(movedAsset))
                 {
+                    var assetType = AssetPipelineSystem.GetAssetTypeByPath(movedAsset);
+                    AssetPipelineLog.Log($"AssetPath:{movedAsset} AssetType:{assetType}".WithColor(Color.red));
                     // 移动后统根据Asset路径对应类型来触发
                     AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAsset, paramList);
                     // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
@@ -461,6 +461,7 @@ namespace TAssetPipeline
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessByAssetType({assetType})");
             if (IsValideByAssetPath(assetPostProcessor.assetPath))
             {
+                AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetType:{assetType}".WithColor(Color.red));
                 // 后处理先执行Asset处理系统，后执行Asset检查系统
                 AssetProcessorSystem.OnPostprocessByAssetType(assetType, assetPostProcessor, paramList);
                 AssetCheckSystem.OnPostCheckByAssetType(assetType, assetPostProcessor, paramList);

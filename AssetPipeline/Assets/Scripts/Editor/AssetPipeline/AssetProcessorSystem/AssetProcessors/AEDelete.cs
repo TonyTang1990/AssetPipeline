@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             AndroidASTCSet.cs
+ * Description:             AEDelete.cs
  * Author:                  TONYTANG
- * Create Date:             2022/06/19
+ * Create Date:             2022/07/10
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AndroidASTCSet.cs
-    /// Android ASTC设置
+    /// AEDelete.cs
+    /// AE目录删除处理器
     /// </summary>
-    [CreateAssetMenu(fileName = "AndroidASTCSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AndroidASTCSet", order = 1003)]
-    public class AndroidASTCSet : BaseProcessor
+    [CreateAssetMenu(fileName = "AEDelete", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AEDelete", order = 1008)]
+    public class AEDelete : BaseProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "Android ASTC设置";
+                return "AE目录删除";
             }
         }
 
@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.Texture;
+                return AssetType.All;
             }
         }
 
@@ -47,7 +47,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-
+            DoAEDelete(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -57,7 +57,18 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
+            DoAEDelete(assetPath);
+        }
 
+        /// <summary>
+        /// 执行AE删除
+        /// </summary>
+        /// <param name="assetPath"></param>
+        private void DoAEDelete(string assetPath)
+        {
+            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
+            AssetDatabase.DeleteAsset(targetAssetPath);
+            AssetPipelineLog.Log($"AssetPath:{assetPath}被删除，执行AssetPath:{targetAssetPath}删除".WithColor(Color.yellow));
         }
     }
 }

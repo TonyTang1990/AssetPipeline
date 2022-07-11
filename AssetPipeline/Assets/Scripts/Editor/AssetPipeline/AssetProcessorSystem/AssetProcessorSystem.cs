@@ -4,6 +4,7 @@
  * Create Date:             2022/06/17
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -185,14 +186,21 @@ namespace TAssetPipeline
             {
                 if(processor != null)
                 {
-                    List<BaseProcessor> assetTypeProcessorList;
-                    if (!globalProcessorMap.TryGetValue(processor.TargetAssetType, out assetTypeProcessorList))
+                    foreach(var assetTypeValue in AssetPipelineConst.ASSET_TYPE_VALUES)
                     {
-                        assetTypeProcessorList = new List<BaseProcessor>();
-                        globalProcessorMap.Add(processor.TargetAssetType, assetTypeProcessorList);
+                        var assetType = (AssetType)assetTypeValue;
+                        if((processor.TargetAssetType & assetType) != AssetType.None)
+                        {
+                            List<BaseProcessor> assetTypeProcessorList;
+                            if (!globalProcessorMap.TryGetValue(assetType, out assetTypeProcessorList))
+                            {
+                                assetTypeProcessorList = new List<BaseProcessor>();
+                                globalProcessorMap.Add(assetType, assetTypeProcessorList);
+                            }
+                            assetTypeProcessorList.Add(processor);
+                            AssetPipelineLog.Log($"添加Asset类型:{assetType}的全局{tip}处理器:{processor.Name}!".WithColor(Color.yellow));
+                        }
                     }
-                    assetTypeProcessorList.Add(processor);
-                    AssetPipelineLog.Log($"添加全局{tip}处理器:{processor.Name}!".WithColor(Color.yellow));
                 }
             }
             return globalProcessorMap;
@@ -224,6 +232,7 @@ namespace TAssetPipeline
                     if(processorData.Processor != null)
                     {
                         AssetPipelineLog.Log($"添加局部处理器:{processorData.Processor.Name}!".WithColor(Color.yellow));
+                        processorData.PrintAllBlackListFolder();
                     }
                 }
             }

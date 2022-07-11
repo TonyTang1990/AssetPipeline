@@ -148,6 +148,14 @@ namespace TAssetPipeline
             mGlobalData = AssetProcessorSystem.LoadGlobalDataByStrategy(currentConfigStrategy);
             mLocalData = AssetProcessorSystem.LoadLocalDataByStrategy(currentConfigStrategy);
             mLocalData.UpdateAllProcessorIconDatas();
+            UpdateAllProcessor();
+        }
+
+        /// <summary>
+        /// 更新所有处理器列表
+        /// </summary>
+        private void UpdateAllProcessor()
+        {
             mAllProcessors = AssetProcessorSystem.GetAllProcessors();
         }
 
@@ -372,6 +380,10 @@ namespace TAssetPipeline
             for (int i = 0; i < mAllProcessors.Count; i++)
             {
                 DrawOneProcessor(mAllProcessors[i]);
+            }
+            if(GUILayout.Button("刷新预览", GUILayout.ExpandWidth(true)))
+            {
+                UpdateAllProcessor();
             }
             EditorGUILayout.EndVertical();
         }

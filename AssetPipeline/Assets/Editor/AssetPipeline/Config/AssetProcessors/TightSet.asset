@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: TightSet
   m_EditorClassIdentifier: 
   CustomDes: "Tight\u8BBE\u7F6E"
+  MeshType: 1

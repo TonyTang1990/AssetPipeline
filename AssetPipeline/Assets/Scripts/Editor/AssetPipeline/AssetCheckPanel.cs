@@ -143,6 +143,14 @@ namespace TAssetPipeline
             mGlobalData = AssetCheckSystem.LoadGlobalDataByStrategy(currentConfigStrategy);
             mLocalData = AssetCheckSystem.LoadLocalDataByStrategy(currentConfigStrategy);
             mLocalData.UpdateAllCheckIconDatas();
+            UpdateAllCheck();
+        }
+
+        /// <summary>
+        /// 更新所有处理器列表
+        /// </summary>
+        private void UpdateAllCheck()
+        {
             mAllChecks = AssetCheckSystem.GetAllChecks();
         }
 
@@ -320,6 +328,10 @@ namespace TAssetPipeline
             for (int i = 0; i < mAllChecks.Count; i++)
             {
                 DrawOneCheck(mAllChecks[i]);
+            }
+            if (GUILayout.Button("刷新预览", GUILayout.ExpandWidth(true)))
+            {
+                UpdateAllCheck();
             }
             EditorGUILayout.EndVertical();
         }
