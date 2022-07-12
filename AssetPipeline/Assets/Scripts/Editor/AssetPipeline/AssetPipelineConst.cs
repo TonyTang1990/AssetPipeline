@@ -28,6 +28,11 @@ namespace TAssetPipeline
         public static Type ASSET_TYPE = typeof(AssetType);
 
         /// <summary>
+        /// AssetProcessType类型
+        /// </summary>
+        public static Type ASSET_PROCESS_TYPE = typeof(AssetProcessType);
+
+        /// <summary>
         /// 处理器基类类型
         /// </summary>
         public static Type BASE_PROCESSOR_TYPE = typeof(BaseProcessor);
@@ -51,5 +56,10 @@ namespace TAssetPipeline
         /// AssetType所有值
         /// </summary>
         public static Array ASSET_TYPE_VALUES = Enum.GetValues(AssetPipelineConst.ASSET_TYPE);
+
+        /// <summary>
+        /// AssetProcessType所有值
+        /// </summary>
+        public static Array ASSET_PROCESS_TYPE_VALUES = Enum.GetValues(AssetPipelineConst.ASSET_PROCESS_TYPE);
     }
 }

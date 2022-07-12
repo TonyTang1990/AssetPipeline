@@ -344,6 +344,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -358,6 +359,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(check.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField(check.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(check.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
             EditorGUILayout.ObjectField(check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();

@@ -395,7 +395,8 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("目标Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -495,7 +496,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if(!isGlobalProcessor)
@@ -517,7 +518,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(processor.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (GUILayout.Button("-", GUILayout.Width(100f)))
@@ -538,7 +539,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(processorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (GUILayout.Button($"数量({processorData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
@@ -560,7 +561,8 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(processor.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(processor.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();

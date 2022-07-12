@@ -376,26 +376,28 @@ namespace TAssetPipeline
         /// <summary>
         /// 指定Asset类型预处理
         /// </summary>
-        /// <param name="assetType"></param>
-        /// <param name="assetPostProcessor"></param>
+        /// <param name="assetProcessType">Asset管线处理类型</param>
+        /// <param name="assetType">Asset类型</param>
+        /// <param name="assetPostProcessor">Asset PostProcessor</param>
         /// <param name="paramList">不定长参数列表</param>
-        public static void OnPreprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
+        public static void OnPreprocessByAssetType(AssetProcessType assetProcessType, AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
             if(IsValideByAssetPath(assetPostProcessor.assetPath))
             {
-                AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetType:{assetType}".WithColor(Color.red));
+                AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                 // 预处理先执行Asset检查系统，后执行Asset处理系统
-                AssetCheckSystem.OnPreCheckByAssetType(assetType, assetPostProcessor, paramList);
-                AssetProcessorSystem.OnPreprocessByAssetType(assetType, assetPostProcessor, paramList);
+                AssetCheckSystem.OnPreCheckByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                AssetProcessorSystem.OnPreprocessByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
             }
         }
 
         /// <summary>
         /// 后处理导入Asset
         /// </summary>
+        /// <param name="assetProcessType"></param>
         /// <param name="importedAsset"></param>
-        public static void OnPostprocessImportedAsset(string importedAsset)
+        public static void OnPostprocessImportedAsset(AssetProcessType assetProcessType, string importedAsset)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessImportedAsset()");
             if (Switch)
@@ -403,18 +405,19 @@ namespace TAssetPipeline
                 if (IsValideByAssetPath(importedAsset))
                 {
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(importedAsset);
-                    AssetPipelineLog.Log($"AssetPath:{importedAsset} AssetType:{assetType}".WithColor(Color.red));
+                    AssetPipelineLog.Log($"AssetPath:{importedAsset} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 后处理先执行Asset处理系统，后执行Asset检查系统
-                    AssetProcessorSystem.OnPostprocessByAssetType2(assetType, importedAsset);
-                    AssetCheckSystem.OnPostCheckByAssetType2(assetType, importedAsset);
+                    AssetProcessorSystem.OnPostprocessByAssetType2(assetProcessType, assetType, importedAsset);
+                    AssetCheckSystem.OnPostCheckByAssetType2(assetProcessType, assetType, importedAsset);
                 }
             }
         }
 
         /// 后处理移除Asset
         /// </summary>
+        /// <param name="assetProcessType"></param>
         /// <param name="deletedAsset"></param>
-        public static void OnPostprocessDeletedAsset(string deletedAsset)
+        public static void OnPostprocessDeletedAsset(AssetProcessType assetProcessType, string deletedAsset)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessDeletedAsset()");
             if (Switch)
@@ -422,18 +425,19 @@ namespace TAssetPipeline
                 if (IsValideByAssetPath(deletedAsset))
                 {
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(deletedAsset);
-                    AssetPipelineLog.Log($"AssetPath:{deletedAsset} AssetType:{assetType}".WithColor(Color.red));
+                    AssetPipelineLog.Log($"AssetPath:{deletedAsset} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 删除后统根据Asset路径对应类型来触发
-                    AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAsset);
+                    AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAsset, assetProcessType);
                 }
             }
         }
 
         /// 后处理移动Asset
         /// </summary>
-        /// <param name="movedAsset">
+        /// <param name="assetProcessType"></param>
+        /// <param name="movedAsset"></param>
         /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
-        public static void OnPostprocessMovedAsset(string movedAsset, params object[] paramList)
+        public static void OnPostprocessMovedAsset(AssetProcessType assetProcessType, string movedAsset, params object[] paramList)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessMovedAsset()");
             if (Switch)
@@ -441,9 +445,9 @@ namespace TAssetPipeline
                 if (IsValideByAssetPath(movedAsset))
                 {
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(movedAsset);
-                    AssetPipelineLog.Log($"AssetPath:{movedAsset} AssetType:{assetType}".WithColor(Color.red));
+                    AssetPipelineLog.Log($"AssetPath:{movedAsset} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 移动后统根据Asset路径对应类型来触发
-                    AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAsset, paramList);
+                    AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAsset, assetProcessType, paramList);
                     // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
                     AssetDatabase.ImportAsset(movedAsset);
                 }
@@ -453,18 +457,19 @@ namespace TAssetPipeline
         /// <summary>
         /// 后处理指定Asset类型的AssetPostprocessor
         /// </summary>
-        /// <param name="">assetType</param>
-        /// <param name="">assetPostProcessor</param>
+        /// <param name="assetProcessType">Asset管线处理类型</param>
+        /// <param name="assetType">Asset类型</param>
+        /// <param name="assetPostProcessor">Asset PostProcessor</param>
         /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
-        public static void OnPostprocessByAssetType(AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
+        public static void OnPostprocessByAssetType(AssetProcessType assetProcessType, AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessByAssetType({assetType})");
             if (IsValideByAssetPath(assetPostProcessor.assetPath))
             {
                 AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetType:{assetType}".WithColor(Color.red));
                 // 后处理先执行Asset处理系统，后执行Asset检查系统
-                AssetProcessorSystem.OnPostprocessByAssetType(assetType, assetPostProcessor, paramList);
-                AssetCheckSystem.OnPostCheckByAssetType(assetType, assetPostProcessor, paramList);
+                AssetProcessorSystem.OnPostprocessByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                AssetCheckSystem.OnPostCheckByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
             }
         }
         #endregion

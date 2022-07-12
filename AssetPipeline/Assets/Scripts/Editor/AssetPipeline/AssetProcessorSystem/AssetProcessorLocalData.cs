@@ -120,6 +120,16 @@ namespace TAssetPipeline
             }
 
             /// <summary>
+            /// 是否是有效处理Asset管线处理类型
+            /// </summary>
+            /// <param name="assetProcessType"></param>
+            /// <returns></returns>
+            public bool IsValideAssetProcessType(AssetProcessType assetProcessType)
+            {
+                return Processor.IsValideAssetProcessType(assetProcessType);
+            }
+
+            /// <summary>
             /// 打印所有黑名单目录
             /// </summary>
             public void PrintAllBlackListFolder()

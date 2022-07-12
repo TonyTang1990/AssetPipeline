@@ -41,6 +41,14 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 目标Asset管线处理类型(子类重定义指定)
+        /// </summary>
+        public abstract AssetProcessType TargetAssetProcessType
+        {
+            get;
+        }
+
+        /// <summary>
         /// 处理器类型名
         /// </summary>
         public string TypeName
@@ -91,6 +99,16 @@ namespace TAssetPipeline
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// 是否是目标处理Asset管线处理类型
+        /// </summary>
+        /// <param name="assetProcessType"></param>
+        /// <returns></returns>
+        public bool IsValideAssetProcessType(AssetProcessType assetProcessType)
+        {
+            return TargetAssetProcessType == assetProcessType;
         }
 
         /// <summary>

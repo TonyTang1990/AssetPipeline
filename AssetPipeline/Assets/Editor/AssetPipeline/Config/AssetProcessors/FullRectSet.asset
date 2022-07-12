@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b246a5b1d72a2c741a4c8c2084874b3c, type: 3}
-  m_Name: FullRecteSet
+  m_Name: FullRectSet
   m_EditorClassIdentifier: 
   CustomDes: "FullRect\u8BBE\u7F6E"
   MeshType: 0

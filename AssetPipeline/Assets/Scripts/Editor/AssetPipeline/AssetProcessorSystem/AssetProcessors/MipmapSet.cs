@@ -41,6 +41,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 目标Asset管线处理类型
+        /// </summary>
+        public override AssetProcessType TargetAssetProcessType
+        {
+            get
+            {
+                return AssetProcessType.PreprocessTexture;
+            }
+        }
+
+        /// <summary>
         /// 是否打开MipMap
         /// </summary>
         [Header("是否打开MipMap")]

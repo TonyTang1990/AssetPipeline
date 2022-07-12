@@ -118,6 +118,16 @@ namespace TAssetPipeline
             {
                 return Check.IsValideAssetType(assetType);
             }
+
+            /// <summary>
+            /// 是否是有效处理Asset管线处理类型
+            /// </summary>
+            /// <param name="assetProcessType"></param>
+            /// <returns></returns>
+            public bool IsValideAssetProcessType(AssetProcessType assetProcessType)
+            {
+                return Check.IsValideAssetProcessType(assetProcessType);
+            }
         }
 
         /// <summary>

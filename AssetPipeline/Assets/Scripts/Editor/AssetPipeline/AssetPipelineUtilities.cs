@@ -38,7 +38,11 @@ namespace TAssetPipeline
             {
                 return 0;
             }
-            return processor1.TargetAssetType.CompareTo(processor2.TargetAssetType);
+            if (processor1.TargetAssetType != processor2.TargetAssetType)
+            {
+                return processor1.TargetAssetType.CompareTo(processor2.TargetAssetType);
+            }
+            return processor1.TargetAssetProcessType.CompareTo(processor2.TargetAssetProcessType);
         }
 
         /// <summary>
@@ -61,7 +65,11 @@ namespace TAssetPipeline
             {
                 return 0;
             }
-            return processorData1.Processor.TargetAssetType.CompareTo(processorData2.Processor.TargetAssetType);
+            if (processorData1.Processor.TargetAssetType != processorData2.Processor.TargetAssetType)
+            {
+                return processorData1.Processor.TargetAssetType.CompareTo(processorData2.Processor.TargetAssetType);
+            }
+            return processorData1.Processor.TargetAssetProcessType.CompareTo(processorData2.Processor.TargetAssetProcessType);
         }
 
         /// <summary>
@@ -84,7 +92,11 @@ namespace TAssetPipeline
             {
                 return 0;
             }
-            return check1.TargetAssetType.CompareTo(check2.TargetAssetType);
+            if (check1.TargetAssetType != check2.TargetAssetType)
+            {
+                return check1.TargetAssetType.CompareTo(check2.TargetAssetType);
+            }
+            return check1.TargetAssetProcessType.CompareTo(check2.TargetAssetProcessType);
         }
 
         /// <summary>
@@ -107,7 +119,11 @@ namespace TAssetPipeline
             {
                 return 0;
             }
-            return checkData1.Check.TargetAssetType.CompareTo(checkData2.Check.TargetAssetType);
+            if (checkData1.Check.TargetAssetType != checkData2.Check.TargetAssetType)
+            {
+                return checkData1.Check.TargetAssetType.CompareTo(checkData2.Check.TargetAssetType);
+            }
+            return checkData1.Check.TargetAssetProcessType.CompareTo(checkData2.Check.TargetAssetProcessType);
         }
     }
 }

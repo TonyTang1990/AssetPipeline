@@ -42,6 +42,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 目标Asset管线处理类型
+        /// </summary>
+        public override AssetProcessType TargetAssetProcessType
+        {
+            get
+            {
+                return AssetProcessType.CommonPreprocess;
+            }
+        }
+
+        /// <summary>
         /// 文件大小限制
         /// </summary>
         [Header("文件大小限制")]

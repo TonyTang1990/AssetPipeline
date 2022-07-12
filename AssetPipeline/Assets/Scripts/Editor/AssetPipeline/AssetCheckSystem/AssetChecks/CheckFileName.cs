@@ -43,6 +43,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 目标Asset管线处理类型
+        /// </summary>
+        public override AssetProcessType TargetAssetProcessType
+        {
+            get
+            {
+                return AssetProcessType.CommonPreprocess;
+            }
+        }
+
+        /// <summary>
         /// 文件名正则匹配
         /// </summary>
         private Regex mFileNameRegex = new Regex("~[!@#$%^&*()_+-=|]");

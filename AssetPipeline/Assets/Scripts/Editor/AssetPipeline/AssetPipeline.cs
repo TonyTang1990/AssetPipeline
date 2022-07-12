@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAsset()");
             var assetType = AssetPipelineSystem.GetAssetTypeByPath(this.assetPath);
-            AssetPipelineSystem.OnPreprocessByAssetType(assetType, this);
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.CommonPreprocess, assetType, this);
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace TAssetPipeline
         private void OnPreprocessAnimation()
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAnimation()");
-            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.AnimationClip, this);
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.PreprocessAnimation, AssetType.AnimationClip, this);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace TAssetPipeline
         private void OnPreprocessAudio()
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAudio()");
-            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.AudioClip, this);
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.PreprocessAudio, AssetType.AudioClip, this);
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace TAssetPipeline
         private void OnPreprocessModel()
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessModel()");
-            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.FBX, this);
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.PreprocessModel, AssetType.FBX, this);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace TAssetPipeline
         private void OnPreprocessTexture()
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessTexture()");
-            AssetPipelineSystem.OnPreprocessByAssetType(AssetType.Texture, this);
+            AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.PreprocessTexture, AssetType.Texture, this);
         }
 
         /// <summary>
@@ -81,19 +81,19 @@ namespace TAssetPipeline
                 for (int i = 0, length = importedAssets.Length; i < length; i++)
                 {
                     AssetPipelineLog.Log("Imported Asset: " + importedAssets[i]);
-                    AssetPipelineSystem.OnPostprocessImportedAsset(importedAssets[i]);
+                    AssetPipelineSystem.OnPostprocessImportedAsset(AssetProcessType.CommonPostprocess, importedAssets[i]);
                 }
 
                 for (int i = 0, length = movedAssets.Length; i < length; i++)
                 {
                     AssetPipelineLog.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
-                    AssetPipelineSystem.OnPostprocessMovedAsset(importedAssets[i], movedFromAssetPaths[i]);
+                    AssetPipelineSystem.OnPostprocessMovedAsset(AssetProcessType.CommonPostprocess, importedAssets[i], movedFromAssetPaths[i]);
                 }
 
                 for (int i = 0, length = deletedAssets.Length; i < length; i++)
                 {
                     AssetPipelineLog.Log("Deleted Asset: " + deletedAssets[i]);
-                    AssetPipelineSystem.OnPostprocessDeletedAsset(deletedAssets[i]);
+                    AssetPipelineSystem.OnPostprocessDeletedAsset(AssetProcessType.CommonPostprocess, deletedAssets[i]);
                 }
             }
             finally
@@ -110,7 +110,7 @@ namespace TAssetPipeline
         private void OnPostprocessAnimation(GameObject go, AnimationClip animClip)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAnimation({go.name}, {animClip.name})");
-            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.AnimationClip, this);
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessAnimation, AssetType.AnimationClip, this, go, animClip);
         }
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace TAssetPipeline
         private void OnPostprocessModel(GameObject go)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessModel({go.name})");
-            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.FBX, this);
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessModel, AssetType.FBX, this, go);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace TAssetPipeline
         private void OnPostprocessMaterial(Material mat)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessMaterial({mat.name})");
-            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.Material, this);
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessMaterial, AssetType.Material, this, mat);
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace TAssetPipeline
         private void OnPostprocessPrefab(GameObject root)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessPrefab({root.name})");
-            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.Prefab, this);
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessPrefab, AssetType.Prefab, this, root);
         }
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace TAssetPipeline
         private void OnPostprocessTexture(Texture2D texture)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessTexture({texture.name})");
-            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.Texture, this);
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessTexture, AssetType.Texture, this, texture);
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace TAssetPipeline
         private void OnPostprocessAudio(AudioClip audioClip)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAudio({audioClip.name})");
-            AssetPipelineSystem.OnPostprocessByAssetType(AssetType.AudioClip, this);
+            AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessAudio, AssetType.AudioClip, this, audioClip);
         }
     }
 }

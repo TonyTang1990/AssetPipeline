@@ -41,6 +41,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 目标Asset管线处理类型
+        /// </summary>
+        public override AssetProcessType TargetAssetProcessType
+        {
+            get
+            {
+                return AssetProcessType.PreprocessTexture;
+            }
+        }
+
+        /// <summary>
         /// 执行处理器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
