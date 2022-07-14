@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// AE目录拷贝处理器
     /// </summary>
     [CreateAssetMenu(fileName = "AECopy", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AECopy", order = 1007)]
-    public class AECopy : BaseProcessor
+    public class AECopy : BasePostProcessor
     {
         /// <summary>
         /// 检查器名

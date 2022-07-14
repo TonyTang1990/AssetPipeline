@@ -4,10 +4,12 @@
  * Create Date:             2022/06/18
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static TAssetPipeline.AssetCheckGlobalData;
 using static TAssetPipeline.AssetCheckLocalData;
 
 namespace TAssetPipeline
@@ -92,9 +94,14 @@ namespace TAssetPipeline
         private AssetCheckLocalData mLocalData;
 
         /// <summary>
-        /// 所有检查器列表
+        /// 所有预检查器列表
         /// </summary>
-        private List<BaseCheck> mAllChecks;
+        private List<BasePreCheck> mAllPreChecks;
+
+        /// <summary>
+        /// 所有后检查器列表
+        /// </summary>
+        private List<BasePostCheck> mAllPostChecks;
 
         /// <summary>
         /// 构造函数
@@ -151,7 +158,8 @@ namespace TAssetPipeline
         /// </summary>
         private void UpdateAllCheck()
         {
-            mAllChecks = AssetCheckSystem.GetAllChecks();
+            mAllPreChecks = AssetCheckSystem.GetAllChecks<BasePreCheck>();
+            mAllPostChecks = AssetCheckSystem.GetAllChecks<BasePostCheck>();
         }
 
         /// <summary>
@@ -178,7 +186,9 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetCheckData()
         {
+            EditorUtility.SetDirty(mGlobalData);
             AssetDatabase.SaveAssetIfDirty(mGlobalData);
+            EditorUtility.SetDirty(mGlobalData);
             AssetDatabase.SaveAssetIfDirty(mLocalData);
         }
 
@@ -258,7 +268,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawGlobalPreCheckArea()
         {
-            DrawChecksArea(mGlobalData.PreCheckData.CheckList, mGlobalData.PreCheckData.CheckChosenList);
+            DrawChecksArea(mGlobalData.PreCheckData, AssetPipelineConst.BASE_PRE_CHECK_TYPE);
         }
 
         /// <summary>
@@ -266,7 +276,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawGlobalPostCheckArea()
         {
-            DrawChecksArea(mGlobalData.PostCheckData.CheckList, mGlobalData.PostCheckData.CheckChosenList);
+            DrawChecksArea(mGlobalData.PostCheckData, AssetPipelineConst.BASE_POST_CHECK_TYPE);
         }
 
         /// <summary>
@@ -307,7 +317,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalPreCheckArea()
         {
-            DrawLocalChecksArea(mLocalData.PreCheckDataList);
+            DrawLocalChecksArea(mLocalData.PreCheckDataList, AssetPipelineConst.BASE_PRE_CHECK_TYPE);
         }
 
         /// <summary>
@@ -315,7 +325,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalPostCheckArea()
         {
-            DrawLocalChecksArea(mLocalData.PostCheckDataList);
+            DrawLocalChecksArea(mLocalData.PostCheckDataList, AssetPipelineConst.BASE_POST_CHECK_TYPE);
         }
 
         /// <summary>
@@ -324,27 +334,41 @@ namespace TAssetPipeline
         private void DrawPreviewAssetCheckArea()
         {
             EditorGUILayout.BeginVertical("box");
-            DrawPreviewCheckTitleArea();
-            for (int i = 0; i < mAllChecks.Count; i++)
+            DrawPreviewCheckTitleArea("预检查器");
+            for (int i = 0; i < mAllPreChecks.Count; i++)
             {
-                DrawOneCheck(mAllChecks[i]);
+                DrawOneCheck(mAllPreChecks[i]);
             }
+            EditorGUILayout.Space();
+            DrawPreviewCheckTitleArea("后检查器");
+            for (int i = 0; i < mAllPostChecks.Count; i++)
+            {
+                DrawOneCheck(mAllPostChecks[i]);
+            }
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("刷新预览", GUILayout.ExpandWidth(true)))
             {
                 UpdateAllCheck();
             }
+            GUI.color = preColor;
             EditorGUILayout.EndVertical();
         }
 
         /// <summary>
         /// 绘制预览检查器标题区域
         /// </summary>
-        private void DrawPreviewCheckTitleArea()
+        /// <param name="title"></param>
+        private void DrawPreviewCheckTitleArea(string title)
         {
+            var preColor = GUI.color;
+            GUI.color = Color.yellow;
+            EditorGUILayout.LabelField(title, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            GUI.color = preColor;
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -369,16 +393,19 @@ namespace TAssetPipeline
         /// 绘制指定局部检查器区域
         /// </summary>
         /// <param name="checkLocalDataList"></param>
-        private void DrawLocalChecksArea(List<CheckLocalData> checkLocalDataList)
+        /// <param name="checkType"></param>
+        private void DrawLocalChecksArea(List<CheckLocalData> checkLocalDataList, Type checkType)
         {
             EditorGUILayout.BeginVertical("box");
             for (int i = 0; i < checkLocalDataList.Count; i++)
             {
-                DrawOneLocalChecksByIndex(checkLocalDataList, i);
+                DrawOneLocalChecksByIndex(checkLocalDataList, i, checkType);
             }
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
-                checkLocalDataList.Add(new CheckLocalData());
+                checkLocalDataList.Add(new CheckLocalData(true));
                 checkLocalDataList.Sort(SortLocalCheckData);
                 Debug.Log($"添加局部检查器数据成功!");
             }
@@ -386,6 +413,7 @@ namespace TAssetPipeline
             {
                 FoldAllLocalCheckData(checkLocalDataList);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndVertical();
         }
 
@@ -394,23 +422,29 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="checkLocalDataList"></param>
         /// <param name="index"></param>
-        private void DrawOneLocalChecksByIndex(List<CheckLocalData> checkLocalDataList, int index)
+        /// <param name="checkType"></param>
+        private void DrawOneLocalChecksByIndex(List<CheckLocalData> checkLocalDataList, int index, Type checkType)
         {
             var checkLocalData = checkLocalDataList[index];
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
             checkLocalData.IsUnFold = EditorGUILayout.Foldout(checkLocalData.IsUnFold, checkLocalData.FolderPath, true);
             DrawCheckLocalDataIcons(checkLocalData);
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 checkLocalDataList.RemoveAt(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             if (checkLocalData.IsUnFold)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("目录路径:", GUILayout.Width(100f));
-                EditorGUILayout.TextField(checkLocalData.FolderPath, GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(checkLocalData.FolderPath, AssetPipelineStyles.ButtonLeftStyle, GUILayout.ExpandWidth(true));
+                var preColor2 = GUI.color;
+                GUI.color = Color.green;
                 if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
                 {
                     var newFolderPath = EditorUtilities.ChoosenProjectFolder(checkLocalData.FolderPath);
@@ -425,8 +459,9 @@ namespace TAssetPipeline
                         Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
                     }
                 }
+                GUI.color = preColor2;
                 EditorGUILayout.EndHorizontal();
-                DrawCheckLocalDatasArea(checkLocalData, checkLocalData.CheckChosenList);
+                DrawCheckLocalDatasArea(checkLocalData, checkType);
             }
             EditorGUILayout.EndVertical();
         }
@@ -446,19 +481,23 @@ namespace TAssetPipeline
         /// <summary>
         /// 绘制指定检查器列表
         /// </summary>
-        /// <param name="checkList"></param>
-        /// <param name="chosenList"></param>
-        private void DrawChecksArea(List<BaseCheck> checkList, List<BaseCheck> chosenList)
+        /// <param name="checkGlobalData"></param>
+        /// <param name="checkType"></param>
+        private void DrawChecksArea(CheckGlobalData checkGlobalData, Type checkType)
         {
             EditorGUILayout.BeginVertical("box");
+            var checkList = checkGlobalData.CheckList;
+            var chosenList = checkGlobalData.CheckChosenList;
             DrawCheckTitleArea();
             for (int i = 0; i < checkList.Count; i++)
             {
-                DrawOneCheckByIndex(checkList, i);
+                DrawOneCheckByIndex(checkList, i, checkType);
             }
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器:", GUILayout.Width(100f));
             chosenList[0] = (BaseCheck)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.Width(100f)))
             {
                 if (chosenList[0] == null)
@@ -467,8 +506,8 @@ namespace TAssetPipeline
                 }
                 else
                 {
-                    var checkType = chosenList[0].GetType();
-                    var findCheck = checkList.Find(check => check.GetType() == checkType);
+                    var chosenType = chosenList[0].GetType();
+                    var findCheck = checkList.Find(check => check != null && check.GetType() == chosenType);
                     if (findCheck != null)
                     {
                         Debug.LogError($"不允许添加重复的检查器类型:{findCheck.GetType().Name},检查器名;{findCheck.Name},添加检查器失败!");
@@ -481,6 +520,7 @@ namespace TAssetPipeline
                     }
                 }
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
@@ -489,18 +529,21 @@ namespace TAssetPipeline
         /// 绘制指定检查器本地数据列表
         /// </summary>
         /// <param name="checkLocalData"></param>
-        /// <param name="chosenList"></param>
-        private void DrawCheckLocalDatasArea(CheckLocalData checkLocalData, List<BaseCheck> chosenList)
+        /// <param name="checkType"></param>
+        private void DrawCheckLocalDatasArea(CheckLocalData checkLocalData, Type checkType)
         {
             EditorGUILayout.BeginVertical("box");
+            var chosenList = checkLocalData.CheckChosenList;
             DrawCheckTitleArea(false);
             for (int i = 0; i < checkLocalData.CheckDataList.Count; i++)
             {
-                DrawOneCheckLocalDataByIndex(checkLocalData, i);
+                DrawOneCheckLocalDataByIndex(checkLocalData, i, checkType);
             }
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器:", GUILayout.Width(100f));
             chosenList[0] = (BaseCheck)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.Width(100f)))
             {
                 if (chosenList[0] == null)
@@ -509,8 +552,8 @@ namespace TAssetPipeline
                 }
                 else
                 {
-                    var checkType = chosenList[0].GetType();
-                    var findCheckData = checkLocalData.CheckDataList.Find(checkData => checkData.Check != null && checkData.Check.TypeName.Equals(checkType.Name));
+                    var chosenType = chosenList[0].GetType();
+                    var findCheckData = checkLocalData.CheckDataList.Find(checkData => checkData.Check != null && checkData.Check.GetType() == chosenType);
                     if (findCheckData != null)
                     {
                         Debug.LogError($"不允许添加重复的检查器类型:{findCheckData.Check.TypeName},检查器名;{findCheckData.Check.Name},添加检查器失败!");
@@ -524,6 +567,7 @@ namespace TAssetPipeline
                     }
                 }
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
@@ -537,7 +581,8 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("管线处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if (!isGlobalCheck)
@@ -553,19 +598,24 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="checkList"></param>
         /// <param name="index"></param>
-        private void DrawOneCheckByIndex(List<BaseCheck> checkList, int index)
+        /// <param name="checkType"></param>
+        private void DrawOneCheckByIndex(List<BaseCheck> checkList, int index, Type checkType)
         {
             var check = checkList[index];
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(check != null ? check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check != null ? check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
-            EditorGUILayout.ObjectField(check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(check != null ? check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(check != null ? check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(check, checkType, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 checkList.RemoveAt(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
         }
 
@@ -574,15 +624,19 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="checkLocalData"></param>
         /// <param name="index"></param>
-        private void DrawOneCheckLocalDataByIndex(CheckLocalData checkLocalData, int index)
+        /// <param name="checkType"></param>
+        private void DrawOneCheckLocalDataByIndex(CheckLocalData checkLocalData, int index, Type checkType)
         {
             var checkData = checkLocalData.CheckDataList[index];
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
-            EditorGUILayout.ObjectField(checkData.Check, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(checkData.Check, checkType, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button($"数量({checkData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
             {
                 LocalDetailWindow.ShowCheckDetailWindow(checkLocalData.FolderPath, checkData);
@@ -591,6 +645,7 @@ namespace TAssetPipeline
             {
                 checkLocalData.RemoveCheckDataByIndex(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
         }
 

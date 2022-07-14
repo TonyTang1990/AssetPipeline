@@ -60,6 +60,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineLog.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetConfigData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineSystem.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AECopy.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineConst.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineWindow.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetProcesserHook\ScriptAutoProcess\ScriptKeywordProcesser.cs" />
@@ -83,8 +84,10 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetSettingData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\BaseCheck.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorGlobalData.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessType.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetChecks\CheckFileName.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineStyles.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AEDelete.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineGUIContent.cs" />
     <Compile Include="Assets\Scripts\Editor\EditorWindow\BaseEditorPanel.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorLocalData.cs" />
@@ -94,13 +97,14 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\LocalDetailWindow.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetCheckGlobalData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetCheckSystem.cs" />
+    <Compile Include="Assets\Scripts\Editor\Utilities\ResourceUtilities.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineUtilities.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelinePanel.cs" />
     <Compile Include="Assets\Scripts\Editor\Utilities\FolderUtilities.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AECopy.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\AEDelete.cs" />
-    <Compile Include="Assets\Scripts\Editor\Utilities\ResourceUtilities.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessType.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\BasePreProcessor.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\BasePostProcessor.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\BasePreCheck.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\BasePostCheck.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

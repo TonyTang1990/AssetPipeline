@@ -12,16 +12,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b916721793b90a459f1ac2648c528ec, type: 3}
   m_Name: AssetPipelineSettingData
   m_EditorClassIdentifier: 
-  ResourceFolder: G:\Projects\GitHubProjects\AssetPipeline\AssetPipeline\Assets
+  ResourceFolder: Assets/Res/
   Switch: 1
   LogSwitch: 1
   StrategyList:
   - Default
+  - Android
+  - IOS
   PlatformStrategyDataList:
   - Target: 13
-    StrategyName: Default
+    StrategyName: Android
   - Target: 9
-    StrategyName: Default
+    StrategyName: IOS
   - Target: 5
     StrategyName: Default
   - Target: 19

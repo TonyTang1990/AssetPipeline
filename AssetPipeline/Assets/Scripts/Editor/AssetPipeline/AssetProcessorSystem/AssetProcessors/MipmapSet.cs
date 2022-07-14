@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// Mipmap设置
     /// </summary>
     [CreateAssetMenu(fileName = "MipmapSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/MipmapSet", order = 1005)]
-    public class MipmapSet : BaseProcessor
+    public class MipmapSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名

@@ -17,7 +17,7 @@ namespace TAssetPipeline
     /// 检查文件大小
     /// </summary>
     [CreateAssetMenu(fileName = "CheckFileSize", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/CheckFileSize", order = 2002)]
-    public class CheckFileSize : BaseCheck
+    public class CheckFileSize : BasePreCheck
     {
         /// <summary>
         /// 检查器名
@@ -87,7 +87,7 @@ namespace TAssetPipeline
             var assetFullPath = PathUtilities.GetAssetFullPath(assetPath);
             using(FileStream fs = File.Open(assetFullPath, FileMode.Open))
             {
-                AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024 / 1024}M,限制大小:{FileSizeLimit / 1024 / 1024}M".WithColor(Color.yellow));
+                AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
                 return fs.Length <= FileSizeLimit;
             }
         }

@@ -191,6 +191,17 @@ namespace TAssetPipeline
                 ProcessorChosenList = new List<BaseProcessor>(1) { null };
                 ProcessorIconList = new List<GUIContent>();
                 mProcessorAssetIconMap = new Dictionary<AssetType, GUIContent>();
+                IsUnFold = false;
+            }
+
+            public ProcessorLocalData(bool isUnfold)
+            {
+                FolderPath = "";
+                ProcessorDataList = new List<ProcessorSettingData>();
+                ProcessorChosenList = new List<BaseProcessor>(1) { null };
+                ProcessorIconList = new List<GUIContent>();
+                mProcessorAssetIconMap = new Dictionary<AssetType, GUIContent>();
+                IsUnFold = isUnfold;
             }
 
             /// <summary>

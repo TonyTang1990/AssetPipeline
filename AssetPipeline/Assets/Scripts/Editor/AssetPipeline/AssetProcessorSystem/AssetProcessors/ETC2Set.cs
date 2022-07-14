@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// ETC2设置
     /// </summary>
     [CreateAssetMenu(fileName = "ETC2Set", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/ETC2Set", order = 1002)]
-    public class ETC2Set : BaseProcessor
+    public class ETC2Set : BasePreProcessor
     {
         /// <summary>
         /// 检查器名

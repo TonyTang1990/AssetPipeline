@@ -38,9 +38,29 @@ namespace TAssetPipeline
         public static Type BASE_PROCESSOR_TYPE = typeof(BaseProcessor);
 
         /// <summary>
+        /// 预处理器基类类型
+        /// </summary>
+        public static Type BASE_PRE_PROCESSOR_TYPE = typeof(BasePreProcessor);
+
+        /// <summary>
+        /// 处后理器基类类型
+        /// </summary>
+        public static Type BASE_POST_PROCESSOR_TYPE = typeof(BasePostProcessor);
+
+        /// <summary>
         /// 检查器基类类型
         /// </summary>
         public static Type BASE_CHECK_TYPE = typeof(BaseCheck);
+
+        /// <summary>
+        /// 预检查器基类类型
+        /// </summary>
+        public static Type BASE_PRE_CHECK_TYPE = typeof(BasePreCheck);
+
+        /// <summary>
+        /// 后检查器基类类型
+        /// </summary>
+        public static Type BASE_POST_CHECK_TYPE = typeof(BasePostCheck);
 
         /// <summary>
         /// A资源目录名

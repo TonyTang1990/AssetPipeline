@@ -41,9 +41,14 @@ namespace TAssetPipeline
         private static AssetProcessorLocalData LocalData;
 
         /// <summary>
-        /// 所有处理器列表
+        /// 所有预处理器列表
         /// </summary>
-        private static List<BaseProcessor> AllProcessors;
+        private static List<BasePreProcessor> AllPreProcessors;
+
+        /// <summary>
+        /// 所有后处理器列表
+        /// </summary>
+        private static List<BasePostProcessor> AllPostProcessors;
 
         /// <summary>
         /// 全局预处理器映射Map<目标Asset管线处理类型, <目标Asset类型, 处理器列表>>
@@ -105,24 +110,27 @@ namespace TAssetPipeline
         /// </summary>
         private static void InitAllProcessors()
         {
-            AllProcessors = GetAllProcessors();
+            AllPreProcessors = GetAllProcessors<BasePreProcessor>();
+            AllPostProcessors = GetAllProcessors<BasePostProcessor>();
         }
 
         /// <summary>
-        /// 获取所有处理器
+        /// 获取所有指定类型的处理器
         /// </summary>
         /// <returns></returns>
-        public static List<BaseProcessor> GetAllProcessors()
+        public static List<T> GetAllProcessors<T>() where T : BaseProcessor
         {
-            List<BaseProcessor> allProcessorList = new List<BaseProcessor>();
+            List<T> allProcessorList = new List<T>();
+            var targetProcessorType = typeof(T);
             var processorSaveRelativePath = GetProcessorSaveRelativePath();
-            var allProcessorsGuids = AssetDatabase.FindAssets($"t:{AssetPipelineConst.BASE_PROCESSOR_TYPE}", new[] { processorSaveRelativePath });
+            var allProcessorsGuids = AssetDatabase.FindAssets($"t:{targetProcessorType}", new[] { processorSaveRelativePath });
             foreach(var processGuid in allProcessorsGuids)
             {
                 var processorAssetPath = AssetDatabase.GUIDToAssetPath(processGuid);
-                var processorAsset = AssetDatabase.LoadAssetAtPath<BaseProcessor>(processorAssetPath);
+                var processorAsset = AssetDatabase.LoadAssetAtPath<T>(processorAssetPath);
                 allProcessorList.Add(processorAsset);
             }
+            allProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
             return allProcessorList;
         }
 
@@ -195,6 +203,10 @@ namespace TAssetPipeline
                     foreach (var assetTypeValue in AssetPipelineConst.ASSET_TYPE_VALUES)
                     {
                         var assetType = (AssetType)assetTypeValue;
+                        if (assetType == AssetType.All)
+                        {
+                            continue;
+                        }
                         if((processor.TargetAssetType & assetType) != AssetType.None)
                         {
                             List<BaseProcessor> assetTypeProcessorList;
@@ -232,12 +244,11 @@ namespace TAssetPipeline
         {
             foreach(var processorLocalData in processorLocalDataList)
             {
-                AssetPipelineLog.Log($"局部{tip}处理器目标目录:{processorLocalData.FolderPath}".WithColor(Color.yellow));
                 foreach (var processorData in processorLocalData.ProcessorDataList)
                 {
                     if(processorData.Processor != null)
                     {
-                        AssetPipelineLog.Log($"添加局部处理器:{processorData.Processor.Name}!".WithColor(Color.yellow));
+                        AssetPipelineLog.Log($"局部{tip}处理器目标目录:{processorLocalData.FolderPath},Asset管线处理类型:{processorData.Processor.TargetAssetProcessType},添加局部处理器:{processorData.Processor.Name}!".WithColor(Color.yellow));
                         processorData.PrintAllBlackListFolder();
                     }
                 }
@@ -505,7 +516,8 @@ namespace TAssetPipeline
                 {
                     continue;
                 }
-                foreach(var processorData in processorLocalData.ProcessorDataList)
+                AssetPipelineLog.Log($"局部处理器目录:{processorLocalData.FolderPath}".WithColor(Color.red));
+                foreach (var processorData in processorLocalData.ProcessorDataList)
                 {
                     if(processorData.IsValideAssetProcessType(assetProcessType) &&
                             processorData.IsValideAssetType(assetType) && !processorData.IsInBlackList(assetPath))
@@ -533,6 +545,7 @@ namespace TAssetPipeline
                 {
                     continue;
                 }
+                AssetPipelineLog.Log($"局部处理器目录:{processorLocalData.FolderPath}".WithColor(Color.red));
                 foreach (var processorData in processorLocalData.ProcessorDataList)
                 {
                     if (processorData.IsValideAssetProcessType(assetProcessType) &&

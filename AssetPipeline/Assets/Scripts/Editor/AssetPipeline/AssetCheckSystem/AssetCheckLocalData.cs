@@ -128,6 +128,17 @@ namespace TAssetPipeline
             {
                 return Check.IsValideAssetProcessType(assetProcessType);
             }
+
+            /// <summary>
+            /// 打印所有黑名单目录
+            /// </summary>
+            public void PrintAllBlackListFolder()
+            {
+                foreach (var blackListFolderPath in BlackListFolderPathList)
+                {
+                    AssetPipelineLog.Log($"黑名单目录:{blackListFolderPath}".WithColor(Color.yellow));
+                }
+            }
         }
 
         /// <summary>
@@ -180,6 +191,17 @@ namespace TAssetPipeline
                 CheckChosenList = new List<BaseCheck>(1) { null };
                 CheckIconList = new List<GUIContent>();
                 mCheckAssetIconMap = new Dictionary<AssetType, GUIContent>();
+                IsUnFold = false;
+            }
+
+            public CheckLocalData(bool isUnfold)
+            {
+                FolderPath = "";
+                CheckDataList = new List<CheckSettingData>();
+                CheckChosenList = new List<BaseCheck>(1) { null };
+                CheckIconList = new List<GUIContent>();
+                mCheckAssetIconMap = new Dictionary<AssetType, GUIContent>();
+                IsUnFold = isUnfold;
             }
 
             /// <summary>

@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// 生成AB名处理器
     /// </summary>
     [CreateAssetMenu(fileName = "GenerateABName", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/GenerateABName", order = 1001)]
-    public class GenerateABName : BaseProcessor
+    public class GenerateABName : BasePostProcessor
     {
         /// <summary>
         /// 检查器名

@@ -201,7 +201,7 @@ namespace TAssetPipeline
         private void DrawCommonInfoArea()
         {
             EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.LabelField("目录路径:", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
+            EditorGUILayout.LabelField("目录路径:", GUILayout.Width(100f));
             EditorGUILayout.LabelField(mFolderPath, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
         }
@@ -233,7 +233,8 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("管线处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -248,7 +249,8 @@ namespace TAssetPipeline
             if (mProcessorData != null)
             {
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
                 EditorGUILayout.ObjectField(mProcessorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
@@ -275,6 +277,7 @@ namespace TAssetPipeline
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("管线处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -290,6 +293,7 @@ namespace TAssetPipeline
             {
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+                EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
                 EditorGUILayout.ObjectField(mCheckData.Check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
@@ -329,7 +333,9 @@ namespace TAssetPipeline
             }
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("目录路径:", GUILayout.Width(100f));
-            EditorGUILayout.TextField(mNewFolerPath, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(mNewFolerPath, AssetPipelineStyles.ButtonLeftStyle, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
             {
                 mNewFolerPath = EditorUtilities.ChoosenProjectFolder(mNewFolerPath);
@@ -354,6 +360,7 @@ namespace TAssetPipeline
                     Debug.LogError($"不允许添加空的黑名单目录!");
                 }
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
@@ -379,11 +386,14 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
-            EditorGUILayout.LabelField(blackListFolderPathList[index], AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(blackListFolderPathList[index], AssetPipelineStyles.ButtonLeftStyle, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 blackListFolderPathList.RemoveAt(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
         }
 

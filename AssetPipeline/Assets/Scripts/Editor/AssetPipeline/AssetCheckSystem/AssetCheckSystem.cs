@@ -40,9 +40,14 @@ namespace TAssetPipeline
         private static AssetCheckLocalData LocalData;
 
         /// <summary>
-        /// 所有检查器列表
+        /// 所有预检查器列表
         /// </summary>
-        private static List<BaseCheck> AllChecks;
+        private static List<BasePreCheck> AllPreChecks;
+
+        /// <summary>
+        /// 所有后检查器列表
+        /// </summary>
+        private static List<BasePostCheck> AllPostChecks;
 
         /// <summary>
         /// 全局预检查器映射Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
@@ -95,24 +100,27 @@ namespace TAssetPipeline
         /// </summary>
         private static void InitAllChecks()
         {
-            AllChecks = GetAllChecks();
+            AllPreChecks = GetAllChecks<BasePreCheck>();
+            AllPostChecks = GetAllChecks<BasePostCheck>();
         }
 
         /// <summary>
-        /// 获取所有检查器
+        /// 获取所有指定类型的检查器
         /// </summary>
         /// <returns></returns>
-        public static List<BaseCheck> GetAllChecks()
+        public static List<T> GetAllChecks<T>() where T : BaseCheck
         {
-            List<BaseCheck> allCheckList = new List<BaseCheck>();
+            List<T> allCheckList = new List<T>();
+            var targetCheckType = typeof(T);
             var checkSaveRelativePath = GetCheckSaveRelativePath();
-            var allCheckGuids = AssetDatabase.FindAssets($"t:{AssetPipelineConst.BASE_CHECK_TYPE}", new[] { checkSaveRelativePath });
+            var allCheckGuids = AssetDatabase.FindAssets($"t:{targetCheckType}", new[] { checkSaveRelativePath });
             foreach (var checkGuid in allCheckGuids)
             {
                 var checkAssetPath = AssetDatabase.GUIDToAssetPath(checkGuid);
-                var checkAsset = AssetDatabase.LoadAssetAtPath<BaseCheck>(checkAssetPath);
+                var checkAsset = AssetDatabase.LoadAssetAtPath<T>(checkAssetPath);
                 allCheckList.Add(checkAsset);
             }
+            allCheckList.Sort(AssetPipelineUtilities.SortCheck);
             return allCheckList;
         }
 
@@ -165,6 +173,10 @@ namespace TAssetPipeline
                     foreach (var assetTypeValue in AssetPipelineConst.ASSET_TYPE_VALUES)
                     {
                         var assetType = (AssetType)assetTypeValue;
+                        if (assetType == AssetType.All)
+                        {
+                            continue;
+                        }
                         if ((check.TargetAssetType & assetType) != AssetType.None)
                         {
                             List<BaseCheck> assetTypeCheckList;
@@ -200,12 +212,12 @@ namespace TAssetPipeline
         {
             foreach (var checkLocalData in checkLocalDataList)
             {
-                AssetPipelineLog.Log($"局部{tip}检查器目标目录:{checkLocalData.FolderPath}".WithColor(Color.yellow));
                 foreach (var checkData in checkLocalData.CheckDataList)
                 {
                     if (checkData.Check != null)
                     {
-                        AssetPipelineLog.Log($"添加局部检查器:{checkData.Check.Name}!".WithColor(Color.yellow));
+                        AssetPipelineLog.Log($"局部{tip}检查器目标目录:{checkLocalData.FolderPath},Asset管线处理类型:{checkData.Check.TargetAssetProcessType},添加局部检查器:{checkData.Check.Name}!".WithColor(Color.yellow));
+                        checkData.PrintAllBlackListFolder();
                     }
                 }
             }
@@ -348,7 +360,7 @@ namespace TAssetPipeline
             {
                 return false;
             }
-            AssetPipelineLog.Log($"开始执行预检查全局处理器:".WithColor(Color.yellow));
+            AssetPipelineLog.Log($"开始执行预检查局部处理器:".WithColor(Color.yellow));
             if (!ExecuteLocalCheckMapByAssetType(LocalData.PreCheckDataList, assetProcessType, assetType, assetPostProcessor, paramList))
             {
                 return false;
@@ -448,6 +460,7 @@ namespace TAssetPipeline
                 {
                     continue;
                 }
+                AssetPipelineLog.Log($"局部检查器目录:{checkLocalData.FolderPath}".WithColor(Color.red));
                 foreach (var checkData in checkLocalData.CheckDataList)
                 {
                     if (checkData.IsValideAssetProcessType(assetProcessType) &&
@@ -477,6 +490,7 @@ namespace TAssetPipeline
                 {
                     continue;
                 }
+                AssetPipelineLog.Log($"局部检查器目录:{checkLocalData.FolderPath}".WithColor(Color.red));
                 foreach (var checkData in checkLocalData.CheckDataList)
                 {
                     if (checkData.IsValideAssetProcessType(assetProcessType) &&
@@ -503,6 +517,9 @@ namespace TAssetPipeline
         //    var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
         //    return ExecuteLocalCheckMapByAssetType2(checkLocalDataList, assetType, assetPath);
         //}
+
+        // 局部检查器触发规则:
+        // 1. 由外往内寻找符合目标目录设置的局部检查器配置触发
 
         /// <summary>
         /// 触发指定Asset路径检查器

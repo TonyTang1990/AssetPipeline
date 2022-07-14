@@ -18,7 +18,7 @@ namespace TAssetPipeline
     /// 检查文件名
     /// </summary>
     [CreateAssetMenu(fileName = "CheckFileName", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/CheckFileName", order = 2001)]
-    public class CheckFileName : BaseCheck
+    public class CheckFileName : BasePreCheck
     {
         /// <summary>
         /// 检查器名

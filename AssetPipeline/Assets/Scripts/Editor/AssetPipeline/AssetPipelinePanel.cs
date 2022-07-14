@@ -188,6 +188,7 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetPipelineData()
         {
+            EditorUtility.SetDirty(mSettingData);
             AssetDatabase.SaveAssetIfDirty(mSettingData);
         }
 
@@ -308,10 +309,13 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawOtherArea()
         {
-            if(GUILayout.Button("保存Asset管线数据", GUILayout.ExpandWidth(true)))
+            var preColor = GUI.color;
+            GUI.color = Color.green;
+            if (GUILayout.Button("保存Asset管线数据", GUILayout.ExpandWidth(true)))
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllDatas();
             }
+            GUI.color = preColor;
         }
 
         /// <summary>

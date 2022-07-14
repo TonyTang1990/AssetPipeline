@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using static TAssetPipeline.AssetProcessorGlobalData;
 using static TAssetPipeline.AssetProcessorLocalData;
 
 namespace TAssetPipeline
@@ -97,9 +98,14 @@ namespace TAssetPipeline
         private AssetProcessorLocalData mLocalData;
 
         /// <summary>
-        /// 所有处理器列表
+        /// 所有预处理器列表
         /// </summary>
-        private List<BaseProcessor> mAllProcessors;
+        private List<BasePreProcessor> mAllPreProcessors;
+
+        /// <summary>
+        /// 所有后处理器列表
+        /// </summary>
+        private List<BasePostProcessor> mAllPostProcessors;
 
         /// <summary>
         /// 构造函数
@@ -156,7 +162,8 @@ namespace TAssetPipeline
         /// </summary>
         private void UpdateAllProcessor()
         {
-            mAllProcessors = AssetProcessorSystem.GetAllProcessors();
+            mAllPreProcessors = AssetProcessorSystem.GetAllProcessors<BasePreProcessor>();
+            mAllPostProcessors = AssetProcessorSystem.GetAllProcessors<BasePostProcessor>();
         }
 
         /// <summary>
@@ -183,7 +190,9 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetProcessorData()
         {
+            EditorUtility.SetDirty(mGlobalData);
             AssetDatabase.SaveAssetIfDirty(mGlobalData);
+            EditorUtility.SetDirty(mLocalData);
             AssetDatabase.SaveAssetIfDirty(mLocalData);
         }
 
@@ -271,7 +280,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawGlobalPreProcessorArea()
         {
-            DrawProcessorsArea(mGlobalData.PreProcessorData.ProcessorList, mGlobalData.PreProcessorData.ProcessorChosenList);
+            DrawProcessorsArea(mGlobalData.PreProcessorData, AssetPipelineConst.BASE_PRE_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -279,7 +288,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawGlobalPostProcessorArea()
         {
-            DrawProcessorsArea(mGlobalData.PostProcessorData.ProcessorList, mGlobalData.PostProcessorData.ProcessorChosenList);
+            DrawProcessorsArea(mGlobalData.PostProcessorData, AssetPipelineConst.BASE_POST_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -287,7 +296,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawGlobalMovedProcessorArea()
         {
-            DrawProcessorsArea(mGlobalData.MovedProcessorData.ProcessorList, mGlobalData.MovedProcessorData.ProcessorChosenList);
+            DrawProcessorsArea(mGlobalData.MovedProcessorData, AssetPipelineConst.BASE_POST_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -295,7 +304,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawGlobalDeletedProcessorArea()
         {
-            DrawProcessorsArea(mGlobalData.DeletedProcessorData.ProcessorList, mGlobalData.DeletedProcessorData.ProcessorChosenList);
+            DrawProcessorsArea(mGlobalData.DeletedProcessorData, AssetPipelineConst.BASE_POST_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -343,7 +352,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalPreProcessorArea()
         {
-            DrawLocalProcessorsArea(mLocalData.PreProcessorDataList);
+            DrawLocalProcessorsArea(mLocalData.PreProcessorDataList, AssetPipelineConst.BASE_PRE_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -351,7 +360,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalPostProcessorArea()
         {
-            DrawLocalProcessorsArea(mLocalData.PostProcessorDataList);
+            DrawLocalProcessorsArea(mLocalData.PostProcessorDataList, AssetPipelineConst.BASE_POST_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -359,7 +368,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalMovedProcessorArea()
         {
-            DrawLocalProcessorsArea(mLocalData.MovedProcessorDataList);
+            DrawLocalProcessorsArea(mLocalData.MovedProcessorDataList, AssetPipelineConst.BASE_POST_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -367,7 +376,7 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawLocalDeletedProcessorArea()
         {
-            DrawLocalProcessorsArea(mLocalData.DeletedProcessorDataList);
+            DrawLocalProcessorsArea(mLocalData.DeletedProcessorDataList, AssetPipelineConst.BASE_POST_PROCESSOR_TYPE);
         }
 
         /// <summary>
@@ -376,27 +385,41 @@ namespace TAssetPipeline
         private void DrawPreviewAssetProcessorArea()
         {
             EditorGUILayout.BeginVertical("box");
-            DrawPreviewProcessorTitleArea();
-            for (int i = 0; i < mAllProcessors.Count; i++)
+            DrawPreviewProcessorTitleArea("预处理器");
+            for (int i = 0; i < mAllPreProcessors.Count; i++)
             {
-                DrawOneProcessor(mAllProcessors[i]);
+                DrawOneProcessor(mAllPreProcessors[i]);
             }
-            if(GUILayout.Button("刷新预览", GUILayout.ExpandWidth(true)))
+            EditorGUILayout.Space();
+            DrawPreviewProcessorTitleArea("后处理器");
+            for (int i = 0; i < mAllPostProcessors.Count; i++)
+            {
+                DrawOneProcessor(mAllPostProcessors[i]);
+            }
+            var preColor = GUI.color;
+            GUI.color = Color.green;
+            if (GUILayout.Button("刷新预览", GUILayout.ExpandWidth(true)))
             {
                 UpdateAllProcessor();
             }
+            GUI.color = preColor;
             EditorGUILayout.EndVertical();
         }
 
         /// <summary>
         /// 绘制预览处理器标题区域
         /// </summary>
-        private void DrawPreviewProcessorTitleArea()
+        /// <param name="title"></param>
+        private void DrawPreviewProcessorTitleArea(string title)
         {
+            var preColor = GUI.color;
+            GUI.color = Color.yellow;
+            EditorGUILayout.LabelField(title, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            GUI.color = preColor;
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-            EditorGUILayout.LabelField("目标Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("管线处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -405,19 +428,25 @@ namespace TAssetPipeline
         /// <summary>
         /// 绘制指定处理器列表
         /// </summary>
+        /// <param name="processorGlobalData"></param>
         /// <param name="processorList"></param>
         /// <param name="chosenList"></param>
-        private void DrawProcessorsArea(List<BaseProcessor> processorList, List<BaseProcessor> chosenList)
+        /// <param name="processorType"></param>
+        private void DrawProcessorsArea(ProcessorGlobalData processorGlobalData, Type processorType)
         {
             EditorGUILayout.BeginVertical("box");
             DrawProcessorTitleArea();
+            var processorList = processorGlobalData.ProcessorList;
+            var chosenList = processorGlobalData.ProcessorChosenList;
             for (int i = 0; i < processorList.Count; i++)
             {
-                DrawOneProcessorByIndex(processorList, i);
+                DrawOneProcessorByIndex(processorList, i, processorType);
             }
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("处理器:", GUILayout.Width(100f));
-            chosenList[0] = (BaseProcessor)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.ExpandWidth(true));
+            chosenList[0] = (BaseProcessor)EditorGUILayout.ObjectField(chosenList[0], processorType, false, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.Width(100f)))
             {
                 if (chosenList[0] == null)
@@ -426,8 +455,8 @@ namespace TAssetPipeline
                 }
                 else
                 {
-                    var processorType = chosenList[0].GetType();
-                    var findProcessor = processorList.Find(processor => processor.GetType() == processorType);
+                    var chosenType = chosenList[0].GetType();
+                    var findProcessor = processorList.Find(processor => processor != null && processor.GetType() == chosenType);
                     if (findProcessor != null)
                     {
                         Debug.LogError($"不允许添加重复的处理器类型:{findProcessor.GetType().Name},处理器名;{findProcessor.Name},添加处理器失败!");
@@ -440,6 +469,7 @@ namespace TAssetPipeline
                     }
                 }
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
@@ -448,18 +478,21 @@ namespace TAssetPipeline
         /// 绘制指定处理器本地数据列表
         /// </summary>
         /// <param name="processorLocalData"></param>
-        /// <param name="chosenList"></param>
-        private void DrawProcessorsLocalDataArea(ProcessorLocalData processorLocalData, List<BaseProcessor> chosenList)
+        /// <param name="processorType"></param>
+        private void DrawProcessorsLocalDataArea(ProcessorLocalData processorLocalData, Type processorType)
         {
             EditorGUILayout.BeginVertical("box");
+            var chosenList = processorLocalData.ProcessorChosenList;
             DrawProcessorTitleArea(false);
             for (int i = 0; i < processorLocalData.ProcessorDataList.Count; i++)
             {
-                DrawOneProcessorLocalDataByIndex(processorLocalData, i);
+                DrawOneProcessorLocalDataByIndex(processorLocalData, i, processorType);
             }
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("处理器:", GUILayout.Width(100f));
-            chosenList[0] = (BaseProcessor)EditorGUILayout.ObjectField(chosenList[0], AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.ExpandWidth(true));
+            chosenList[0] = (BaseProcessor)EditorGUILayout.ObjectField(chosenList[0], processorType, false, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.Width(100f)))
             {
                 if(chosenList[0] == null)
@@ -468,8 +501,8 @@ namespace TAssetPipeline
                 }
                 else
                 {
-                    var processorType = chosenList[0].GetType();
-                    var findProcessorData = processorLocalData.ProcessorDataList.Find(processorData => processorData.Processor != null && processorData.Processor.TypeName.Equals(processorType.Name));
+                    var chosenType = chosenList[0].GetType();
+                    var findProcessorData = processorLocalData.ProcessorDataList.Find(processorData => processorData.Processor != null && processorData.Processor.GetType() == chosenType);
                     if(findProcessorData != null)
                     {
                         Debug.LogError($"不允许添加重复的处理器类型:{findProcessorData.Processor.TypeName},处理器名;{findProcessorData.Processor.Name},添加处理器失败!");
@@ -483,6 +516,7 @@ namespace TAssetPipeline
                     }
                 }
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndVertical();
         }
@@ -497,6 +531,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField("索引", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("管线处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             if(!isGlobalProcessor)
@@ -512,19 +547,24 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="processorsList"></param>
         /// <param name="index"></param>
-        private void DrawOneProcessorByIndex(List<BaseProcessor> processorsList, int index)
+        /// <param name="processorType"></param>
+        private void DrawOneProcessorByIndex(List<BaseProcessor> processorsList, int index, Type processorType)
         {
             var processor = processorsList[index];
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(processor.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
-            EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processor.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(processor, processorType, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 processorsList.RemoveAt(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
         }
 
@@ -533,15 +573,19 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="processorsLocalData"></param>
         /// <param name="index"></param>
-        private void DrawOneProcessorLocalDataByIndex(ProcessorLocalData processorsLocalData, int index)
+        /// <param name="processorType"></param>
+        private void DrawOneProcessorLocalDataByIndex(ProcessorLocalData processorsLocalData, int index, Type processorType)
         {
             var processorData = processorsLocalData.ProcessorDataList[index];
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(index.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(100f));
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
-            EditorGUILayout.ObjectField(processorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.ObjectField(processorData.Processor, processorType, false, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button($"数量({processorData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
             {
                 LocalDetailWindow.ShowProcessorDetailWindow(processorsLocalData.FolderPath, processorData);
@@ -550,6 +594,7 @@ namespace TAssetPipeline
             {
                 processorsLocalData.RemoveProcessorDataByIndex(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
         }
 
@@ -572,16 +617,20 @@ namespace TAssetPipeline
         /// 绘制指定局部处理器区域
         /// </summary>
         /// <param name="processorLocalDataList"></param>
-        private void DrawLocalProcessorsArea(List<ProcessorLocalData> processorLocalDataList)
+        /// <param name="processorType"></param>
+        private void DrawLocalProcessorsArea(List<ProcessorLocalData> processorLocalDataList, Type processorType)
         {
             EditorGUILayout.BeginVertical("box");
             for(int i = 0; i < processorLocalDataList.Count; i++)
             {
-                DrawOneLocalProcessorsByIndex(processorLocalDataList, i);
+                DrawOneLocalProcessorsByIndex(processorLocalDataList, i, processorType);
             }
+            var preColor = GUI.color;
+            GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.ExpandWidth(true)))
             {
-                processorLocalDataList.Add(new ProcessorLocalData());
+                FoldAllLocalProcessorData(processorLocalDataList);
+                processorLocalDataList.Add(new ProcessorLocalData(true));
                 processorLocalDataList.Sort(SortLocalProcesorData);
                 Debug.Log($"添加局部处理器数据成功!");
             }
@@ -589,6 +638,7 @@ namespace TAssetPipeline
             {
                 FoldAllLocalProcessorData(processorLocalDataList);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndVertical();
         }
 
@@ -597,23 +647,29 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="processorLocalDataList"></param>
         /// <param name="index"></param>
-        private void DrawOneLocalProcessorsByIndex(List<ProcessorLocalData> processorLocalDataList, int index)
+        /// <param name="processorType"></param>
+        private void DrawOneLocalProcessorsByIndex(List<ProcessorLocalData> processorLocalDataList, int index, Type processorType)
         {
             var processorLocalData = processorLocalDataList[index];
             EditorGUILayout.BeginVertical("box");
             EditorGUILayout.BeginHorizontal();
             processorLocalData.IsUnFold = EditorGUILayout.Foldout(processorLocalData.IsUnFold, processorLocalData.FolderPath, true);
             DrawProcessorLocalDataIcons(processorLocalData);
-            if(GUILayout.Button("-", GUILayout.Width(100f)))
+            var preColor = GUI.color;
+            GUI.color = Color.green;
+            if (GUILayout.Button("-", GUILayout.Width(100f)))
             {
                 processorLocalDataList.RemoveAt(index);
             }
+            GUI.color = preColor;
             EditorGUILayout.EndHorizontal();
             if (processorLocalData.IsUnFold)
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("目录路径:", GUILayout.Width(100f));
-                EditorGUILayout.TextField(processorLocalData.FolderPath, GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(processorLocalData.FolderPath, AssetPipelineStyles.ButtonLeftStyle, GUILayout.ExpandWidth(true));
+                var preColor2 = GUI.color;
+                GUI.color = Color.green;
                 if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
                 {
                     var newFolderPath = EditorUtilities.ChoosenProjectFolder(processorLocalData.FolderPath);
@@ -628,8 +684,9 @@ namespace TAssetPipeline
                         Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
                     }
                 }
+                GUI.color = preColor2;
                 EditorGUILayout.EndHorizontal();
-                DrawProcessorsLocalDataArea(processorLocalData, processorLocalData.ProcessorChosenList);
+                DrawProcessorsLocalDataArea(processorLocalData, processorType);
             }
             EditorGUILayout.EndVertical();
         }

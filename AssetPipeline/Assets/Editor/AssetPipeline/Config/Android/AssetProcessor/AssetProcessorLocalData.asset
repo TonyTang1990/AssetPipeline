@@ -12,3 +12,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1794ea97449537e41981b95db4d6d1cf, type: 3}
   m_Name: AssetProcessorLocalData
   m_EditorClassIdentifier: 
+  PreProcessorDataList:
+  - FolderPath: Assets/Res/textures/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: ae0ed7e60c9f6764fb26d211c4fa90f0, type: 2}
+      BlackListFolderPathList:
+      - Assets/Res/textures/TestBlackList/
+    - Processor: {fileID: 11400000, guid: 73b672ff399d9f547aa8991a3d259163, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/textures/AlphaFromSource/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: 3c691977a8a5382429c22a658b921866, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/textures/ASTC/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/textures/Mipmap/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: 397c9f594cabfa44aadead6f8ed852f3, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/textures/Mix/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: 3c691977a8a5382429c22a658b921866, type: 2}
+      BlackListFolderPathList: []
+    - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      BlackListFolderPathList: []
+    - Processor: {fileID: 11400000, guid: f3afeb65fbec752429c69e2481e04641, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/textures/TestBlackList/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/textures/TightSet/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: f3afeb65fbec752429c69e2481e04641, type: 2}
+      BlackListFolderPathList: []
+  PostProcessorDataList: []
+  MovedProcessorDataList: []
+  DeletedProcessorDataList: []

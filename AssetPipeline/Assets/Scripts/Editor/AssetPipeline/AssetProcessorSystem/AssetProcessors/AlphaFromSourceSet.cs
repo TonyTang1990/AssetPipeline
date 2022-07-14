@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// AlphaFromSource设置
     /// </summary>
     [CreateAssetMenu(fileName = "AlphaFromSourceSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AlphaFromSourceSet", order = 1004)]
-    public class AlphaFromSourceSet : BaseProcessor
+    public class AlphaFromSourceSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名

@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// SpriteMeshType设置
     /// </summary>
     [CreateAssetMenu(fileName = "SpriteMeshTypeSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/SpriteMeshTypeSet", order = 1006)]
-    public class SpriteMeshTypeSet : BaseProcessor
+    public class SpriteMeshTypeSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -89,7 +89,7 @@ namespace TAssetPipeline
             textureImporter.ReadTextureSettings(textureImporterSetting);
             textureImporterSetting.spriteMeshType = MeshType;
             textureImporter.SetTextureSettings(textureImporterSetting);
-            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}spriteMeshType:{MeshType}".WithColor(Color.yellow));
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath},spriteMeshType:{MeshType}".WithColor(Color.yellow));
         }
     }
 }

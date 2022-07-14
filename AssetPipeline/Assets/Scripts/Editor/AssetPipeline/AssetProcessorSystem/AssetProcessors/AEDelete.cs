@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// AE目录删除处理器
     /// </summary>
     [CreateAssetMenu(fileName = "AEDelete", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AEDelete", order = 1008)]
-    public class AEDelete : BaseProcessor
+    public class AEDelete : BasePostProcessor
     {
         /// <summary>
         /// 检查器名

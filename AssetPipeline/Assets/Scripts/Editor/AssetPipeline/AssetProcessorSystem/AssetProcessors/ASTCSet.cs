@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// ASTC设置
     /// </summary>
     [CreateAssetMenu(fileName = "ASTCSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/ASTCSet", order = 1003)]
-    public class ASTCSet : BaseProcessor
+    public class ASTCSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名

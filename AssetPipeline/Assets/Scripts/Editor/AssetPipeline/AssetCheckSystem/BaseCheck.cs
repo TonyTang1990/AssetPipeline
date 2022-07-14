@@ -123,7 +123,7 @@ namespace TAssetPipeline
             {
                 return false;
             }
-            AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行检查器:{Name}!".WithColor(Color.green));
+            AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行检查器:{Name},检查器描述:{CustomDes}!".WithColor(Color.green));
             return DoCheck(assetPostProcessor, paramList);
         }
 
@@ -138,7 +138,7 @@ namespace TAssetPipeline
             {
                 return false;
             }
-            AssetPipelineLog.Log($"@Asset:{assetPath}执行检查器:{Name}!".WithColor(Color.green));
+            AssetPipelineLog.Log($"@Asset:{assetPath}执行检查器:{Name},检查器描述:{CustomDes}!".WithColor(Color.green));
             return DoCheckByPath(assetPath, paramList);
         }
 

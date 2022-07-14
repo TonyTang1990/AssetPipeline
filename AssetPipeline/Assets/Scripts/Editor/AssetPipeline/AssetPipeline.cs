@@ -87,7 +87,7 @@ namespace TAssetPipeline
                 for (int i = 0, length = movedAssets.Length; i < length; i++)
                 {
                     AssetPipelineLog.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
-                    AssetPipelineSystem.OnPostprocessMovedAsset(AssetProcessType.CommonPostprocess, importedAssets[i], movedFromAssetPaths[i]);
+                    AssetPipelineSystem.OnPostprocessMovedAsset(AssetProcessType.CommonPostprocess, movedAssets[i], movedFromAssetPaths[i]);
                 }
 
                 for (int i = 0, length = deletedAssets.Length; i < length; i++)

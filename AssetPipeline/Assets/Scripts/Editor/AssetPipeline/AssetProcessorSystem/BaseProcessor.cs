@@ -122,7 +122,7 @@ namespace TAssetPipeline
             {
                 return;
             }
-            AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行处理器:{Name}!".WithColor(Color.green));
+            AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行处理器名:{Name},处理器描述:{CustomDes}!".WithColor(Color.green));
             DoProcessor(assetPostProcessor, paramList);
         }
 
@@ -137,7 +137,7 @@ namespace TAssetPipeline
             {
                 return;
             }
-            AssetPipelineLog.Log($"@Asset:{assetPath}执行处理器:{Name}!".WithColor(Color.green));
+            AssetPipelineLog.Log($"@Asset:{assetPath}执行处理器:{Name},处理器描述:{CustomDes}!".WithColor(Color.green));
             DoProcessorByPath(assetPath, paramList);
         }
 
