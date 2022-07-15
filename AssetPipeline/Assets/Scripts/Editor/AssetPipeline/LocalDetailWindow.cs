@@ -4,6 +4,7 @@
  * Create Date:             2022/07/08
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -33,27 +34,28 @@ namespace TAssetPipeline
         /// Asset管线处理器局部数据详情配置窗口
         /// </summary>
         /// <param name="folderPath">目标目录</param>
-        /// <param name="processorData"></param>
+        /// <param name="processorData">处理器数据</param>
+        /// <param name="processorType">处理器类型</param>
         /// <returns></returns>
-        public static void ShowProcessorDetailWindow(string folderPath, ProcessorSettingData processorData)
+        public static void ShowProcessorDetailWindow(string folderPath, ProcessorSettingData processorData, Type processorType)
         {
             var localDetailWindow = EditorWindow.GetWindow<LocalDetailWindow>(false, "局部数据详情配置窗口");
             localDetailWindow.Show();
-            localDetailWindow.SetProcessorData(folderPath, processorData);
+            localDetailWindow.SetProcessorData(folderPath, processorData, processorType);
         }
 
         /// <summary>
         /// Asset管线检查器局部数据详情配置窗口
         /// </summary>
         /// <param name="folderPath">目标目录</param>
-        /// <param name="checkData"></param>
-        /// <param name="extraDes">额外描述</param>
+        /// <param name="checkData">检查器数据</param>
+        /// <param name="checkType">检查器类型</param>
         /// <returns></returns>
-        public static void ShowCheckDetailWindow(string folderPath, CheckSettingData checkData)
+        public static void ShowCheckDetailWindow(string folderPath, CheckSettingData checkData, Type checkType)
         {
             var localDetailWindow = EditorWindow.GetWindow<LocalDetailWindow>(false, "局部数据详情配置窗口");
             localDetailWindow.Show();
-            localDetailWindow.SetCheckData(folderPath, checkData);
+            localDetailWindow.SetCheckData(folderPath, checkData, checkType);
         }
 
         /// <summary>
@@ -84,9 +86,19 @@ namespace TAssetPipeline
         private ProcessorSettingData mProcessorData;
 
         /// <summary>
+        /// 处理器类型
+        /// </summary>
+        private Type mProcessorType;
+
+        /// <summary>
         /// 当前检查数据
         /// </summary>
         private CheckSettingData mCheckData;
+
+        /// <summary>
+        /// 检查器类型
+        /// </summary>
+        private Type mCheckType;
 
         /// <summary>
         /// UI滚动位置
@@ -116,7 +128,10 @@ namespace TAssetPipeline
             mFolderPath = string.Empty;
             mLocalType = LocalDetailType.None;
             mProcessorData = null;
+            mProcessorType = null;
             mNewFolerPath = string.Empty;
+            mCheckData = null;
+            mCheckType = null;
         }
 
         /// <summary>
@@ -124,12 +139,14 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="folderPath">目标目录</param>
         /// <param name="processorData"></param>
-        private void SetProcessorData(string folderPath, ProcessorSettingData processorData)
+        /// <param name="processorType"></param>
+        private void SetProcessorData(string folderPath, ProcessorSettingData processorData, Type processorType)
         {
             ResetData();
             mFolderPath = folderPath;
             mLocalType = LocalDetailType.ProcessorLocalDetail;
             mProcessorData = processorData;
+            mProcessorType = processorType;
         }
 
         /// <summary>
@@ -137,12 +154,14 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="folderPath">目标目录</param>
         /// <param name="checkData"></param>
-        private void SetCheckData(string folderPath, CheckSettingData checkData)
+        /// <param name="checkType"></param>
+        private void SetCheckData(string folderPath, CheckSettingData checkData, Type checkType)
         {
             ResetData();
             mFolderPath = folderPath;
             mLocalType = LocalDetailType.CheckLocalDetail;
             mCheckData = checkData;
+            mCheckType = checkType;
         }
 
         /// <summary>
@@ -251,7 +270,7 @@ namespace TAssetPipeline
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
-                EditorGUILayout.ObjectField(mProcessorData.Processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
+                EditorGUILayout.ObjectField(mProcessorData.Processor, mProcessorType, false, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
             else
@@ -294,7 +313,7 @@ namespace TAssetPipeline
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.Name : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
-                EditorGUILayout.ObjectField(mCheckData.Check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
+                EditorGUILayout.ObjectField(mCheckData.Check, mCheckType, false, GUILayout.Width(250f));
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             }
             else

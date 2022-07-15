@@ -57,11 +57,11 @@ public class BaseEditorWindow : EditorWindow
     /// </summary>
     protected virtual void OnDisable()
     {
-        SaveData();
         foreach (var editorPanel in mEditorPanelMap)
         {
             editorPanel.Value.OnDisable();
         }
+        SaveData();
     }
 
     protected virtual void OnDestroy()

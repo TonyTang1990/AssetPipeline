@@ -26,7 +26,7 @@ namespace TAssetPipeline
         {
             { ".png", AssetType.Texture },
             { ".jpg", AssetType.Texture },
-            { ".ps", AssetType.Texture },
+            { ".psd", AssetType.Texture },
             { ".tif", AssetType.Texture },
             { ".mat", AssetType.Material },
             { ".spriteatlas", AssetType.SpriteAtlas },
@@ -42,6 +42,7 @@ namespace TAssetPipeline
             { ".unity", AssetType.Scene },
             { ".anim", AssetType.AnimationClip },
             { ".mesh", AssetType.Mesh },
+            { ".mp4", AssetType.Video },
             { ".cs", AssetType.Script },
             { ".dll", AssetType.Script },
             { ".java", AssetType.Script },
@@ -95,14 +96,40 @@ namespace TAssetPipeline
             {
                 return SettingData.Switch;
             }
+            set
+            {
+                SettingData.Switch = value;
+            }
         }
 
         /// <summary>
-        /// Asset黑名单Map<Asset路径, 是否在黑名单>
+        /// 已加载平台
         /// </summary>
-        private static Dictionary<string, bool> BlackListAssetPathMap = new Dictionary<string, bool>
+        public static BuildTarget LoadedTarget
         {
-            { GetSettingDataRelativePath(), true },
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 已加载策略
+        /// </summary>
+        public static string LoadedStrategyName
+        {
+            get;
+            private set;
+        }
+        
+        /// <summary>
+        /// Asset黑名单Map<Asset名, 是否在黑名单>
+        /// </summary>
+        private static Dictionary<string, bool> BlackListAssetNameMap = new Dictionary<string, bool>
+        {
+            { GetSettingDataAssetName(), true },
+            { AssetProcessorSystem.GetGlobalDataAssetName(), true },
+            { AssetProcessorSystem.GetLocalDataAssetName(), true },
+            { AssetCheckSystem.GetGlobalDataAssetName(), true },
+            { AssetCheckSystem.GetLocalDataAssetName(), true },
         };
 
         // 存储目录结构展示:
@@ -149,15 +176,24 @@ namespace TAssetPipeline
             Debug.Log($"Asset管线系统初始化".WithColor(Color.red));
             MakeSureSaveFolderExist();
             SettingData = LoadSettingData();
-            var activeTarget = EditorUserBuildSettings.activeBuildTarget;
-            var strategyName = GetActiveTargetStrategyName();
+            LoadedTarget = EditorUserBuildSettings.activeBuildTarget;
+            LoadedStrategyName = GetActiveTargetStrategyName();
             Debug.Log($"Asset管线开关:{SettingData.Switch}".WithColor(Color.red));
             Debug.Log($"Asset管线Log开关:{SettingData.LogSwitch}".WithColor(Color.red));
-            Debug.Log($"加载当前激活平台:{activeTarget}的Asset管线策略:{strategyName}".WithColor(Color.red));
+            Debug.Log($"加载当前激活平台:{LoadedTarget}的Asset管线策略:{LoadedStrategyName}".WithColor(Color.red));
             AssetPipelineLog.Switch = SettingData.LogSwitch;
             MakeActiveTargetStrategyFolderExist();
             AssetProcessorSystem.Init();
             AssetCheckSystem.Init();
+        }
+
+        /// <summary>
+        /// 当前激活平台是否已加载
+        /// </summary>
+        /// <returns></returns>
+        public static bool IsActiveTargetLoaded()
+        {
+            return LoadedTarget == EditorUserBuildSettings.activeBuildTarget;
         }
 
         /// <summary>
@@ -220,7 +256,7 @@ namespace TAssetPipeline
                        AssetType.FBX | AssetType.AudioClip | AssetType.Font |
                        AssetType.Shader | AssetType.Prefab | AssetType.ScriptableObject |
                        AssetType.TextAsset | AssetType.Scene | AssetType.AnimationClip |
-                       AssetType.Mesh;
+                       AssetType.Mesh | AssetType.Video;
         }
 
         /// <summary>
@@ -284,7 +320,16 @@ namespace TAssetPipeline
         private static string GetSettingDataRelativePath()
         {
             var saveFolderRelativePath = GetSaveFolderRelativePath();
-            return $"{saveFolderRelativePath}/{AssetPipelineSettingDataName}.asset";
+            return $"{saveFolderRelativePath}/{GetSettingDataAssetName()}";
+        }
+
+        /// <summary>
+        /// 获取Asset管线设置数据Asset名字
+        /// </summary>
+        /// <returns></returns>
+        private static string GetSettingDataAssetName()
+        {
+            return $"{AssetPipelineSettingDataName}.asset";
         }
 
         /// <summary>
@@ -322,7 +367,8 @@ namespace TAssetPipeline
         private static bool IsAssetPathInBlackList(string assetPath)
         {
             bool result;
-            if (!BlackListAssetPathMap.TryGetValue(assetPath, out result))
+            var assetName = Path.GetFileName(assetPath);
+            if (!BlackListAssetNameMap.TryGetValue(assetName, out result))
             {
                 return false;
             }
@@ -383,7 +429,7 @@ namespace TAssetPipeline
         public static void OnPreprocessByAssetType(AssetProcessType assetProcessType, AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
-            if(IsValideByAssetPath(assetPostProcessor.assetPath))
+            if (IsValideByAssetPath(assetPostProcessor.assetPath))
             {
                 AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                 // 预处理先执行Asset检查系统，后执行Asset处理系统

@@ -12,3 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c754c1b325bfad43a00764ea75831da, type: 3}
   m_Name: AssetProcessorGlobalData
   m_EditorClassIdentifier: 
+  PreProcessorData:
+    ProcessorList: []
+  PostProcessorData:
+    ProcessorList: []
+  MovedProcessorData:
+    ProcessorList: []
+  DeletedProcessorData:
+    ProcessorList: []

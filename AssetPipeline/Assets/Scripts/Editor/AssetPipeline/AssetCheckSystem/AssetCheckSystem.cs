@@ -272,6 +272,24 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 获取Asset检查器全局数据Asset名
+        /// </summary>
+        /// <returns></returns>
+        public static string GetGlobalDataAssetName()
+        {
+            return $"{AssetCheckGlobalDataName}.asset";
+        }
+
+        /// <summary>
+        /// 获取Asset检查器局部数据Asset名
+        /// </summary>
+        /// <returns></returns>
+        public static string GetLocalDataAssetName()
+        {
+            return $"{AssetCheckLocalDataName}.asset";
+        }
+
+        /// <summary>
         /// 获取指定策略的Asset检查器全局数据相对路径
         /// </summary>
         /// <param name="strategyName"></param>
@@ -279,7 +297,7 @@ namespace TAssetPipeline
         private static string GetGlobalDataRelativePathByStartegy(string strategyName)
         {
             var saveFolderRelativePath = GetDataSaveFolderByStrategy(strategyName);
-            return $"{saveFolderRelativePath}/{AssetCheckGlobalDataName}.asset";
+            return $"{saveFolderRelativePath}/{GetGlobalDataAssetName()}";
         }
 
         /// <summary>
@@ -290,7 +308,7 @@ namespace TAssetPipeline
         private static string GetLocalDataRelativePathByStrategy(string strategyName)
         {
             var saveFolderRelativePath = GetDataSaveFolderByStrategy(strategyName);
-            return $"{saveFolderRelativePath}/{AssetCheckLocalDataName}.asset";
+            return $"{saveFolderRelativePath}/{GetLocalDataAssetName()}";
         }
 
         /// <summary>

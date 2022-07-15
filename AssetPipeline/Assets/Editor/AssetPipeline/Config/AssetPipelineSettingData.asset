@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b916721793b90a459f1ac2648c528ec, type: 3}
   m_Name: AssetPipelineSettingData
   m_EditorClassIdentifier: 
-  ResourceFolder: Assets/Res/
+  ResourceFolder: Assets/
   Switch: 1
   LogSwitch: 1
   StrategyList:

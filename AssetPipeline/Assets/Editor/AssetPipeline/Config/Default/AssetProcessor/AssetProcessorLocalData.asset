@@ -12,3 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1794ea97449537e41981b95db4d6d1cf, type: 3}
   m_Name: AssetProcessorLocalData
   m_EditorClassIdentifier: 
+  PreProcessorDataList: []
+  PostProcessorDataList: []
+  MovedProcessorDataList: []
+  DeletedProcessorDataList: []

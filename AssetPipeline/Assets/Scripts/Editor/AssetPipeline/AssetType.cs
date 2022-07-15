@@ -33,8 +33,9 @@ namespace TAssetPipeline
         AnimationClip = 1 << 11,          // 动画文件
         Mesh = 1 << 12,                   // Mesh文件
         Script = 1 << 13,                 // 脚本(e.g. cs, dll等)
-        Folder = 1 << 14,                 // 文件夹
-        Other = 1 << 15,                  // 其他
+        Video = 1 << 14,                  // 视频
+        Folder = 1 << 15,                 // 文件夹
+        Other = 1 << 16,                  // 其他
         All = Int32.MaxValue,             // 所有类型
     }
 }

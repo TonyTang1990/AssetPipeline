@@ -33,7 +33,6 @@ TextureImporter:
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
   vTOnly: 0
-  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -185,13 +184,9 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable:
-      SimpleShaderBG: 21300002
-      TextureShader: 21300004
-      LightModelShader: 21300000
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
   userData: 
-  assetBundleName: tutorialcellspritesheet
+  assetBundleName: b472211cdbe3af4dfaa7d6621f0d847765a4c2c88a585ba30cf6fbae9a75b0e8
   assetBundleVariant: 

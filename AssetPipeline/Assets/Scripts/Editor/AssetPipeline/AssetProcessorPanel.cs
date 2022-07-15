@@ -588,7 +588,7 @@ namespace TAssetPipeline
             GUI.color = Color.green;
             if (GUILayout.Button($"数量({processorData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
             {
-                LocalDetailWindow.ShowProcessorDetailWindow(processorsLocalData.FolderPath, processorData);
+                LocalDetailWindow.ShowProcessorDetailWindow(processorsLocalData.FolderPath, processorData, processorType);
             }
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {

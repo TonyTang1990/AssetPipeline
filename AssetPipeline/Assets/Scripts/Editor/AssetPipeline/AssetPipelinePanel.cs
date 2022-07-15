@@ -162,8 +162,6 @@ namespace TAssetPipeline
             SaveAssetPipelineData();
             SaveAssetPipelinePrefDatas();
             Debug.Log($"保存Asset管线数据完成!");
-            // 强制重载Assset管线数据，确保加载使用最新的Asset管线设置数据
-            AssetPipelineSystem.Init();
         }
 
         /// <summary>
@@ -379,8 +377,13 @@ namespace TAssetPipeline
                 var newStrategyName = mAllStrategyNames[mPlatformStrategySelectedIndexMap[platformStrategyData.Target]];
                 if(EditorUtility.DisplayDialog("平台策略切换", $"确认切换平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}吗？切换后对应平台需要重新导入触发对应策略方案!", "确认", "取消"))
                 {
-                    Debug.Log($"更新平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}");
+                    Debug.Log($"更新平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}".WithColor(Color.yellow));
                     platformStrategyData.StrategyName = newStrategyName;
+                    if(EditorUserBuildSettings.activeBuildTarget == platformStrategyData.Target)
+                    {
+                        Debug.Log($"当前切换目标平台:{platformStrategyData.Target}和当前激活平台一致,强制保存重新加载最新配置数据!".WithColor(Color.yellow));
+                        GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllDatas();
+                    }
                 }
                 else
                 {

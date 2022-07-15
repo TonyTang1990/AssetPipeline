@@ -639,7 +639,7 @@ namespace TAssetPipeline
             GUI.color = Color.green;
             if (GUILayout.Button($"数量({checkData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
             {
-                LocalDetailWindow.ShowCheckDetailWindow(checkLocalData.FolderPath, checkData);
+                LocalDetailWindow.ShowCheckDetailWindow(checkLocalData.FolderPath, checkData, checkType);
             }
             if (GUILayout.Button("-", GUILayout.Width(100f)))
             {

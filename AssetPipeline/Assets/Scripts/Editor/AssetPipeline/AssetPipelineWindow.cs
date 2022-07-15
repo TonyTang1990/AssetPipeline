@@ -93,6 +93,14 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 保存数据
+        /// </summary>
+        protected override void SaveData()
+        {
+            base.SaveData();
+        }
+
+        /// <summary>
         /// 初始化所有数据
         /// </summary>
         private void InitAllData()
@@ -109,6 +117,8 @@ namespace TAssetPipeline
             AssetProcessorPanel.SaveData();
             AssetCheckPanel.SaveData();
             Debug.Log($"保存所有Asset管线数据完成!");
+            // 强制重载Assset管线数据，确保加载使用最新的Asset管线设置数据
+            AssetPipelineSystem.Init();
         }
 
         /// <summary>

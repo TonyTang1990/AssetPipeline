@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -16,13 +17,23 @@ namespace TAssetPipeline
     /// AssetPipeline.cs
     /// Asset管线入口
     /// </summary>
-    public class AssetPipeline : AssetPostprocessor
+    public class AssetPipeline : AssetPostprocessor, IActiveBuildTargetChanged
     {
         /// <summary>
         /// 预处理所有Asset
         /// </summary>
         private void OnPreprocessAsset()
         {
+            // 在切换平台瞬间触发的Asset导入会先于InitializeOnLoadMethodAttribute标签的执行
+            // 导致在Asset管线没有正确加载当前平台策略前触发Asset管线流程
+            // 因此为了确保切换平台瞬间Asset管线处理正确
+            // 在完成平台切换前前选择关闭Asset管线系统，等切换平台完成后重新初始化Asset管线系统
+            if (!AssetPipelineSystem.IsActiveTargetLoaded() && AssetPipelineSystem.Switch)
+            {
+                Debug.LogWarning($"当前平台:{EditorUserBuildSettings.activeBuildTarget}和当前已加载平台:{AssetPipelineSystem.LoadedTarget}不一致，关闭Asset管线系统!".WithColor(Color.yellow));
+                Debug.LogWarning($"建议切换平台时关闭Asset管线配置窗口!".WithColor(Color.yellow));
+                AssetPipelineSystem.Switch = false;
+            }
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAsset()");
             var assetType = AssetPipelineSystem.GetAssetTypeByPath(this.assetPath);
             AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.CommonPreprocess, assetType, this);
@@ -74,7 +85,6 @@ namespace TAssetPipeline
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAllAssets()");
-
             try
             {
                 AssetDatabase.StartAssetEditing();
@@ -161,6 +171,29 @@ namespace TAssetPipeline
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPostprocessAudio({audioClip.name})");
             AssetPipelineSystem.OnPostprocessByAssetType(AssetProcessType.PostprocessAudio, AssetType.AudioClip, this, audioClip);
+        }
+
+        public int callbackOrder
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// 响应平台切换完成
+        /// </summary>
+        /// <param name="previousTarget"></param>
+        /// <param name="newTarget"></param>
+        public void OnActiveBuildTargetChanged(BuildTarget previousTarget, BuildTarget newTarget)
+        {
+            Debug.Log($"平台从:{previousTarget}切换到:{newTarget}平台完成!".WithColor(Color.yellow));
+            if (!AssetPipelineSystem.Switch)
+            {
+                AssetPipelineSystem.Switch = true;
+                Debug.Log($"打开Asset管线系统!".WithColor(Color.yellow));
+            }
         }
     }
 }

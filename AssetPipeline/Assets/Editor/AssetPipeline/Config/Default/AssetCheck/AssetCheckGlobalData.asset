@@ -12,3 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ece30109a310f46449532ccd5a4482c3, type: 3}
   m_Name: AssetCheckGlobalData
   m_EditorClassIdentifier: 
+  PreCheckData:
+    CheckList: []
+  PostCheckData:
+    CheckList: []
