@@ -115,7 +115,7 @@ Asset管线核心框架部分:
   }
   ```
 
-  ​	**上面的Asset类型只所以定义成Flags是为了处理器和检查器可以定义需要支持的Asset雷和组合**
+  ​	**上面的Asset类型只所以定义成Flags是为了处理器和检查器可以定义需要支持的Asset类型组合**
 
 - Asset管线处理类型定义
 
@@ -492,4 +492,4 @@ public class GenerateABName : BasePostProcessor
 
 ## 博客
 
-[可配置Asset管线系统]()
+[可配置Asset管线系统](http://tonytang1990.github.io/2022/07/16/%E5%8F%AF%E9%85%8D%E7%BD%AEAsset%E7%AE%A1%E7%BA%BF%E7%B3%BB%E7%BB%9F/)
