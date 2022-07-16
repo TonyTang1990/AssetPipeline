@@ -42,7 +42,6 @@ Asset管线核心框架部分:
 
 - AssetType -- Asset类型定义
 - AssetProcessType -- Asset管线处理类型定义
-- LocaDetailWindow -- Asset管线局部数据详情配置窗口(用于配置局部数据黑名单路径配置)
 - AssetPipeline -- Asset管线入口(负责接入Asset后处理流程以及Asset管线系统初始化)
 - AssetPipelineSystem -- Asset管线系统(负责初始化Asset管线里各系统以及各系统调用)
 - AssetProcessorSystem -- Asset处理系统(负责Asset自动化后处理相关配置)
@@ -64,6 +63,7 @@ Asset管线核心框架部分:
 - AssetPipelinePanel -- Asset管线面板
 - AssetProcessorPanel -- Asset处理器面板
 - AssetCheckPanel -- Asset检查器面板
+- LocaDetailWindow -- Asset管线局部数据详情配置窗口(用于配置局部数据黑名单路径配置)
 
 其他部分:
 
