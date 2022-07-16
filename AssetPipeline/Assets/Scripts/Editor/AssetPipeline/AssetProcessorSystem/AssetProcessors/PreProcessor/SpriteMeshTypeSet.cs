@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             ASTCSet.cs
+ * Description:             SpriteMeshTypeSet.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/19
  */
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// ASTCSet.cs
-    /// ASTC设置
+    /// SpriteMeshTypeSet.cs
+    /// SpriteMeshType设置
     /// </summary>
-    [CreateAssetMenu(fileName = "ASTCSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/ASTCSet", order = 1003)]
-    public class ASTCSet : BasePreProcessor
+    [CreateAssetMenu(fileName = "SpriteMeshTypeSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/SpriteMeshTypeSet", order = 1005)]
+    public class SpriteMeshTypeSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "ASTC设置";
+                return "SpriteMeshType设置";
             }
         }
 
@@ -52,10 +52,10 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 目标纹理格式
+        /// SpriteMeshType
         /// </summary>
-        [Header("目标纹理格式")]
-        public TextureImporterFormat TargetTextureFormat = TextureImporterFormat.ASTC_4x4;
+        [Header("SpriteMeshType选择")]
+        public SpriteMeshType MeshType = SpriteMeshType.FullRect;
 
         /// <summary>
         /// 执行处理器处理
@@ -64,8 +64,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            var assetImporter = assetPostProcessor.assetImporter;
-            DoASTCSet(assetImporter);
+            DoTightSet(assetPostProcessor.assetImporter);
         }
 
         /// <summary>
@@ -76,25 +75,21 @@ namespace TAssetPipeline
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
             var assetImporter = AssetImporter.GetAtPath(assetPath);
-            DoASTCSet(assetImporter);
+            DoTightSet(assetImporter);
         }
 
         /// <summary>
-        /// 执行ASTC设置
+        /// 执行Tight设置
         /// </summary>
         /// <param name="assetImporter"></param>
-        private void DoASTCSet(AssetImporter assetImporter)
+        private void DoTightSet(AssetImporter assetImporter)
         {
             var textureImporter = assetImporter as TextureImporter;
-            var actiivePlatformName = EditorUtilities.GetPlatformNameByTarget(EditorUserBuildSettings.activeBuildTarget);
-            var platformTextureSettings = textureImporter.GetPlatformTextureSettings(actiivePlatformName);
-            var automaticFormat = textureImporter.GetAutomaticFormat(actiivePlatformName);
-            var isAutomaticASTC = ResourceUtilities.IsASTCFormat(automaticFormat);
-            var textureFormat = isAutomaticASTC ? automaticFormat : TargetTextureFormat;
-            platformTextureSettings.overridden = true;
-            platformTextureSettings.format = textureFormat;
-            textureImporter.SetPlatformTextureSettings(platformTextureSettings);
-            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}纹理压缩格式:{textureFormat}".WithColor(Color.yellow));
+            TextureImporterSettings textureImporterSetting = new TextureImporterSettings();
+            textureImporter.ReadTextureSettings(textureImporterSetting);
+            textureImporterSetting.spriteMeshType = MeshType;
+            textureImporter.SetTextureSettings(textureImporterSetting);
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath},spriteMeshType:{MeshType}".WithColor(Color.yellow));
         }
     }
 }

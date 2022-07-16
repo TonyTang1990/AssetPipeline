@@ -79,9 +79,9 @@ namespace TAssetPipeline
         /// <summary>
         /// 初始化数据
         /// </summary>
-        public override void InitData()
+        public override void LoadAllData()
         {
-            base.InitData();
+            base.LoadAllData();
             InitAssetPipelineData();
             LoadAssetPipelinePrefDatas();
         }
@@ -156,9 +156,9 @@ namespace TAssetPipeline
         /// <summary>
         /// 保存数据
         /// </summary>
-        public override void SaveData()
+        public override void SaveAllData()
         {
-            base.SaveData();
+            base.SaveAllData();
             SaveAssetPipelineData();
             SaveAssetPipelinePrefDatas();
             Debug.Log($"保存Asset管线数据完成!");
@@ -195,10 +195,13 @@ namespace TAssetPipeline
         /// </summary>
         public override void OnGUI()
         {
-            DrawPlatformInfoArea();
-            mAssetPipelineScrollPos = EditorGUILayout.BeginScrollView(mAssetPipelineScrollPos);
-            DrawAssetPipelineContentArea();
-            EditorGUILayout.EndScrollView();
+            if(mSettingData != null)
+            {
+                DrawPlatformInfoArea();
+                mAssetPipelineScrollPos = EditorGUILayout.BeginScrollView(mAssetPipelineScrollPos);
+                DrawAssetPipelineContentArea();
+                EditorGUILayout.EndScrollView();
+            }
         }
 
         /// <summary>
@@ -311,7 +314,7 @@ namespace TAssetPipeline
             GUI.color = Color.green;
             if (GUILayout.Button("保存Asset管线数据", GUILayout.ExpandWidth(true)))
             {
-                GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllDatas();
+                GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllData();
             }
             GUI.color = preColor;
         }
@@ -368,31 +371,34 @@ namespace TAssetPipeline
         /// </summary>
         private void DrawOnePlatformStartegy(PlatformStrategyData platformStrategyData)
         {
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField(platformStrategyData.Target.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(200f));
-            EditorGUI.BeginChangeCheck();
-            mPlatformStrategySelectedIndexMap[platformStrategyData.Target] = EditorGUILayout.Popup(mPlatformStrategySelectedIndexMap[platformStrategyData.Target], mAllStrategyNames, GUILayout.ExpandWidth(true));
-            if (EditorGUI.EndChangeCheck())
+            if(platformStrategyData != null)
             {
-                var newStrategyName = mAllStrategyNames[mPlatformStrategySelectedIndexMap[platformStrategyData.Target]];
-                if(EditorUtility.DisplayDialog("平台策略切换", $"确认切换平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}吗？切换后对应平台需要重新导入触发对应策略方案!", "确认", "取消"))
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(platformStrategyData.Target.ToString(), AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(200f));
+                EditorGUI.BeginChangeCheck();
+                mPlatformStrategySelectedIndexMap[platformStrategyData.Target] = EditorGUILayout.Popup(mPlatformStrategySelectedIndexMap[platformStrategyData.Target], mAllStrategyNames, GUILayout.ExpandWidth(true));
+                if (EditorGUI.EndChangeCheck())
                 {
-                    Debug.Log($"更新平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}".WithColor(Color.yellow));
-                    platformStrategyData.StrategyName = newStrategyName;
-                    if(EditorUserBuildSettings.activeBuildTarget == platformStrategyData.Target)
+                    var newStrategyName = mAllStrategyNames[mPlatformStrategySelectedIndexMap[platformStrategyData.Target]];
+                    if (EditorUtility.DisplayDialog("平台策略切换", $"确认切换平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}吗？切换后对应平台需要重新导入触发对应策略方案!", "确认", "取消"))
                     {
-                        Debug.Log($"当前切换目标平台:{platformStrategyData.Target}和当前激活平台一致,强制保存重新加载最新配置数据!".WithColor(Color.yellow));
-                        GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllDatas();
+                        Debug.Log($"更新平台:{platformStrategyData.Target}的打包策略从:{platformStrategyData.StrategyName}到{newStrategyName}".WithColor(Color.yellow));
+                        platformStrategyData.StrategyName = newStrategyName;
+                        if (EditorUserBuildSettings.activeBuildTarget == platformStrategyData.Target)
+                        {
+                            Debug.Log($"当前切换目标平台:{platformStrategyData.Target}和当前激活平台一致,强制保存重新加载最新配置数据!".WithColor(Color.yellow));
+                            GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllData();
+                        }
+                    }
+                    else
+                    {
+                        var preIndex = Array.IndexOf<string>(mAllStrategyNames, platformStrategyData.StrategyName);
+                        mPlatformStrategySelectedIndexMap[platformStrategyData.Target] = preIndex;
+                        Debug.Log($"取消更新平台:{platformStrategyData.Target}的打包策略");
                     }
                 }
-                else
-                {
-                    var preIndex = Array.IndexOf<string>(mAllStrategyNames, platformStrategyData.StrategyName);
-                    mPlatformStrategySelectedIndexMap[platformStrategyData.Target] = preIndex;
-                    Debug.Log($"取消更新平台:{platformStrategyData.Target}的打包策略");
-                }
+                EditorGUILayout.EndHorizontal();
             }
-            EditorGUILayout.EndHorizontal();
         }
 
         /// <summary>
@@ -401,7 +407,12 @@ namespace TAssetPipeline
         /// <param name="strategyName"></param>
         private bool AddStrategy(string strategyName)
         {
-            if (string.IsNullOrEmpty(mStrategyAdded))
+            if(mSettingData == null)
+            {
+                Debug.LogError($"未加载有效配置数据,添加策略失败!");
+                return false;
+            }
+            else if (string.IsNullOrEmpty(mStrategyAdded))
             {
                 Debug.LogError($"不允许添加空策略名!");
                 return false;
@@ -424,14 +435,23 @@ namespace TAssetPipeline
         /// <returns></returns>
         private bool RemoveStrategyByIndex(int index)
         {
-            if(index >= 0 && index < mSettingData.StrategyList.Count)
+            if(mSettingData != null)
             {
-                mSettingData.StrategyList.RemoveAt(index);
-                UpdateStrategyNames();
-                Debug.Log($"移除指定索引:{index}的策略名配置!");
-                return true;
+                if (index >= 0 && index < mSettingData.StrategyList.Count)
+                {
+                    mSettingData.StrategyList.RemoveAt(index);
+                    UpdateStrategyNames();
+                    Debug.Log($"移除指定索引:{index}的策略名配置!");
+                    return true;
+                }
+                Debug.LogError($"移除指定索引:{index}超出有效索引范围:{0}-{mSettingData.StrategyList.Count},移除失败!");
+                return false;
             }
-            return false;
+            else
+            {
+                Debug.LogError($"未加载有效配置数据,移除指定索引:{index}的策略名配置失败!");
+                return false;
+            }
         }
     }
 }

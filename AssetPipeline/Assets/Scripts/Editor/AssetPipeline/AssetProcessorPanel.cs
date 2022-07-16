@@ -126,11 +126,11 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 初始化数据
+        /// 加载所有数据
         /// </summary>
-        public override void InitData()
+        public override void LoadAllData()
         {
-            base.InitData();
+            base.LoadAllData();
             mSelectedTagIndex = (int)AssetProcessorTag.Global;
             LoadAssetProcessorPrefDatas();
             InitAssetProcessorData();
@@ -167,11 +167,11 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 保存数据
+        /// 保存所有数据
         /// </summary>
-        public override void SaveData()
+        public override void SaveAllData()
         {
-            base.SaveData();
+            base.SaveAllData();
             SaveAssetProcessorPrefDatas();
             SaveAssetProcessorData();
             Debug.Log($"保存Asset处理器数据完成!");
@@ -190,10 +190,16 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetProcessorData()
         {
-            EditorUtility.SetDirty(mGlobalData);
-            AssetDatabase.SaveAssetIfDirty(mGlobalData);
-            EditorUtility.SetDirty(mLocalData);
-            AssetDatabase.SaveAssetIfDirty(mLocalData);
+            if(mGlobalData != null)
+            {
+                EditorUtility.SetDirty(mGlobalData);
+                AssetDatabase.SaveAssetIfDirty(mGlobalData);
+            }
+            if(mLocalData != null)
+            {
+                EditorUtility.SetDirty(mLocalData);
+                AssetDatabase.SaveAssetIfDirty(mLocalData);
+            }
         }
 
         /// <summary>
@@ -202,10 +208,17 @@ namespace TAssetPipeline
 
         public override void OnGUI()
         {
-            DrawAssetProcessorTagArea();
-            mAssetProcessorScrollPos = GUILayout.BeginScrollView(mAssetProcessorScrollPos);
-            DrawAssetProcessorContentArea();
-            GUILayout.EndScrollView();
+            if (mGlobalData != null && mLocalData != null)
+            {
+                DrawAssetProcessorTagArea();
+                mAssetProcessorScrollPos = GUILayout.BeginScrollView(mAssetProcessorScrollPos);
+                DrawAssetProcessorContentArea();
+                GUILayout.EndScrollView();
+            }
+            else
+            {
+                EditorGUILayout.LabelField($"未加载有效配置数据!", GUILayout.ExpandWidth(true));
+            }
         }
 
         /// <summary>
@@ -495,7 +508,7 @@ namespace TAssetPipeline
             GUI.color = Color.green;
             if (GUILayout.Button("+", GUILayout.Width(100f)))
             {
-                if(chosenList[0] == null)
+                if (chosenList[0] == null)
                 {
                     Debug.LogError($"不允许添加空处理器,添加处理器失败!");
                 }
@@ -503,13 +516,13 @@ namespace TAssetPipeline
                 {
                     var chosenType = chosenList[0].GetType();
                     var findProcessorData = processorLocalData.ProcessorDataList.Find(processorData => processorData.Processor != null && processorData.Processor.GetType() == chosenType);
-                    if(findProcessorData != null)
+                    if (findProcessorData != null)
                     {
                         Debug.LogError($"不允许添加重复的处理器类型:{findProcessorData.Processor.TypeName},处理器名;{findProcessorData.Processor.Name},添加处理器失败!");
                     }
                     else
                     {
-                        if(processorLocalData.AddProcessorData(chosenList[0]))
+                        if (processorLocalData.AddProcessorData(chosenList[0]))
                         {
                             Debug.Log($"添加处理器;{chosenList[0].Name}成功!");
                         }
@@ -621,7 +634,7 @@ namespace TAssetPipeline
         private void DrawLocalProcessorsArea(List<ProcessorLocalData> processorLocalDataList, Type processorType)
         {
             EditorGUILayout.BeginVertical("box");
-            for(int i = 0; i < processorLocalDataList.Count; i++)
+            for (int i = 0; i < processorLocalDataList.Count; i++)
             {
                 DrawOneLocalProcessorsByIndex(processorLocalDataList, i, processorType);
             }
@@ -673,7 +686,7 @@ namespace TAssetPipeline
                 if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
                 {
                     var newFolderPath = EditorUtilities.ChoosenProjectFolder(processorLocalData.FolderPath);
-                    if(!newFolderPath.Equals(processorLocalData.FolderPath) &&
+                    if (!newFolderPath.Equals(processorLocalData.FolderPath) &&
                         !CheckFolderPathExist(processorLocalDataList, newFolderPath))
                     {
                         processorLocalData.FolderPath = newFolderPath;
@@ -697,7 +710,7 @@ namespace TAssetPipeline
         /// <param name="processorLocalData"></param>
         private void DrawProcessorLocalDataIcons(ProcessorLocalData processorLocalData)
         {
-            for(int i = 0; i < processorLocalData.ProcessorIconList.Count; i++)
+            for (int i = 0; i < processorLocalData.ProcessorIconList.Count; i++)
             {
                 EditorGUILayout.LabelField(processorLocalData.ProcessorIconList[i], GUILayout.Width(20f));
             }
@@ -709,9 +722,12 @@ namespace TAssetPipeline
         /// <param name="processorLocalDataList"></param>
         private void FoldAllLocalProcessorData(List<ProcessorLocalData> processorLocalDataList)
         {
-            foreach(var processorLocalData in processorLocalDataList)
+            if(processorLocalDataList != null)
             {
-                processorLocalData.IsUnFold = false;
+                foreach (var processorLocalData in processorLocalDataList)
+                {
+                    processorLocalData.IsUnFold = false;
+                }
             }
         }
 

@@ -63,6 +63,7 @@ public abstract class BaseEditorPanel
         }
         OwnerEditorWindow = ownerEditorWindow;
         PanelName = string.IsNullOrEmpty(panelName) ? this.GetType().Name : panelName;
+        LoadAllData();
     }
 
     /// <summary>
@@ -75,11 +76,19 @@ public abstract class BaseEditorPanel
     }
 
     /// <summary>
+    /// 加载所有数据
+    /// </summary>
+    public virtual void LoadAllData()
+    {
+
+    }
+
+    /// <summary>
     /// 响应激活
     /// </summary>
     public void OnEnable()
     {
-        InitData();
+
     }
 
     /// <summary>
@@ -87,21 +96,21 @@ public abstract class BaseEditorPanel
     /// </summary>
     public void OnDisable()
     {
-        SaveData();
+
     }
 
     /// <summary>
-    /// 初始化数据
+    ///  响应销毁
     /// </summary>
-    public virtual void InitData()
+    public virtual void OnDestroy()
     {
 
     }
 
     /// <summary>
-    /// 保存数据
+    /// 保存所有数据
     /// </summary>
-    public virtual void SaveData()
+    public virtual void SaveAllData()
     {
 
     }

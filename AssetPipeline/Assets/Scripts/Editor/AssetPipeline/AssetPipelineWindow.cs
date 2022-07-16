@@ -83,39 +83,22 @@ namespace TAssetPipeline
             AssetCheckPanel = CreatePanel<AssetCheckPanel>();
         }
 
-        /// <summary>
-        /// 初始化窗口数据
-        /// </summary>
-        protected override void InitData()
-        {
-            base.InitData();
-            InitAllData();
-        }
 
         /// <summary>
-        /// 保存数据
+        /// 加载数据
         /// </summary>
-        protected override void SaveData()
+        public override void LoadAllData()
         {
-            base.SaveData();
-        }
-
-        /// <summary>
-        /// 初始化所有数据
-        /// </summary>
-        private void InitAllData()
-        {
+            base.LoadAllData();
             mCurrentSelectedTagIndex = (int)AssetPipelineTag.AssetPipelineSystem;
         }
 
         /// <summary>
         /// 保存所有数据
         /// </summary>
-        public void SaveAllDatas()
+        public override void SaveAllData()
         {
-            AssetPipelinePanel.SaveData();
-            AssetProcessorPanel.SaveData();
-            AssetCheckPanel.SaveData();
+            base.SaveAllData();
             Debug.Log($"保存所有Asset管线数据完成!");
             // 强制重载Assset管线数据，确保加载使用最新的Asset管线设置数据
             AssetPipelineSystem.Init();
@@ -126,10 +109,23 @@ namespace TAssetPipeline
         /// </summary>
         private void OnGUI()
         {
-            EditorGUILayout.BeginVertical();
-            DrawTagArea();
-            DrawContentArea();
-            EditorGUILayout.EndVertical();
+            if(AssetPipelinePanel != null && AssetProcessorPanel != null && AssetCheckPanel != null)
+            {
+                EditorGUILayout.BeginVertical();
+                DrawTagArea();
+                DrawContentArea();
+                EditorGUILayout.EndVertical();
+            }
+            else
+            {
+                var preColor = GUI.color;
+                GUI.color = Color.green;
+                if (GUILayout.Button("重新加载配置数据", GUILayout.ExpandWidth(true)))
+                {
+                    LoadAllData();
+                }
+                GUI.color = preColor;
+            }
         }
 
         /// <summary>

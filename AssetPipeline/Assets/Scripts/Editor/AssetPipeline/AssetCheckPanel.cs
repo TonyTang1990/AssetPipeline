@@ -122,11 +122,11 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 初始化数据
+        /// 加载所有数据
         /// </summary>
-        public override void InitData()
+        public override void LoadAllData()
         {
-            base.InitData();
+            base.LoadAllData();
             mSelectedTagIndex = (int)AssetCheckTag.Global;
             LoadAssetCheckPrefDatas();
             InitAssetCheckData();
@@ -163,11 +163,11 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 保存数据
+        /// 保存所有数据
         /// </summary>
-        public override void SaveData()
+        public override void SaveAllData()
         {
-            base.SaveData();
+            base.SaveAllData();
             SaveAssetCheckPrefDatas();
             SaveAssetCheckData();
             Debug.Log($"保存Asset检查器数据完成!");
@@ -186,10 +186,16 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetCheckData()
         {
-            EditorUtility.SetDirty(mGlobalData);
-            AssetDatabase.SaveAssetIfDirty(mGlobalData);
-            EditorUtility.SetDirty(mGlobalData);
-            AssetDatabase.SaveAssetIfDirty(mLocalData);
+            if(mGlobalData != null)
+            {
+                EditorUtility.SetDirty(mGlobalData);
+                AssetDatabase.SaveAssetIfDirty(mGlobalData);
+            }
+            if(mLocalData != null)
+            {
+                EditorUtility.SetDirty(mLocalData);
+                AssetDatabase.SaveAssetIfDirty(mLocalData);
+            }
         }
 
         /// <summary>
@@ -198,10 +204,17 @@ namespace TAssetPipeline
 
         public override void OnGUI()
         {
-            DrawAssetCheckTagArea();
-            mAssetCheckScrollPos = GUILayout.BeginScrollView(mAssetCheckScrollPos);
-            DrawAssetCheckContentArea();
-            GUILayout.EndScrollView();
+            if(mGlobalData != null && mLocalData != null)
+            {
+                DrawAssetCheckTagArea();
+                mAssetCheckScrollPos = GUILayout.BeginScrollView(mAssetCheckScrollPos);
+                DrawAssetCheckContentArea();
+                GUILayout.EndScrollView();
+            }
+            else
+            {
+                EditorGUILayout.LabelField($"未加载有效配置数据!", GUILayout.ExpandWidth(true));
+            }
         }
 
         /// <summary>

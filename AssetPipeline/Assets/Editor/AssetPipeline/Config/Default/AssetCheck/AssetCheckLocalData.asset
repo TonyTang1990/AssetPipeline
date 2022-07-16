@@ -12,3 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b8fcd9758686ced47abebe5d71174731, type: 3}
   m_Name: AssetCheckLocalData
   m_EditorClassIdentifier: 
+  PreCheckDataList: []
+  PostCheckDataList: []

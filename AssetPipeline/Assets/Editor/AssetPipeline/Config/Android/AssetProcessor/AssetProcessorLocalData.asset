@@ -13,6 +13,21 @@ MonoBehaviour:
   m_Name: AssetProcessorLocalData
   m_EditorClassIdentifier: 
   PreProcessorDataList:
+  - FolderPath: Assets/Res/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      BlackListFolderPathList:
+      - Assets/Res/a/
+      - Assets/Res/e/
+      - Assets/Res/textures/
+  - FolderPath: Assets/Res/a/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      BlackListFolderPathList: []
+  - FolderPath: Assets/Res/e/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: ae0ed7e60c9f6764fb26d211c4fa90f0, type: 2}
+      BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: ae0ed7e60c9f6764fb26d211c4fa90f0, type: 2}
@@ -48,6 +63,14 @@ MonoBehaviour:
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: f3afeb65fbec752429c69e2481e04641, type: 2}
       BlackListFolderPathList: []
-  PostProcessorDataList: []
+  PostProcessorDataList:
+  - FolderPath: Assets/Res/a/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: 862961f64f6afd443a9e51a4d3c09714, type: 2}
+      BlackListFolderPathList: []
   MovedProcessorDataList: []
-  DeletedProcessorDataList: []
+  DeletedProcessorDataList:
+  - FolderPath: Assets/Res/a/
+    ProcessorDataList:
+    - Processor: {fileID: 11400000, guid: da3dd1878aaebc1438828dbc6c57e3ac, type: 2}
+      BlackListFolderPathList: []

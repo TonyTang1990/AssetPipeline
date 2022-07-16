@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             MipmapSet.cs
+ * Description:             ASTCSet.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/19
  */
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// MipmapSet.cs
-    /// Mipmap设置
+    /// ASTCSet.cs
+    /// ASTC设置
     /// </summary>
-    [CreateAssetMenu(fileName = "MipmapSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/MipmapSet", order = 1005)]
-    public class MipmapSet : BasePreProcessor
+    [CreateAssetMenu(fileName = "ASTCSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/ASTCSet", order = 1001)]
+    public class ASTCSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "Mipmap设置";
+                return "ASTC设置";
             }
         }
 
@@ -52,10 +52,10 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 是否打开MipMap
+        /// 目标纹理格式
         /// </summary>
-        [Header("是否打开MipMap")]
-        public bool EnableMipMap = false;
+        [Header("目标纹理格式")]
+        public TextureImporterFormat TargetTextureFormat = TextureImporterFormat.ASTC_4x4;
 
         /// <summary>
         /// 执行处理器处理
@@ -64,7 +64,8 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoMipMapSet(assetPostProcessor.assetImporter);
+            var assetImporter = assetPostProcessor.assetImporter;
+            DoASTCSet(assetImporter);
         }
 
         /// <summary>
@@ -75,18 +76,25 @@ namespace TAssetPipeline
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
             var assetImporter = AssetImporter.GetAtPath(assetPath);
-            DoMipMapSet(assetImporter);
+            DoASTCSet(assetImporter);
         }
 
         /// <summary>
-        /// 执行MipMap设置
+        /// 执行ASTC设置
         /// </summary>
         /// <param name="assetImporter"></param>
-        private void DoMipMapSet(AssetImporter assetImporter)
+        private void DoASTCSet(AssetImporter assetImporter)
         {
             var textureImporter = assetImporter as TextureImporter;
-            textureImporter.mipmapEnabled = EnableMipMap;
-            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}mipmapEnabled:{EnableMipMap}".WithColor(Color.yellow));
+            var actiivePlatformName = EditorUtilities.GetPlatformNameByTarget(EditorUserBuildSettings.activeBuildTarget);
+            var platformTextureSettings = textureImporter.GetPlatformTextureSettings(actiivePlatformName);
+            var automaticFormat = textureImporter.GetAutomaticFormat(actiivePlatformName);
+            var isAutomaticASTC = ResourceUtilities.IsASTCFormat(automaticFormat);
+            var textureFormat = isAutomaticASTC ? automaticFormat : TargetTextureFormat;
+            platformTextureSettings.overridden = true;
+            platformTextureSettings.format = textureFormat;
+            textureImporter.SetPlatformTextureSettings(platformTextureSettings);
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}纹理压缩格式:{textureFormat}".WithColor(Color.yellow));
         }
     }
 }

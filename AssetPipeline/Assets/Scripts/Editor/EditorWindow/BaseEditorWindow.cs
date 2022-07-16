@@ -25,6 +25,15 @@ public class BaseEditorWindow : EditorWindow
     /// </summary>
     protected virtual void Awake()
     {
+        LoadAllData();
+    }
+
+    /// <summary>
+    /// 加载所有数据
+    /// </summary>
+    public virtual void LoadAllData()
+    {
+        RegisterAllPanels();
     }
 
     /// <summary>
@@ -40,11 +49,8 @@ public class BaseEditorWindow : EditorWindow
     /// </summary>
     protected virtual void OnEnable()
     {
-        InitData();
-        // 避免没有脚本编译丢失时依然触发面板重新创建
-        if(mEditorPanelMap == null)
+        if(mEditorPanelMap != null)
         {
-            RegisterAllPanels();
             foreach (var editorPanel in mEditorPanelMap)
             {
                 editorPanel.Value.OnEnable();
@@ -57,32 +63,42 @@ public class BaseEditorWindow : EditorWindow
     /// </summary>
     protected virtual void OnDisable()
     {
-        foreach (var editorPanel in mEditorPanelMap)
+        if (mEditorPanelMap != null)
         {
-            editorPanel.Value.OnDisable();
+            foreach (var editorPanel in mEditorPanelMap)
+            {
+                editorPanel.Value.OnDisable();
+            }
         }
-        SaveData();
     }
 
+    /// <summary>
+    /// 响应销毁
+    /// </summary>
     protected virtual void OnDestroy()
     {
-        SaveData();
+        if (mEditorPanelMap != null)
+        {
+            foreach (var editorPanel in mEditorPanelMap)
+            {
+                editorPanel.Value.OnDestroy();
+            }
+        }
+        SaveAllData();
     }
 
     /// <summary>
-    /// 初始化窗口数据
+    /// 保存所有数据
     /// </summary>
-    protected virtual void InitData()
+    public virtual void SaveAllData()
     {
-
-    }
-
-    /// <summary>
-    /// 保存数据
-    /// </summary>
-    protected virtual void SaveData()
-    {
-
+        if (mEditorPanelMap != null)
+        {
+            foreach (var editorPanel in mEditorPanelMap)
+            {
+                editorPanel.Value.SaveAllData();
+            }
+        }
     }
 
     /// <summary>
@@ -126,7 +142,7 @@ public class BaseEditorWindow : EditorWindow
     /// <returns></returns>
     protected bool IsCreatePanel(string panelName)
     {
-        return mEditorPanelMap.ContainsKey(panelName);
+        return mEditorPanelMap != null ? mEditorPanelMap.ContainsKey(panelName) : false;
     }
 
     /// <summary>
@@ -134,9 +150,12 @@ public class BaseEditorWindow : EditorWindow
     /// </summary>
     public void RefreshAllPanels()
     {
-        foreach(var panel in mEditorPanelMap)
+        if(mEditorPanelMap != null)
         {
-            panel.Value.InitData();
+            foreach (var panel in mEditorPanelMap)
+            {
+                panel.Value.LoadAllData();
+            }
         }
     }
 }

@@ -15,7 +15,7 @@ namespace TAssetPipeline
     /// AlphaFromSourceSet.cs
     /// AlphaFromSource设置
     /// </summary>
-    [CreateAssetMenu(fileName = "AlphaFromSourceSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AlphaFromSourceSet", order = 1004)]
+    [CreateAssetMenu(fileName = "AlphaFromSourceSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/AlphaFromSourceSet", order = 1003)]
     public class AlphaFromSourceSet : BasePreProcessor
     {
         /// <summary>

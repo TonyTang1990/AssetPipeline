@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 157604144f7eda040bf65295491a223a, type: 3}
-  m_Name: MipmapSet
+  m_Script: {fileID: 11500000, guid: 8d679a3d44b404b41aabf3b89a18501b, type: 3}
+  m_Name: AEDelete
   m_EditorClassIdentifier: 
-  CustomDes: "Mipmap\u8BBE\u7F6E"
+  CustomDes: "AE\u5220\u9664"

@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             AECopy.cs
+ * Description:             AEDelete.cs
  * Author:                  TONYTANG
  * Create Date:             2022/07/10
  */
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AECopy.cs
-    /// AE目录拷贝处理器
+    /// AEDelete.cs
+    /// AE目录删除处理器
     /// </summary>
-    [CreateAssetMenu(fileName = "AECopy", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AECopy", order = 1007)]
-    public class AECopy : BasePostProcessor
+    [CreateAssetMenu(fileName = "AEDelete", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/AEDelete", order = 1103)]
+    public class AEDelete : BasePostProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "AE目录拷贝";
+                return "AE目录删除";
             }
         }
 
@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.All;
+                return AssetPipelineSystem.GetAllCommonAssetType();
             }
         }
 
@@ -58,7 +58,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoAECopy(assetPostProcessor.assetPath);
+            DoAEDelete(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -68,18 +68,24 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
-            DoAECopy(assetPath);
+            DoAEDelete(assetPath);
         }
 
         /// <summary>
-        /// 执行AE拷贝
+        /// 执行AE删除
         /// </summary>
         /// <param name="assetPath"></param>
-        private void DoAECopy(string assetPath)
+        private void DoAEDelete(string assetPath)
         {
             var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
-            AssetDatabase.CopyAsset(assetPath, targetAssetPath);
-            AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
+            if(AssetDatabase.DeleteAsset(targetAssetPath))
+            {
+                AssetPipelineLog.Log($"AssetPath:{assetPath}被删除，执行AssetPath:{targetAssetPath}删除".WithColor(Color.yellow));
+            }
+            else
+            {
+                Debug.LogError($"AssetPath:{assetPath}被删除，执行AssetPath:{targetAssetPath}删除失败!");
+            }
         }
     }
 }

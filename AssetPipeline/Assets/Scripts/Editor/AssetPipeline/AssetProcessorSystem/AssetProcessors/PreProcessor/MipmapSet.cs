@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             AEDelete.cs
+ * Description:             MipmapSet.cs
  * Author:                  TONYTANG
- * Create Date:             2022/07/10
+ * Create Date:             2022/06/19
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AEDelete.cs
-    /// AE目录删除处理器
+    /// MipmapSet.cs
+    /// Mipmap设置
     /// </summary>
-    [CreateAssetMenu(fileName = "AEDelete", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AEDelete", order = 1008)]
-    public class AEDelete : BasePostProcessor
+    [CreateAssetMenu(fileName = "MipmapSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/MipmapSet", order = 1004)]
+    public class MipmapSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "AE目录删除";
+                return "Mipmap设置";
             }
         }
 
@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.All;
+                return AssetType.Texture;
             }
         }
 
@@ -47,9 +47,15 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetProcessType.CommonPostprocess;
+                return AssetProcessType.PreprocessTexture;
             }
         }
+
+        /// <summary>
+        /// 是否打开MipMap
+        /// </summary>
+        [Header("是否打开MipMap")]
+        public bool EnableMipMap = false;
 
         /// <summary>
         /// 执行处理器处理
@@ -58,7 +64,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoAEDelete(assetPostProcessor.assetPath);
+            DoMipMapSet(assetPostProcessor.assetImporter);
         }
 
         /// <summary>
@@ -68,18 +74,19 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
-            DoAEDelete(assetPath);
+            var assetImporter = AssetImporter.GetAtPath(assetPath);
+            DoMipMapSet(assetImporter);
         }
 
         /// <summary>
-        /// 执行AE删除
+        /// 执行MipMap设置
         /// </summary>
-        /// <param name="assetPath"></param>
-        private void DoAEDelete(string assetPath)
+        /// <param name="assetImporter"></param>
+        private void DoMipMapSet(AssetImporter assetImporter)
         {
-            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
-            AssetDatabase.DeleteAsset(targetAssetPath);
-            AssetPipelineLog.Log($"AssetPath:{assetPath}被删除，执行AssetPath:{targetAssetPath}删除".WithColor(Color.yellow));
+            var textureImporter = assetImporter as TextureImporter;
+            textureImporter.mipmapEnabled = EnableMipMap;
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}mipmapEnabled:{EnableMipMap}".WithColor(Color.yellow));
         }
     }
 }

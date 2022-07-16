@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             CheckFileName.cs
+ * Description:             CheckFileSize.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/19
  */
@@ -7,18 +7,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 
 namespace TAssetPipeline
 {
     /// <summary>
-    /// CheckFileName.cs
-    /// 检查文件名
+    /// CheckFileSize.cs
+    /// 检查文件大小
     /// </summary>
-    [CreateAssetMenu(fileName = "CheckFileName", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/CheckFileName", order = 2001)]
-    public class CheckFileName : BasePreCheck
+    [CreateAssetMenu(fileName = "CheckFileSize", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/CheckFileSize", order = 2002)]
+    public class CheckFileSize : BasePreCheck
     {
         /// <summary>
         /// 检查器名
@@ -27,7 +26,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "检查文件名";
+                return "检查文件大小";
             }
         }
 
@@ -38,7 +37,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.All;
+                return AssetPipelineSystem.GetAllCommonAssetType();
             }
         }
 
@@ -54,41 +53,43 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 文件名正则匹配
+        /// 文件大小限制
         /// </summary>
-        private Regex mFileNameRegex = new Regex("~[!@#$%^&*()_+-=|]");
+        [Header("文件大小限制")]
+        public int FileSizeLimit = 1024 * 1024 * 8;
 
         /// <summary>
         /// 执行检查器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
-        /// <param name="paramList">不定长参数列表</param>
+        /// <param name="paramList">不定长参数</param>
         protected override bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            return DoCheckFileName(assetPostProcessor.assetPath);
+            return DoCheckFileSize(assetPostProcessor.assetPath);
         }
 
         /// <summary>
         /// 执行指定路径的检查器处理
         /// </summary>
         /// <param name="assetPath"></param>
-        /// <param name="paramList">不定长参数列表</param>
         protected override bool DoCheckByPath(string assetPath, params object[] paramList)
         {
-            return DoCheckFileName(assetPath);
+            return DoCheckFileSize(assetPath);
         }
 
         /// <summary>
-        /// 检查文件名
+        /// 执行文件大小检查
         /// </summary>
         /// <param name="assetPath"></param>
         /// <returns></returns>
-        private bool DoCheckFileName(string assetPath)
+        private bool DoCheckFileSize(string assetPath)
         {
-            var fileName = Path.GetFileName(assetPath);
-            var result = mFileNameRegex.IsMatch(fileName);
-            AssetPipelineLog.Log($"检查AssetPath:{assetPath}文件名结果:{result}".WithColor(Color.yellow));
-            return result;
+            var assetFullPath = PathUtilities.GetAssetFullPath(assetPath);
+            using(FileStream fs = File.Open(assetFullPath, FileMode.Open))
+            {
+                AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
+                return fs.Length <= FileSizeLimit;
+            }
         }
     }
 }

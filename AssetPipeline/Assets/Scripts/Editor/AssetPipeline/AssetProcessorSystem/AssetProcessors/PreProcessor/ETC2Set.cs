@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             SpriteMeshTypeSet.cs
+ * Description:             ETC2Set.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/19
  */
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// SpriteMeshTypeSet.cs
-    /// SpriteMeshType设置
+    /// ETC2Set.cs
+    /// ETC2设置
     /// </summary>
-    [CreateAssetMenu(fileName = "SpriteMeshTypeSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/SpriteMeshTypeSet", order = 1006)]
-    public class SpriteMeshTypeSet : BasePreProcessor
+    [CreateAssetMenu(fileName = "ETC2Set", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/ETC2Set", order = 1002)]
+    public class ETC2Set : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "SpriteMeshType设置";
+                return "ETC2设置";
             }
         }
 
@@ -52,19 +52,14 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// SpriteMeshType
-        /// </summary>
-        [Header("SpriteMeshType选择")]
-        public SpriteMeshType MeshType = SpriteMeshType.FullRect;
-
-        /// <summary>
         /// 执行处理器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoTightSet(assetPostProcessor.assetImporter);
+            var assetImporter = assetPostProcessor.assetImporter;
+            DoETC2Set(assetImporter);
         }
 
         /// <summary>
@@ -75,21 +70,23 @@ namespace TAssetPipeline
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
             var assetImporter = AssetImporter.GetAtPath(assetPath);
-            DoTightSet(assetImporter);
+            DoETC2Set(assetImporter);
         }
 
         /// <summary>
-        /// 执行Tight设置
+        /// 执行ETC2设置
         /// </summary>
         /// <param name="assetImporter"></param>
-        private void DoTightSet(AssetImporter assetImporter)
+        private void DoETC2Set(AssetImporter assetImporter)
         {
             var textureImporter = assetImporter as TextureImporter;
-            TextureImporterSettings textureImporterSetting = new TextureImporterSettings();
-            textureImporter.ReadTextureSettings(textureImporterSetting);
-            textureImporterSetting.spriteMeshType = MeshType;
-            textureImporter.SetTextureSettings(textureImporterSetting);
-            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath},spriteMeshType:{MeshType}".WithColor(Color.yellow));
+            var actiivePlatformName = EditorUtilities.GetPlatformNameByTarget(EditorUserBuildSettings.activeBuildTarget);
+            var platformTextureSettings = textureImporter.GetPlatformTextureSettings(actiivePlatformName);
+            platformTextureSettings.overridden = true;
+            var textureFormat = textureImporter.DoesSourceTextureHaveAlpha() ? TextureImporterFormat.ETC2_RGBA8 : TextureImporterFormat.ETC2_RGB4;
+            platformTextureSettings.format = textureFormat;
+            textureImporter.SetPlatformTextureSettings(platformTextureSettings);
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath}纹理压缩格式:{textureFormat}".WithColor(Color.yellow));
         }
     }
 }

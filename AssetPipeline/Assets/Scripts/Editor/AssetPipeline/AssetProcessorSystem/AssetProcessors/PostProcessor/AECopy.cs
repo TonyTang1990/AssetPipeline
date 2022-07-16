@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             GenerateABName.cs
+ * Description:             AECopy.cs
  * Author:                  TONYTANG
- * Create Date:             2022/06/19
+ * Create Date:             2022/07/10
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// GenerateABName.cs
-    /// 生成AB名处理器
+    /// AECopy.cs
+    /// AE目录拷贝处理器
     /// </summary>
-    [CreateAssetMenu(fileName = "GenerateABName", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/GenerateABName", order = 1001)]
-    public class GenerateABName : BasePostProcessor
+    [CreateAssetMenu(fileName = "AECopy", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/AECopy", order = 1102)]
+    public class AECopy : BasePostProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "生成AB名";
+                return "AE目录拷贝";
             }
         }
 
@@ -58,7 +58,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            MarkAssetBundleName(assetPostProcessor.assetPath);
+            DoAECopy(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -68,26 +68,35 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
-            MarkAssetBundleName(assetPath);
+            DoAECopy(assetPath);
         }
 
         /// <summary>
-        /// 标记指定Asset路径的AB名
+        /// 执行AE拷贝
         /// </summary>
         /// <param name="assetPath"></param>
-        private void MarkAssetBundleName(string assetPath)
+        private void DoAECopy(string assetPath)
         {
-            string md5 = null;
-            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
-            if(asset == null)
+            // 每次修改MD5后会导致Asset处于未保存状态
+            // 会导致再次出发PostImported导入流程
+            // 为避免不断循环触发AE拷贝，拷贝前先判定是否存在不重复触发
+            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
+            var targetAsset = AssetDatabase.LoadAssetAtPath<Object>(targetAssetPath);
+            if(targetAsset == null)
             {
-                Debug.LogError($"AssetPath:{assetPath}的Asset不存在,标记AB名失败!");
-                return;
+                if (AssetDatabase.CopyAsset(assetPath, targetAssetPath))
+                {
+                    AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
+                }
+                else
+                {
+                    Debug.LogError($"AssetPath:{assetPath}拷贝到:{targetAssetPath}失败!");
+                }
             }
-            md5 = FileUtilities.GetFilePathMD5(assetPath);
-            var assetImporter = AssetImporter.GetAtPath(assetPath);
-            assetImporter.assetBundleName = md5;
-            AssetPipelineLog.Log($"标记AssetPath:{assetPath} MD5:{md5}".WithColor(Color.yellow));
+            else
+            {
+                AssetPipelineLog.Log($"AssetPath:{assetPath}目标拷贝路径已存在，不需要拷贝!".WithColor(Color.yellow));
+            }
         }
     }
 }
