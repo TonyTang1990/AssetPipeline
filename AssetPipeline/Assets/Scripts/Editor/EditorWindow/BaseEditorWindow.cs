@@ -105,10 +105,9 @@ public class BaseEditorWindow : EditorWindow
     /// 创建子面板
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="panelName"></param>
-    protected T CreatePanel<T>(string panelName = null) where T : BaseEditorPanel, new()
+    protected T CreatePanel<T>() where T : BaseEditorPanel, new()
     {
-        panelName = string.IsNullOrEmpty(panelName) ? typeof(T).Name : panelName;
+        string panelName = typeof(T).Name;
         if (IsCreatePanel(panelName))
         {
             Debug.LogError($"已经创建了面板:{panelName}类型:{typeof(T).Name},创建面板失败!");
@@ -125,11 +124,12 @@ public class BaseEditorWindow : EditorWindow
     /// </summary>
     /// <param name="panelName"></param>
     /// <returns></returns>
-    protected BaseEditorPanel GetPanel(string panelName)
+    protected T GetPanel<T>() where T : BaseEditorPanel, new()
     {
-        if(IsCreatePanel(panelName))
+        string panelName = typeof(T).Name;
+        if (IsCreatePanel(panelName))
         {
-            return mEditorPanelMap[panelName];
+            return mEditorPanelMap[panelName] as T;
         }
         Debug.LogError($"未创建面板:{panelName},获取面板失败!");
         return null;

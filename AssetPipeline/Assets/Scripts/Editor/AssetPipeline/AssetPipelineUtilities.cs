@@ -38,11 +38,15 @@ namespace TAssetPipeline
             {
                 return 0;
             }
-            if (processor1.TargetAssetType != processor2.TargetAssetType)
+            if(processor1.TargetAssetProcessType != processor2.TargetAssetProcessType)
             {
-                return processor1.TargetAssetType.CompareTo(processor2.TargetAssetType);
+                return processor1.TargetAssetProcessType.CompareTo(processor2.TargetAssetProcessType);
             }
-            return processor1.TargetAssetProcessType.CompareTo(processor2.TargetAssetProcessType);
+            if(processor1.Order != processor2.Order)
+            {
+                return processor1.Order.CompareTo(processor2.Order);
+            }
+            return processor1.TypeName.CompareTo(processor2.TypeName);
         }
 
         /// <summary>
@@ -53,23 +57,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static int SortProcessorData(ProcessorSettingData processorData1, ProcessorSettingData processorData2)
         {
-            if (processorData1.Processor == null && processorData2.Processor != null)
-            {
-                return -1;
-            }
-            if (processorData1.Processor != null && processorData2.Processor == null)
-            {
-                return 1;
-            }
-            if (processorData1.Processor == null && processorData2.Processor == null)
-            {
-                return 0;
-            }
-            if (processorData1.Processor.TargetAssetType != processorData2.Processor.TargetAssetType)
-            {
-                return processorData1.Processor.TargetAssetType.CompareTo(processorData2.Processor.TargetAssetType);
-            }
-            return processorData1.Processor.TargetAssetProcessType.CompareTo(processorData2.Processor.TargetAssetProcessType);
+            return SortProcessor(processorData1.Processor, processorData2.Processor);
         }
 
         /// <summary>
@@ -92,11 +80,15 @@ namespace TAssetPipeline
             {
                 return 0;
             }
-            if (check1.TargetAssetType != check2.TargetAssetType)
+            if (check1.TargetAssetProcessType != check2.TargetAssetProcessType)
             {
-                return check1.TargetAssetType.CompareTo(check2.TargetAssetType);
+                return check1.TargetAssetProcessType.CompareTo(check2.TargetAssetProcessType);
             }
-            return check1.TargetAssetProcessType.CompareTo(check2.TargetAssetProcessType);
+            if (check1.Order != check2.Order)
+            {
+                return check1.Order.CompareTo(check2.Order);
+            }
+            return check1.TypeName.CompareTo(check2.TypeName);
         }
 
         /// <summary>
@@ -107,23 +99,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static int SortCheckData(CheckSettingData checkData1, CheckSettingData checkData2)
         {
-            if (checkData1.Check == null && checkData2.Check != null)
-            {
-                return -1;
-            }
-            if (checkData1.Check != null && checkData2.Check == null)
-            {
-                return 1;
-            }
-            if (checkData1.Check == null && checkData2.Check == null)
-            {
-                return 0;
-            }
-            if (checkData1.Check.TargetAssetType != checkData2.Check.TargetAssetType)
-            {
-                return checkData1.Check.TargetAssetType.CompareTo(checkData2.Check.TargetAssetType);
-            }
-            return checkData1.Check.TargetAssetProcessType.CompareTo(checkData2.Check.TargetAssetProcessType);
+            return SortCheck(checkData1.Check, checkData2.Check);
         }
     }
 }

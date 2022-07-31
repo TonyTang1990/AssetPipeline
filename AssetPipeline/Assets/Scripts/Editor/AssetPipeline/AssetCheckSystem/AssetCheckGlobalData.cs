@@ -46,5 +46,14 @@ namespace TAssetPipeline
         /// </summary>
         [Header("后检查器数据")]
         public CheckGlobalData PostCheckData = new CheckGlobalData();
+
+        /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            PreCheckData.CheckList.Sort(AssetPipelineUtilities.SortCheck);
+            PostCheckData.CheckList.Sort(AssetPipelineUtilities.SortCheck);
+        }
     }
 }

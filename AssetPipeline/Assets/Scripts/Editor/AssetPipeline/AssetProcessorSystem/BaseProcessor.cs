@@ -49,6 +49,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 处理器触发排序Order(值越大越靠后)
+        /// </summary>
+        public virtual int Order
+        {
+            get
+            {
+                return 100;
+            }
+        }
+
+        /// <summary>
         /// 处理器类型名
         /// </summary>
         public string TypeName

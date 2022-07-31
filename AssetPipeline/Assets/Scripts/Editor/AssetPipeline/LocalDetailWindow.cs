@@ -271,7 +271,7 @@ namespace TAssetPipeline
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
                 EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
                 EditorGUILayout.ObjectField(mProcessorData.Processor, mProcessorType, false, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(mProcessorData.Processor != null ? mProcessorData.Processor.CustomDes : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             }
             else
             {
@@ -314,7 +314,7 @@ namespace TAssetPipeline
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
                 EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
                 EditorGUILayout.ObjectField(mCheckData.Check, mCheckType, false, GUILayout.Width(250f));
-                EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+                EditorGUILayout.LabelField(mCheckData.Check != null ? mCheckData.Check.CustomDes : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             }
             else
             {

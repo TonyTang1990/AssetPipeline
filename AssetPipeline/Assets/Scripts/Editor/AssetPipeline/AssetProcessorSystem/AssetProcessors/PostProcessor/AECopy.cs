@@ -82,20 +82,13 @@ namespace TAssetPipeline
             // 为避免不断循环触发AE拷贝，拷贝前先判定是否存在不重复触发
             var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
             var targetAsset = AssetDatabase.LoadAssetAtPath<Object>(targetAssetPath);
-            if(targetAsset == null)
+            if (AssetDatabase.CopyAsset(assetPath, targetAssetPath))
             {
-                if (AssetDatabase.CopyAsset(assetPath, targetAssetPath))
-                {
-                    AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
-                }
-                else
-                {
-                    Debug.LogError($"AssetPath:{assetPath}拷贝到:{targetAssetPath}失败!");
-                }
+                AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
             }
             else
             {
-                AssetPipelineLog.Log($"AssetPath:{assetPath}目标拷贝路径已存在，不需要拷贝!".WithColor(Color.yellow));
+                Debug.LogError($"AssetPath:{assetPath}拷贝到:{targetAssetPath}失败!");
             }
         }
     }

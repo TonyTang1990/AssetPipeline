@@ -84,7 +84,7 @@ namespace TAssetPipeline
             }
             else
             {
-                Debug.LogError($"AssetPath:{assetPath}被删除，执行AssetPath:{targetAssetPath}删除失败!");
+                Debug.LogError($"AssetPath:{assetPath}不存在，执行AssetPath:{targetAssetPath}删除失败!");
             }
         }
     }

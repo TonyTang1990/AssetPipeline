@@ -54,6 +54,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 处理器触发排序Order
+        /// </summary>
+        public override int Order
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        /// <summary>
         /// 文件名正则匹配
         /// </summary>
         private Regex mFileNameRegex = new Regex("~[!@#$%^&*()_+-=|]");

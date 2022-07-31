@@ -53,6 +53,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 处理器触发排序Order
+        /// </summary>
+        public override int Order
+        {
+            get
+            {
+                return 2;
+            }
+        }
+
+        /// <summary>
         /// 文件大小限制
         /// </summary>
         [Header("文件大小限制")]

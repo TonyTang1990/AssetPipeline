@@ -94,6 +94,18 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            var assetProcessorPanel = GetPanel<AssetProcessorPanel>();
+            assetProcessorPanel.SortAllData();
+            var assetCheckPanel = GetPanel<AssetCheckPanel>();
+            assetCheckPanel.SortAllData();
+            Debug.Log($"排序所有Asset管线数据完成!");
+        }
+
+        /// <summary>
         /// 保存所有数据
         /// </summary>
         public override void SaveAllData()

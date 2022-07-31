@@ -225,6 +225,14 @@ namespace TAssetPipeline
             }
 
             /// <summary>
+            /// 排序所有处理器
+            /// </summary>
+            public void SortAllData()
+            {
+                ProcessorDataList.Sort(AssetPipelineUtilities.SortProcessorData);
+            }
+
+            /// <summary>
             /// 是否包含指定处理器
             /// </summary>
             /// <param name="processor"></param>
@@ -341,6 +349,29 @@ namespace TAssetPipeline
             foreach (var deletedProcessorData in DeletedProcessorDataList)
             {
                 deletedProcessorData.UpdaterProcessorIcon();
+            }
+        }
+
+        /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            foreach (var preProcessorData in PreProcessorDataList)
+            {
+                preProcessorData.SortAllData();
+            }
+            foreach (var postProcessorData in PostProcessorDataList)
+            {
+                postProcessorData.SortAllData();
+            }
+            foreach (var movedProcessorData in MovedProcessorDataList)
+            {
+                movedProcessorData.SortAllData();
+            }
+            foreach (var deletedProcessorData in DeletedProcessorDataList)
+            {
+                deletedProcessorData.SortAllData();
             }
         }
     }

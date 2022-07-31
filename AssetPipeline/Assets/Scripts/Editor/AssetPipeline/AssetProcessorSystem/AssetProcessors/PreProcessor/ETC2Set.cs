@@ -52,6 +52,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 处理器触发排序Order
+        /// </summary>
+        public override int Order
+        {
+            get
+            {
+                return 2;
+            }
+        }
+
+        /// <summary>
         /// 执行处理器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>

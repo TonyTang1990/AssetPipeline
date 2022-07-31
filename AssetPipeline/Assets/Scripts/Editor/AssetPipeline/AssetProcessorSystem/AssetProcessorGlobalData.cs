@@ -58,5 +58,16 @@ namespace TAssetPipeline
         /// </summary>
         [Header("删除处理器数据")]
         public ProcessorGlobalData DeletedProcessorData = new ProcessorGlobalData();
+
+        /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            PreProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
+            PostProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
+            MovedProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
+            DeletedProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
+        }
     }
 }

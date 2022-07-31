@@ -225,6 +225,14 @@ namespace TAssetPipeline
             }
 
             /// <summary>
+            /// 排序所有数据
+            /// </summary>
+            public void SortAllData()
+            {
+                CheckDataList.Sort(AssetPipelineUtilities.SortCheckData);
+            }
+
+            /// <summary>
             /// 添加检查器数据
             /// </summary>
             /// <param name="check"></param>
@@ -307,6 +315,21 @@ namespace TAssetPipeline
             foreach (var postCheckData in PostCheckDataList)
             {
                 postCheckData.UpdaterCheckIcon();
+            }
+        }
+
+        /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            foreach (var preCheckData in PreCheckDataList)
+            {
+                preCheckData.SortAllData();
+            }
+            foreach (var postCheckData in PostCheckDataList)
+            {
+                postCheckData.SortAllData();
             }
         }
     }

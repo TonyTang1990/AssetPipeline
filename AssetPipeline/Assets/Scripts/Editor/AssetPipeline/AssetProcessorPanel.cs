@@ -167,6 +167,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            mGlobalData.SortAllData();
+            mLocalData.SortAllData();
+            mAllPreProcessors.Sort(AssetPipelineUtilities.SortProcessor);
+            mAllPostProcessors.Sort(AssetPipelineUtilities.SortProcessor);
+        }
+
+        /// <summary>
         /// 保存所有数据
         /// </summary>
         public override void SaveAllData()
@@ -433,6 +444,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField("处理器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField("管线处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("排序Order", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(80f));
             EditorGUILayout.LabelField("处理器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -570,7 +582,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField(processor.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(processor, processorType, false, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             var preColor = GUI.color;
             GUI.color = Color.green;
             if (GUILayout.Button("-", GUILayout.Width(100f)))
@@ -596,7 +608,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(processorData.Processor, processorType, false, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(processorData.Processor != null ? processorData.Processor.CustomDes : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             var preColor = GUI.color;
             GUI.color = Color.green;
             if (GUILayout.Button($"数量({processorData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
@@ -621,8 +633,9 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(processor.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField(processor.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField(processor.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.IntField(processor.Order, AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(80f));
             EditorGUILayout.ObjectField(processor, AssetPipelineConst.BASE_PROCESSOR_TYPE, false, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(processor.CustomDes, AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -686,15 +699,17 @@ namespace TAssetPipeline
                 if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
                 {
                     var newFolderPath = EditorUtilities.ChoosenProjectFolder(processorLocalData.FolderPath);
-                    if (!newFolderPath.Equals(processorLocalData.FolderPath) &&
-                        !CheckFolderPathExist(processorLocalDataList, newFolderPath))
+                    if (!newFolderPath.Equals(processorLocalData.FolderPath))
                     {
-                        processorLocalData.FolderPath = newFolderPath;
-                        processorLocalDataList.Sort(SortLocalProcesorData);
-                    }
-                    else
-                    {
-                        Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
+                        if (!CheckFolderPathExist(processorLocalDataList, newFolderPath))
+                        {
+                            processorLocalData.FolderPath = newFolderPath;
+                            processorLocalDataList.Sort(SortLocalProcesorData);
+                        }
+                        else
+                        {
+                            Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
+                        }
                     }
                 }
                 GUI.color = preColor2;

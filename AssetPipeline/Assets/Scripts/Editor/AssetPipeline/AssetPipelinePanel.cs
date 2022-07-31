@@ -312,6 +312,10 @@ namespace TAssetPipeline
         {
             var preColor = GUI.color;
             GUI.color = Color.green;
+            if (GUILayout.Button("重新排序所有数据(用于排序Order修改后确保排序正确)", GUILayout.ExpandWidth(true)))
+            {
+                GetOwnerEditorWindow<AssetPipelineWindow>().SortAllData();
+            }
             if (GUILayout.Button("保存Asset管线数据", GUILayout.ExpandWidth(true)))
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllData();

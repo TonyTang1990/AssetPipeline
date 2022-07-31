@@ -52,6 +52,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 处理器触发排序Order
+        /// </summary>
+        public override int Order
+        {
+            get
+            {
+                return 1;
+            }
+        }
+
+        /// <summary>
         /// 目标纹理格式
         /// </summary>
         [Header("目标纹理格式")]

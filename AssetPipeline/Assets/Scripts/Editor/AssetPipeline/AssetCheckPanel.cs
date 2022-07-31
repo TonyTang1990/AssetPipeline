@@ -163,6 +163,17 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 排序所有数据
+        /// </summary>
+        public void SortAllData()
+        {
+            mGlobalData.SortAllData();
+            mLocalData.SortAllData();
+            mAllPreChecks.Sort(AssetPipelineUtilities.SortCheck);
+            mAllPostChecks.Sort(AssetPipelineUtilities.SortCheck);
+        }
+
+        /// <summary>
         /// 保存所有数据
         /// </summary>
         public override void SaveAllData()
@@ -380,8 +391,9 @@ namespace TAssetPipeline
             GUI.color = preColor;
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("检查器名", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField("Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField("目标Asset类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("Asset处理类型", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField("排序Order", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(80f));
             EditorGUILayout.LabelField("检查器Asset", AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
             EditorGUILayout.LabelField("自定义描述", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
@@ -395,10 +407,11 @@ namespace TAssetPipeline
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(check.Name, AssetPipelineStyles.TabMiddleStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(250f));
+            EditorGUILayout.LabelField(check.TargetAssetType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.LabelField(check.TargetAssetProcessType.ToString(), AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
+            EditorGUILayout.IntField(check.Order, AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(80f));
             EditorGUILayout.ObjectField(check, AssetPipelineConst.BASE_CHECK_TYPE, false, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -461,15 +474,17 @@ namespace TAssetPipeline
                 if (GUILayout.Button("选择目录路径", GUILayout.Width(150.0f)))
                 {
                     var newFolderPath = EditorUtilities.ChoosenProjectFolder(checkLocalData.FolderPath);
-                    if (!newFolderPath.Equals(checkLocalData.FolderPath) &&
-                        !CheckFolderPathExist(checkLocalDataList, newFolderPath))
+                    if (!newFolderPath.Equals(checkLocalData.FolderPath))
                     {
-                        checkLocalData.FolderPath = newFolderPath;
-                        checkLocalDataList.Sort(SortLocalCheckData);
-                    }
-                    else
-                    {
-                        Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
+                        if (!CheckFolderPathExist(checkLocalDataList, newFolderPath))
+                        {
+                            checkLocalData.FolderPath = newFolderPath;
+                            checkLocalDataList.Sort(SortLocalCheckData);
+                        }
+                        else
+                        {
+                            Debug.LogError($"局部目录:{newFolderPath}配置已存在，请勿设置重复局部目录!!");
+                        }
                     }
                 }
                 GUI.color = preColor2;
@@ -621,7 +636,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(check != null ? check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField(check != null ? check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(check, checkType, false, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(check.CustomDes, AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             var preColor = GUI.color;
             GUI.color = Color.green;
             if (GUILayout.Button("-", GUILayout.Width(100f)))
@@ -647,7 +662,7 @@ namespace TAssetPipeline
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.TargetAssetProcessType.ToString() : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.Width(150f));
             EditorGUILayout.ObjectField(checkData.Check, checkType, false, GUILayout.Width(250f));
-            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.CustomDes : "无", AssetPipelineStyles.TabMiddleStyle, GUILayout.ExpandWidth(true));
+            EditorGUILayout.LabelField(checkData.Check != null ? checkData.Check.CustomDes : "无", AssetPipelineStyles.ButtonMidStyle, GUILayout.ExpandWidth(true));
             var preColor = GUI.color;
             GUI.color = Color.green;
             if (GUILayout.Button($"数量({checkData.BlackListFolderPathList.Count})", GUILayout.Width(150f)))
