@@ -85,11 +85,9 @@ namespace TAssetPipeline
             }
             var md5 = FileUtilities.GetFilePathMD5(assetPath).ToLower();
             var assetImporter = AssetImporter.GetAtPath(assetPath);
-            // 每次修改MD5后会导致Asset处于未保存状态
-            // 会导致再次出发PostImported导入流程
-            // 为避免不断循环触发PostImpoerted导入流程，MD5不变不触发修改
             // Note:
-            // assetBundleName赋值后都是小写
+            // 1. assetBundleName赋值后都是小写
+            // 2. 每次修改到不同MD5后会导致Asset处于未保存状态,会导致多触发一次PostImported导入流程
             if (!string.Equals(assetImporter.assetBundleName, md5))
             {
                 AssetPipelineLog.Log($"标记AssetPath:{assetPath} MD5:{md5} 原MD5:{assetImporter.assetBundleName}".WithColor(Color.yellow));

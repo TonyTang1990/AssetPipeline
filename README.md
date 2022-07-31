@@ -483,7 +483,7 @@ public class GenerateABName : BasePostProcessor
 ## 注意事项
 
 1. **默认Editor/AssetPipeline/Config/AssetProcessors和Editor/AssetPipeline/Config/AssetChecks目录下才会生成预览，请创建在这两个目录下**
-2. **生成AB名处理器会在后处理设置完成后导致Asset处理未保存状态，导致相同Asset设置AB名会重复触发Post Import流程，暂时通过判定AB名是否相同避免重复设置AB名避免重复进入Post Import流程**
+2. **生成AB名处理器如果设置不同AB名会导致Asset处理未保存状态，导致Asset多触发一次Post Import流程**
 
 ## 博客
 
