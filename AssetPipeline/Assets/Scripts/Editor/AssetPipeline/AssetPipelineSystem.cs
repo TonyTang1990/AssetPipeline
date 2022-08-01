@@ -39,6 +39,7 @@ namespace TAssetPipeline
             { ".prefab", AssetType.Prefab },
             { ".asset", AssetType.ScriptableObject },
             { ".txt", AssetType.TextAsset },
+            { ".bytes", AssetType.TextAsset },
             { ".unity", AssetType.Scene },
             { ".anim", AssetType.AnimationClip },
             { ".mesh", AssetType.Mesh },
