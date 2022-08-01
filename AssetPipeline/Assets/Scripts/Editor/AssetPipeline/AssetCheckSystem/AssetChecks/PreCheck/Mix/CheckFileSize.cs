@@ -98,8 +98,16 @@ namespace TAssetPipeline
             var assetFullPath = PathUtilities.GetAssetFullPath(assetPath);
             using(FileStream fs = File.Open(assetFullPath, FileMode.Open))
             {
-                AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
-                return fs.Length <= FileSizeLimit;
+                var overSize = fs.Length > FileSizeLimit;
+                if(!overSize)
+                {
+                    AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
+                }
+                else
+                {
+                    AssetPipelineLog.LogError($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
+                }
+                return !overSize;
             }
         }
     }

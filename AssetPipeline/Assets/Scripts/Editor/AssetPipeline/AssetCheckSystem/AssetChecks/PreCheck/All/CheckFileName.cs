@@ -98,7 +98,14 @@ namespace TAssetPipeline
         {
             var fileName = Path.GetFileName(assetPath);
             var result = mFileNameRegex.IsMatch(fileName);
-            AssetPipelineLog.Log($"检查AssetPath:{assetPath}文件名匹配结果:{result}".WithColor(Color.yellow));
+            if(!result)
+            {
+                AssetPipelineLog.Log($"检查AssetPath:{assetPath}文件名匹配结果:{result}".WithColor(Color.yellow));
+            }
+            else
+            {
+                AssetPipelineLog.LogError($"检查AssetPath:{assetPath}文件名匹配结果:{result}".WithColor(Color.yellow));
+            }
             return result;
         }
     }
