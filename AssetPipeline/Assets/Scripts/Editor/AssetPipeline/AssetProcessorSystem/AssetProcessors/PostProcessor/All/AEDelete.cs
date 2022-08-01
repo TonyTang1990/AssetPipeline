@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             GenerateABName.cs
+ * Description:             AEDelete.cs
  * Author:                  TONYTANG
- * Create Date:             2022/06/19
+ * Create Date:             2022/07/10
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// GenerateABName.cs
-    /// 生成AB名处理器
+    /// AEDelete.cs
+    /// AE目录删除处理器
     /// </summary>
-    [CreateAssetMenu(fileName = "GenerateABName", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/GenerateABName", order = 1101)]
-    public class GenerateABName : BasePostProcessor
+    [CreateAssetMenu(fileName = "AEDelete", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/All/AEDelete", order = 1103)]
+    public class AEDelete : BasePostProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "生成AB名";
+                return "AE目录删除";
             }
         }
 
@@ -58,7 +58,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            MarkAssetBundleName(assetPostProcessor.assetPath);
+            DoAEDelete(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -68,34 +68,23 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
-            MarkAssetBundleName(assetPath);
+            DoAEDelete(assetPath);
         }
 
         /// <summary>
-        /// 标记指定Asset路径的AB名
+        /// 执行AE删除
         /// </summary>
         /// <param name="assetPath"></param>
-        private void MarkAssetBundleName(string assetPath)
+        private void DoAEDelete(string assetPath)
         {
-            var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
-            if(asset == null)
+            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
+            if(AssetDatabase.DeleteAsset(targetAssetPath))
             {
-                Debug.LogError($"AssetPath:{assetPath}的Asset不存在,标记AB名失败!");
-                return;
-            }
-            var md5 = FileUtilities.GetFilePathMD5(assetPath).ToLower();
-            var assetImporter = AssetImporter.GetAtPath(assetPath);
-            // Note:
-            // 1. assetBundleName赋值后都是小写
-            // 2. 每次修改到不同MD5后会导致Asset处于未保存状态,会导致多触发一次PostImported导入流程
-            if (!string.Equals(assetImporter.assetBundleName, md5))
-            {
-                AssetPipelineLog.Log($"标记AssetPath:{assetPath} MD5:{md5} 原MD5:{assetImporter.assetBundleName}".WithColor(Color.yellow));
-                assetImporter.assetBundleName = md5;
+                AssetPipelineLog.Log($"AssetPath:{assetPath}被删除，执行AssetPath:{targetAssetPath}删除".WithColor(Color.yellow));
             }
             else
             {
-                AssetPipelineLog.Log($"AssetPath:{assetPath} MD5相同，不需要更改!".WithColor(Color.yellow));
+                Debug.LogError($"AssetPath:{assetPath}不存在，执行AssetPath:{targetAssetPath}删除失败!");
             }
         }
     }

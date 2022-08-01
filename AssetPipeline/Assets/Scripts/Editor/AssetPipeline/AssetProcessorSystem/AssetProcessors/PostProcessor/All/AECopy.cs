@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             SpriteMeshTypeSet.cs
+ * Description:             AECopy.cs
  * Author:                  TONYTANG
- * Create Date:             2022/06/19
+ * Create Date:             2022/07/10
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// SpriteMeshTypeSet.cs
-    /// SpriteMeshType设置
+    /// AECopy.cs
+    /// AE目录拷贝处理器
     /// </summary>
-    [CreateAssetMenu(fileName = "SpriteMeshTypeSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/SpriteMeshTypeSet", order = 1005)]
-    public class SpriteMeshTypeSet : BasePreProcessor
+    [CreateAssetMenu(fileName = "AECopy", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/All/AECopy", order = 1102)]
+    public class AECopy : BasePostProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "SpriteMeshType设置";
+                return "AE目录拷贝";
             }
         }
 
@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetType.Texture;
+                return AssetPipelineSystem.GetAllCommonAssetType();
             }
         }
 
@@ -47,15 +47,9 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetProcessType.PreprocessTexture;
+                return AssetProcessType.CommonPostprocess;
             }
         }
-
-        /// <summary>
-        /// SpriteMeshType
-        /// </summary>
-        [Header("SpriteMeshType选择")]
-        public SpriteMeshType MeshType = SpriteMeshType.FullRect;
 
         /// <summary>
         /// 执行处理器处理
@@ -64,7 +58,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoTightSet(assetPostProcessor.assetImporter);
+            DoAECopy(assetPostProcessor.assetPath);
         }
 
         /// <summary>
@@ -74,22 +68,28 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
-            var assetImporter = AssetImporter.GetAtPath(assetPath);
-            DoTightSet(assetImporter);
+            DoAECopy(assetPath);
         }
 
         /// <summary>
-        /// 执行Tight设置
+        /// 执行AE拷贝
         /// </summary>
-        /// <param name="assetImporter"></param>
-        private void DoTightSet(AssetImporter assetImporter)
+        /// <param name="assetPath"></param>
+        private void DoAECopy(string assetPath)
         {
-            var textureImporter = assetImporter as TextureImporter;
-            TextureImporterSettings textureImporterSetting = new TextureImporterSettings();
-            textureImporter.ReadTextureSettings(textureImporterSetting);
-            textureImporterSetting.spriteMeshType = MeshType;
-            textureImporter.SetTextureSettings(textureImporterSetting);
-            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath},spriteMeshType:{MeshType}".WithColor(Color.yellow));
+            // 每次修改MD5后会导致Asset处于未保存状态
+            // 会导致再次出发PostImported导入流程
+            // 为避免不断循环触发AE拷贝，拷贝前先判定是否存在不重复触发
+            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
+            var targetAsset = AssetDatabase.LoadAssetAtPath<Object>(targetAssetPath);
+            if (AssetDatabase.CopyAsset(assetPath, targetAssetPath))
+            {
+                AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
+            }
+            else
+            {
+                Debug.LogError($"AssetPath:{assetPath}拷贝到:{targetAssetPath}失败!");
+            }
         }
     }
 }

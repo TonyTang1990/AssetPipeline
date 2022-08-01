@@ -15,7 +15,7 @@ namespace TAssetPipeline
     /// ETC2Set.cs
     /// ETC2设置
     /// </summary>
-    [CreateAssetMenu(fileName = "ETC2Set", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/ETC2Set", order = 1002)]
+    [CreateAssetMenu(fileName = "ETC2Set", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/Texture/ETC2Set", order = 1002)]
     public class ETC2Set : BasePreProcessor
     {
         /// <summary>

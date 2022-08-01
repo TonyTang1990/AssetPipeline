@@ -1,7 +1,7 @@
 ﻿/*
- * Description:             AECopy.cs
+ * Description:             AlphaFromSourceSet.cs
  * Author:                  TONYTANG
- * Create Date:             2022/07/10
+ * Create Date:             2022/06/19
  */
 
 using System.Collections;
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AECopy.cs
-    /// AE目录拷贝处理器
+    /// AlphaFromSourceSet.cs
+    /// AlphaFromSource设置
     /// </summary>
-    [CreateAssetMenu(fileName = "AECopy", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/AECopy", order = 1102)]
-    public class AECopy : BasePostProcessor
+    [CreateAssetMenu(fileName = "AlphaFromSourceSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/Texture/AlphaFromSourceSet", order = 1003)]
+    public class AlphaFromSourceSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "AE目录拷贝";
+                return "AlphaFromSource设置";
             }
         }
 
@@ -36,7 +36,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetPipelineSystem.GetAllCommonAssetType();
+                return AssetType.Texture;
             }
         }
 
@@ -47,7 +47,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return AssetProcessType.CommonPostprocess;
+                return AssetProcessType.PreprocessTexture;
             }
         }
 
@@ -58,7 +58,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoAECopy(assetPostProcessor.assetPath);
+            DoAlphaFromSourceSet(assetPostProcessor.assetImporter);
         }
 
         /// <summary>
@@ -68,28 +68,22 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
-            DoAECopy(assetPath);
+            var assetImporter = AssetImporter.GetAtPath(assetPath);
+            DoAlphaFromSourceSet(assetImporter);
         }
 
         /// <summary>
-        /// 执行AE拷贝
+        /// 执行AlphaFromSource设置
         /// </summary>
-        /// <param name="assetPath"></param>
-        private void DoAECopy(string assetPath)
+        /// <param name="assetImporter"></param>
+        private void DoAlphaFromSourceSet(AssetImporter assetImporter)
         {
-            // 每次修改MD5后会导致Asset处于未保存状态
-            // 会导致再次出发PostImported导入流程
-            // 为避免不断循环触发AE拷贝，拷贝前先判定是否存在不重复触发
-            var targetAssetPath = assetPath.Replace($"/{AssetPipelineConst.A_FOLDER_NAME}/", $"/{AssetPipelineConst.E_FOLDER_NAME}/");
-            var targetAsset = AssetDatabase.LoadAssetAtPath<Object>(targetAssetPath);
-            if (AssetDatabase.CopyAsset(assetPath, targetAssetPath))
-            {
-                AssetPipelineLog.Log($"执行AssetPath:{assetPath}拷贝到:{targetAssetPath}".WithColor(Color.yellow));
-            }
-            else
-            {
-                Debug.LogError($"AssetPath:{assetPath}拷贝到:{targetAssetPath}失败!");
-            }
+            var textureImporter = assetImporter as TextureImporter;
+            var hasAlpha = textureImporter.DoesSourceTextureHaveAlpha() ? true : false;
+            textureImporter.alphaIsTransparency = hasAlpha;
+            var alphaSource = hasAlpha ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
+            textureImporter.alphaSource = alphaSource;
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath} alphaIsTransparency:{hasAlpha} alphaSource:{alphaSource}".WithColor(Color.yellow));
         }
     }
 }

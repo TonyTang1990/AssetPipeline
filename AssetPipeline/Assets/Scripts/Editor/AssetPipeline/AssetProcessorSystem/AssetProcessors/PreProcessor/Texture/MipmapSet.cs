@@ -15,7 +15,7 @@ namespace TAssetPipeline
     /// MipmapSet.cs
     /// Mipmap设置
     /// </summary>
-    [CreateAssetMenu(fileName = "MipmapSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/MipmapSet", order = 1004)]
+    [CreateAssetMenu(fileName = "MipmapSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/Texture/MipmapSet", order = 1004)]
     public class MipmapSet : BasePreProcessor
     {
         /// <summary>

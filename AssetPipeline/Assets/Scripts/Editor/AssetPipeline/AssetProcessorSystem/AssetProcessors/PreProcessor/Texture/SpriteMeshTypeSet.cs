@@ -1,5 +1,5 @@
 ﻿/*
- * Description:             AlphaFromSourceSet.cs
+ * Description:             SpriteMeshTypeSet.cs
  * Author:                  TONYTANG
  * Create Date:             2022/06/19
  */
@@ -12,11 +12,11 @@ using UnityEngine;
 namespace TAssetPipeline
 {
     /// <summary>
-    /// AlphaFromSourceSet.cs
-    /// AlphaFromSource设置
+    /// SpriteMeshTypeSet.cs
+    /// SpriteMeshType设置
     /// </summary>
-    [CreateAssetMenu(fileName = "AlphaFromSourceSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/AlphaFromSourceSet", order = 1003)]
-    public class AlphaFromSourceSet : BasePreProcessor
+    [CreateAssetMenu(fileName = "SpriteMeshTypeSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/Texture/SpriteMeshTypeSet", order = 1005)]
+    public class SpriteMeshTypeSet : BasePreProcessor
     {
         /// <summary>
         /// 检查器名
@@ -25,7 +25,7 @@ namespace TAssetPipeline
         {
             get
             {
-                return "AlphaFromSource设置";
+                return "SpriteMeshType设置";
             }
         }
 
@@ -52,13 +52,19 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// SpriteMeshType
+        /// </summary>
+        [Header("SpriteMeshType选择")]
+        public SpriteMeshType MeshType = SpriteMeshType.FullRect;
+
+        /// <summary>
         /// 执行处理器处理
         /// </summary>
         /// <param name="assetPostProcessor"></param>
         /// <param name="paramList">不定长参数列表</param>
         protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
-            DoAlphaFromSourceSet(assetPostProcessor.assetImporter);
+            DoTightSet(assetPostProcessor.assetImporter);
         }
 
         /// <summary>
@@ -69,21 +75,21 @@ namespace TAssetPipeline
         protected override void DoProcessorByPath(string assetPath, params object[] paramList)
         {
             var assetImporter = AssetImporter.GetAtPath(assetPath);
-            DoAlphaFromSourceSet(assetImporter);
+            DoTightSet(assetImporter);
         }
 
         /// <summary>
-        /// 执行AlphaFromSource设置
+        /// 执行Tight设置
         /// </summary>
         /// <param name="assetImporter"></param>
-        private void DoAlphaFromSourceSet(AssetImporter assetImporter)
+        private void DoTightSet(AssetImporter assetImporter)
         {
             var textureImporter = assetImporter as TextureImporter;
-            var hasAlpha = textureImporter.DoesSourceTextureHaveAlpha() ? true : false;
-            textureImporter.alphaIsTransparency = hasAlpha;
-            var alphaSource = hasAlpha ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
-            textureImporter.alphaSource = alphaSource;
-            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath} alphaIsTransparency:{hasAlpha} alphaSource:{alphaSource}".WithColor(Color.yellow));
+            TextureImporterSettings textureImporterSetting = new TextureImporterSettings();
+            textureImporter.ReadTextureSettings(textureImporterSetting);
+            textureImporterSetting.spriteMeshType = MeshType;
+            textureImporter.SetTextureSettings(textureImporterSetting);
+            AssetPipelineLog.Log($"设置AssetPath:{assetImporter.assetPath},spriteMeshType:{MeshType}".WithColor(Color.yellow));
         }
     }
 }

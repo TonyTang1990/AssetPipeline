@@ -15,7 +15,7 @@ namespace TAssetPipeline
     /// ASTCSet.cs
     /// ASTC设置
     /// </summary>
-    [CreateAssetMenu(fileName = "ASTCSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/ASTCSet", order = 1001)]
+    [CreateAssetMenu(fileName = "ASTCSet", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PreProcessor/Texture/ASTCSet", order = 1001)]
     public class ASTCSet : BasePreProcessor
     {
         /// <summary>
