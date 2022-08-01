@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// CheckFileSize.cs
     /// 检查文件大小
     /// </summary>
-    [CreateAssetMenu(fileName = "CheckFileSize", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/CheckFileSize", order = 2002)]
+    [CreateAssetMenu(fileName = "CheckFileSize", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/Mix/CheckFileSize", order = 2002)]
     public class CheckFileSize : BasePreCheck
     {
         /// <summary>

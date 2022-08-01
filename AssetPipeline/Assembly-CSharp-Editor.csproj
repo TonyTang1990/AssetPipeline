@@ -60,14 +60,14 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineLog.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetConfigData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineSystem.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\All\AECopy.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\Mix\AECopy.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineConst.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineWindow.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetProcesserHook\ScriptAutoProcess\ScriptKeywordProcesser.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PreProcessor\Texture\MipmapSet.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetChecks\PreCheck\All\CheckFileSize.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetChecks\PreCheck\Mix\CheckFileSize.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipeline.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\All\GenerateABName.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\Mix\GenerateABName.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineSettingData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetCheckLocalData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PreProcessor\Texture\SpriteMeshTypeSet.cs" />
@@ -88,7 +88,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessType.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetChecks\PreCheck\All\CheckFileName.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineStyles.cs" />
-    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\All\AEDelete.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\Mix\AEDelete.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineGUIContent.cs" />
     <Compile Include="Assets\Scripts\Editor\EditorWindow\BaseEditorPanel.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorLocalData.cs" />

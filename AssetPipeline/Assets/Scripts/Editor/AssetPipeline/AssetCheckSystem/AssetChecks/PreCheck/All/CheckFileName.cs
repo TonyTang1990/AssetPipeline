@@ -17,7 +17,7 @@ namespace TAssetPipeline
     /// CheckFileName.cs
     /// 检查文件名
     /// </summary>
-    [CreateAssetMenu(fileName = "CheckFileName", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/CheckFileName", order = 2001)]
+    [CreateAssetMenu(fileName = "CheckFileName", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/All/CheckFileName", order = 2001)]
     public class CheckFileName : BasePreCheck
     {
         /// <summary>
