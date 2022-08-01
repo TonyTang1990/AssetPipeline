@@ -35,7 +35,9 @@ namespace TAssetPipeline
         Script = 1 << 13,                 // 脚本(e.g. cs, dll等)
         Video = 1 << 14,                  // 视频
         Folder = 1 << 15,                 // 文件夹
-        Other = 1 << 16,                  // 其他
+        LightingSetting = 1 << 16,        // 光照设置
+        ShaderVariants = 1 << 17,         // Shader变体文件
+        Other = 1 << 18,                  // 其他
         All = Int32.MaxValue,             // 所有类型
     }
 }
