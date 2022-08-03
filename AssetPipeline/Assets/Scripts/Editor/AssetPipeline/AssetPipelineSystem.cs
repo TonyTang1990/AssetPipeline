@@ -38,7 +38,7 @@ namespace TAssetPipeline
             { ".ttf", AssetType.Font },
             { ".shader", AssetType.Shader },
             { ".compute", AssetType.Shader },
-            { ".shadervariants", AssetType.ShaderVariants },
+            { ".shadervariants", AssetType.ShaderVariantCollection },
             { ".prefab", AssetType.Prefab },
             { ".asset", AssetType.ScriptableObject },
             { ".txt", AssetType.TextAsset },
@@ -46,13 +46,26 @@ namespace TAssetPipeline
             { ".cginc", AssetType.TextAsset },
             { ".glslinc", AssetType.TextAsset },
             { ".unity", AssetType.Scene },
-            { ".lighting", AssetType.LightingSetting },
             { ".anim", AssetType.AnimationClip },
+            { ".controller", AssetType.AnimatorController },
+            { ".overridecontroller", AssetType.AnimatorOverrideController },
             { ".mesh", AssetType.Mesh },
-            { ".mp4", AssetType.Video },
+            { ".mp4", AssetType.VideoClip },
+            { ".rendertexture", AssetType.RenderTexture },
+            { ".playable", AssetType.TimelineAsset },
+            { ".lighting", AssetType.LightingSetting },
             { ".cs", AssetType.Script },
-            { ".dll", AssetType.Script },
-            { ".java", AssetType.Script },
+            { ".guiskin", AssetType.GUISkin },
+            { ".preset", AssetType.Preset },
+            { ".asmdef", AssetType.AssemblyDefinitionAsset },
+            { ".java", AssetType.DefaultAsset },
+            { ".h", AssetType.DefaultAsset },
+            { ".mm", AssetType.DefaultAsset },
+            { ".cpp", AssetType.DefaultAsset },
+            { ".py", AssetType.DefaultAsset },
+            { ".dll", AssetType.DefaultAsset },
+            { ".a", AssetType.DefaultAsset },
+            { ".so", AssetType.DefaultAsset },
         };
 
         /// <summary>
@@ -73,9 +86,19 @@ namespace TAssetPipeline
             { AssetType.TextAsset, AssetPipelineGUIContent.TextAssetIcon },
             { AssetType.Scene, AssetPipelineGUIContent.SceneIcon },
             { AssetType.AnimationClip, AssetPipelineGUIContent.AnimationClipIcon },
+            { AssetType.AnimatorController, AssetPipelineGUIContent.AnimatorControllerIcon },
+            { AssetType.AnimatorOverrideController, AssetPipelineGUIContent.AnimatorOverrideControllerIcon },
             { AssetType.Mesh, AssetPipelineGUIContent.MeshIcon },
+            { AssetType.VideoClip, AssetPipelineGUIContent.VideoClipIcon },
+            { AssetType.RenderTexture, AssetPipelineGUIContent.RenderTextureIcon },
+            { AssetType.TimelineAsset, AssetPipelineGUIContent.TimelineAssetIcon },
+            { AssetType.LightingSetting, AssetPipelineGUIContent.LightingSettingsIcon },
             { AssetType.Script, AssetPipelineGUIContent.ScriptIcon },
             { AssetType.Folder, AssetPipelineGUIContent.FolderIcon },
+            { AssetType.GUISkin, AssetPipelineGUIContent.GUISkinIcon },
+            { AssetType.Preset, AssetPipelineGUIContent.PresetIcon },
+            { AssetType.AssemblyDefinitionAsset, AssetPipelineGUIContent.AssemblyDefinitionAssetIcon },
+            { AssetType.DefaultAsset, AssetPipelineGUIContent.DefaultAssetIcon },
             { AssetType.Other, AssetPipelineGUIContent.HelpIcon },
         };
 
@@ -242,7 +265,7 @@ namespace TAssetPipeline
                 return assetType;
             }
             // 找不到默认当做Other类型处理
-            Debug.LogWarning($"找不到后缀:{postFix}的Asset类型!");
+            Debug.LogError($"找不到后缀:{postFix}的Asset类型!");
             return AssetType.Other;
         }
 
@@ -263,15 +286,25 @@ namespace TAssetPipeline
 
         /// <summary>
         /// 获取所有通用的Asset类型组合
+        /// Note:
+        /// 排除以下Asset类型:
+        /// 1. Script -- 代码Asset
+        /// 2. Folder -- 目录
+        /// 3. Editor资源(e.g. GUISkin, Preset, AssemblyDefinitionAsset......)
+        /// 4. DefaultAsset -- Unity不识别类型(e.g. dll, exe, so, a......)
+        /// 5. Other -- 未找到对应Asset类型
         /// </summary>
         /// <returns></returns>
         public static AssetType GetAllCommonAssetType()
         {
             return AssetType.Texture | AssetType.Material | AssetType.SpriteAtlas |
                        AssetType.FBX | AssetType.AudioClip | AssetType.Font |
-                       AssetType.Shader | AssetType.Prefab | AssetType.ScriptableObject |
-                       AssetType.TextAsset | AssetType.Scene | AssetType.AnimationClip |
-                       AssetType.Mesh | AssetType.Video;
+                       AssetType.Shader | AssetType.ShaderVariantCollection | AssetType.Prefab |
+                       AssetType.ScriptableObject | AssetType.TextAsset | AssetType.Scene |
+                       AssetType.AnimationClip | AssetType.AnimatorController |
+                       AssetType.AnimatorOverrideController | AssetType.Mesh |
+                       AssetType.VideoClip | AssetType.RenderTexture | AssetType.TimelineAsset |
+                       AssetType.LightingSetting;
         }
 
         /// <summary>

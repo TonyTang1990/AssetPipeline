@@ -279,6 +279,12 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>G:\Software\UnityAllVersions\2020.3.34f1c2\Editor\Data\Managed\UnityEngine\UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Xcode">
+      <HintPath>G:\Software\UnityAllVersions\2020.3.34f1c2\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Xcode.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.iOS.Extensions.Common">
+      <HintPath>G:\Software\UnityAllVersions\2020.3.34f1c2\Editor\Data\PlaybackEngines\iOSSupport\UnityEditor.iOS.Extensions.Common.dll</HintPath>
+    </Reference>
     <Reference Include="netstandard">
       <HintPath>G:\Software\UnityAllVersions\2020.3.34f1c2\Editor\Data\NetStandard\ref\2.0.0\netstandard.dll</HintPath>
     </Reference>

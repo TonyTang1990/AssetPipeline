@@ -58,6 +58,11 @@ namespace TAssetPipeline
         public static GUIContent ShaderIcon = EditorGUIUtility.IconContent("Shader Icon");
 
         /// <summary>
+        /// ShaderVariantCollection Icon
+        /// </summary>
+        public static GUIContent ShaderVariantCollectionIcon = EditorGUIUtility.IconContent("ShaderVariantCollection Icon");
+
+        /// <summary>
         /// 预制件Icon
         /// </summary>
         public static GUIContent PrefabIcon = EditorGUIUtility.IconContent("Prefab Icon");
@@ -83,6 +88,41 @@ namespace TAssetPipeline
         public static GUIContent AnimationClipIcon = EditorGUIUtility.IconContent("AnimationClip Icon");
 
         /// <summary>
+        /// 动画AnimatorController Icon
+        /// </summary>
+        public static GUIContent AnimatorControllerIcon = EditorGUIUtility.IconContent("AnimatorController Icon");
+
+        /// <summary>
+        /// 动画AnimatorOverrideController Icon
+        /// </summary>
+        public static GUIContent AnimatorOverrideControllerIcon = EditorGUIUtility.IconContent("AnimatorOverrideController Icon");
+
+        /// <summary>
+        /// 网格Icon
+        /// </summary>
+        public static GUIContent MeshIcon = EditorGUIUtility.IconContent("Mesh Icon");
+
+        /// <summary>
+        /// 视频Icon
+        /// </summary>
+        public static GUIContent VideoClipIcon = EditorGUIUtility.IconContent("VideoClip Icon");
+
+        /// <summary>
+        /// RenderTexture Icon
+        /// </summary>
+        public static GUIContent RenderTextureIcon = EditorGUIUtility.IconContent("RenderTexture Icon");
+
+        /// <summary>
+        /// TimelineAsset Icon
+        /// </summary>
+        public static GUIContent TimelineAssetIcon = EditorGUIUtility.IconContent("TimelineAsset Icon");
+
+        /// <summary>
+        /// LightingSettings Icon
+        /// </summary>
+        public static GUIContent LightingSettingsIcon = EditorGUIUtility.IconContent("LightingSettings Icon");
+
+        /// <summary>
         /// 脚本Icon
         /// </summary>
         public static GUIContent ScriptIcon = EditorGUIUtility.IconContent("cs Script Icon");
@@ -93,19 +133,29 @@ namespace TAssetPipeline
         public static GUIContent FolderIcon = EditorGUIUtility.IconContent("Folder Icon");
 
         /// <summary>
+        /// GUISkin Icon
+        /// </summary>
+        public static GUIContent GUISkinIcon = EditorGUIUtility.IconContent("GUISkin Icon");
+
+        /// <summary>
+        /// Preset Icon
+        /// </summary>
+        public static GUIContent PresetIcon = EditorGUIUtility.IconContent("Preset Icon");
+
+        /// <summary>
+        /// AssemblyDefinitionAsset Icon
+        /// </summary>
+        public static GUIContent AssemblyDefinitionAssetIcon = EditorGUIUtility.IconContent("AssemblyDefinitionAsset Icon");
+
+        /// <summary>
+        /// DefaultAsset Icon
+        /// </summary>
+        public static GUIContent DefaultAssetIcon = EditorGUIUtility.IconContent("DefaultAsset Icon");
+
+        /// <summary>
         /// 帮助Icon
         /// </summary>
         public static GUIContent HelpIcon = EditorGUIUtility.IconContent("_Help@2x");
-
-        /// <summary>
-        /// 动画控制器Icon
-        /// </summary>
-        public static GUIContent AnimatorControllerIcon = EditorGUIUtility.IconContent("AnimatorController Icon");
-
-        /// <summary>
-        /// 网格Icon
-        /// </summary>
-        public static GUIContent MeshIcon = EditorGUIUtility.IconContent("Mesh Icon");
 
         /// <summary>
         /// No I
