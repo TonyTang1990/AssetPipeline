@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -26,6 +27,11 @@ namespace TAssetPipeline
         /// AssetType类型
         /// </summary>
         public static Type ASSET_TYPE = typeof(AssetType);
+
+        /// <summary>
+        /// Asset管线脚本所处的程序集
+        /// </summary>
+        public static Assembly ASSET_PIPELINE_ASSEMBLY = ASSET_TYPE.Assembly;
 
         /// <summary>
         /// AssetProcessType类型

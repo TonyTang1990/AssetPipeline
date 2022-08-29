@@ -1,0 +1,5 @@
+{
+    "CustomDes": "关闭Mipmap设置",
+    "TypeFullName": "TAssetPipeline.MipmapSet",
+    "EnableMipMap": false
+}

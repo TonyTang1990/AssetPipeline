@@ -4,6 +4,7 @@
  * Create Date:             2022/06/17
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -30,6 +31,11 @@ namespace TAssetPipeline
         private const string AssetCheckLocalDataName = "AssetCheckLocalData";
 
         /// <summary>
+        /// Asset检查器信息数据文件名(仅Json需要)
+        /// </summary>
+        private const string AssetCheckInfoDataName = "AssetCheckInfoData";
+
+        /// <summary>
         /// Asset检查器全局数据
         /// </summary>
         private static AssetCheckGlobalData GlobalData;
@@ -40,14 +46,9 @@ namespace TAssetPipeline
         private static AssetCheckLocalData LocalData;
 
         /// <summary>
-        /// 所有预检查器列表
+        /// 所有Asset路径检查器Map<Asset路径, Asset检查器实例对象>(来源Json)
         /// </summary>
-        private static List<BasePreCheck> AllPreChecks;
-
-        /// <summary>
-        /// 所有后检查器列表
-        /// </summary>
-        private static List<BasePostCheck> AllPostChecks;
+        private static Dictionary<string, BaseCheck> AllAssetCheckMap;
 
         /// <summary>
         /// 全局预检查器映射Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
@@ -100,8 +101,88 @@ namespace TAssetPipeline
         /// </summary>
         private static void InitAllChecks()
         {
-            AllPreChecks = GetAllChecks<BasePreCheck>();
-            AllPostChecks = GetAllChecks<BasePostCheck>();
+            AllAssetCheckMap = GetAllJsonAssetCheckMap();
+        }
+
+        /// <summary>
+        /// 获取所有Asset路径处理器Map<Asset路径, Asset处理器实例对象>(Json)
+        /// </summary>
+        /// <returns></returns>
+        private static Dictionary<string, BaseCheck> GetAllJsonAssetCheckMap()
+        {
+            var allAssetCheckrMap = new Dictionary<string, BaseCheck>();
+            var assetCheckInfoData = LoadAssetCheckInfoData();
+            if (assetCheckInfoData == null)
+            {
+                return allAssetCheckrMap;
+            }
+            foreach (var assetInfo in assetCheckInfoData.AllCheckAssetInfo)
+            {
+                var assetCheckType = AssetPipelineConst.ASSET_PIPELINE_ASSEMBLY.GetType(assetInfo.AssetTypeFullName);
+                if (assetCheckType == null)
+                {
+                    Debug.LogError($"找不到Asset检查器类型全名:{assetInfo.AssetTypeFullName}");
+                    continue;
+                }
+                if (allAssetCheckrMap.ContainsKey(assetInfo.AssetPath))
+                {
+                    Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetTypeFullName}的Asset类型全名:{assetInfo.AssetTypeFullName}");
+                    continue;
+                }
+                var assetCheckInstance = Activator.CreateInstance(assetCheckType) as BaseCheck;
+                allAssetCheckrMap.Add(assetInfo.AssetPath, assetCheckInstance);
+            }
+            return allAssetCheckrMap;
+        }
+
+        /// <summary>
+        /// 获取指定Asset路径的检查器
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        public static BaseCheck GetCheckByAssetPath(string assetPath)
+        {
+            BaseCheck check = null;
+            if (!AllAssetCheckMap.TryGetValue(assetPath, out check))
+            {
+                Debug.LogError($"找不到Asset路径:{assetPath}的检查器实例对象!");
+                return null;
+            }
+            return check;
+        }
+
+        /// <summary>
+        /// 加载Asset检查器信息数据(Json)
+        /// </summary>
+        /// <returns></returns>
+        private static AssetCheckInfoData LoadAssetCheckInfoData()
+        {
+            var assetCheckInfoDataSavePath = $"{AssetCheckSystem.GetCheckInfoDataSaveRelativePath()}.json";
+            if (!File.Exists(assetCheckInfoDataSavePath))
+            {
+                Debug.LogError($"Asset检查器信息数据文件:{assetCheckInfoDataSavePath}不能存在,加载失败!");
+                return null;
+            }
+            var assetCheckInfoDataJsonContent = File.ReadAllText(assetCheckInfoDataSavePath);
+            AssetCheckInfoData assetCheckInfoData = JsonUtility.FromJson<AssetCheckInfoData>(assetCheckInfoDataJsonContent);
+            return assetCheckInfoData;
+        }
+
+        /// <summary>
+        /// 保存Asset检查器信息数据(Json)
+        /// </summary>
+        /// <returns></returns>
+        public static bool SaveAssetCheckInfoData(AssetCheckInfoData assetCheckInfoData)
+        {
+            if (assetCheckInfoData == null)
+            {
+                Debug.Log($"不允许保存空的Asset检查器信息数据!");
+                return false;
+            }
+            var assetCheckInfoDataSavePath = $"{AssetCheckSystem.GetCheckInfoDataSaveRelativePath()}.json";
+            var assetCheckInfoDataJsonContent = JsonUtility.ToJson(assetCheckInfoData, true);
+            File.WriteAllText(assetCheckInfoDataSavePath, assetCheckInfoDataJsonContent);
+            return true;
         }
 
         /// <summary>
@@ -261,6 +342,16 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 获取自定义Asset检查器信息数据存储相对路径
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCheckInfoDataSaveRelativePath()
+        {
+            var saveFolderRelativePath = AssetPipelineSystem.GetSaveFolderRelativePath();
+            return PathUtilities.GetRegularPath($"{saveFolderRelativePath}/AssetChecks/{AssetCheckInfoDataName}");
+        }
+
+        /// <summary>
         /// 获取指定策略的数据保存相对路径
         /// </summary>
         /// <param name="strategyName"></param>
@@ -277,7 +368,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static string GetGlobalDataAssetName()
         {
-            return $"{AssetCheckGlobalDataName}.asset";
+            return $"{AssetCheckGlobalDataName}";
         }
 
         /// <summary>
@@ -286,7 +377,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static string GetLocalDataAssetName()
         {
-            return $"{AssetCheckLocalDataName}.asset";
+            return $"{AssetCheckLocalDataName}";
         }
 
         /// <summary>
@@ -294,7 +385,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        private static string GetGlobalDataRelativePathByStartegy(string strategyName)
+        public static string GetGlobalDataRelativePathByStartegy(string strategyName)
         {
             var saveFolderRelativePath = GetDataSaveFolderByStrategy(strategyName);
             return $"{saveFolderRelativePath}/{GetGlobalDataAssetName()}";
@@ -305,7 +396,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        private static string GetLocalDataRelativePathByStrategy(string strategyName)
+        public static string GetLocalDataRelativePathByStrategy(string strategyName)
         {
             var saveFolderRelativePath = GetDataSaveFolderByStrategy(strategyName);
             return $"{saveFolderRelativePath}/{GetLocalDataAssetName()}";
@@ -329,13 +420,35 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static AssetCheckGlobalData LoadGlobalDataByStrategy(string strategyName)
         {
-            var globalDataRelativePath = GetGlobalDataRelativePathByStartegy(strategyName);
+            var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.asset";
             var globalData = AssetDatabase.LoadAssetAtPath<AssetCheckGlobalData>(globalDataRelativePath);
             if (globalData == null)
             {
-                Debug.Log($"创建新的Asset检查器全局数据!".WithColor(Color.green));
+                Debug.Log($"找不到Asset检查器全局数据:{globalDataRelativePath}!".WithColor(Color.green));
                 globalData = ScriptableObject.CreateInstance<AssetCheckGlobalData>();
-                AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
+                //AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
+            }
+            return globalData;
+        }
+
+        /// <summary>
+        /// 加载当前激活平台Json检查器全局数据
+        /// </summary>
+        /// <param name="strategyName"></param>
+        /// <returns></returns>
+        public static AssetCheckGlobalData LoadJsonGlobalDataByStrategy(string strategyName)
+        {
+            var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.json";
+            AssetCheckGlobalData globalData = null;
+            if (File.Exists(globalDataRelativePath))
+            {
+                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
+                globalData = JsonUtility.FromJson<AssetCheckGlobalData>(globalDataJsonContent);
+            }
+            if (globalData == null)
+            {
+                Debug.Log($"找不到Asset检查器全局数据:{globalDataRelativePath}!".WithColor(Color.red));
+                globalData = ScriptableObject.CreateInstance<AssetCheckGlobalData>();
             }
             return globalData;
         }
@@ -347,13 +460,35 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static AssetCheckLocalData LoadLocalDataByStrategy(string strategyName)
         {
-            var localDataRelativePath = GetLocalDataRelativePathByStrategy(strategyName);
+            var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.asset";
             var localData = AssetDatabase.LoadAssetAtPath<AssetCheckLocalData>(localDataRelativePath);
             if (localData == null)
             {
-                Debug.Log($"创建新的Asset检查器局部数据!".WithColor(Color.green));
+                Debug.Log($"找不到Asset检查器局部数据:{localDataRelativePath}!".WithColor(Color.green));
                 localData = ScriptableObject.CreateInstance<AssetCheckLocalData>();
-                AssetDatabase.CreateAsset(localData, localDataRelativePath);
+                //AssetDatabase.CreateAsset(localData, localDataRelativePath);
+            }
+            return localData;
+        }
+
+        /// <summary>
+        /// 加载当前激活平台Json检查器局部数据
+        /// </summary>
+        /// <param name="strategyName"></param>
+        /// <returns></returns>
+        public static AssetCheckLocalData LoadJsonLocalDataByStrategy(string strategyName)
+        {
+            var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.json";
+            AssetCheckLocalData localData = null;
+            if (File.Exists(localDataRelativePath))
+            {
+                var localDataJsonContent = File.ReadAllText(localDataRelativePath);
+                localData = JsonUtility.FromJson<AssetCheckLocalData>(localDataJsonContent);
+            }
+            if (localData == null)
+            {
+                Debug.Log($"找不到Asset检查器局部数据:{localDataRelativePath}!".WithColor(Color.red));
+                localData = ScriptableObject.CreateInstance<AssetCheckLocalData>();
             }
             return localData;
         }

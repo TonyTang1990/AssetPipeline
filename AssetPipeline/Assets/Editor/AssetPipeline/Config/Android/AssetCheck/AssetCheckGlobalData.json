@@ -1,0 +1,15 @@
+{
+    "PreCheckData": {
+        "CheckList": [
+            {
+                "instanceID": 15728
+            },
+            {
+                "instanceID": 15724
+            }
+        ]
+    },
+    "PostCheckData": {
+        "CheckList": []
+    }
+}

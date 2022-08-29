@@ -31,6 +31,11 @@ namespace TAssetPipeline
         private const string AssetProcessorLocalDataName = "AssetProcessorLocalData";
 
         /// <summary>
+        /// Asset处理器信息数据文件名(仅Json需要)
+        /// </summary>
+        private const string AssetProcessorInfoDataName = "AssetProcessorInfoData";
+
+        /// <summary>
         /// Asset处理器全局数据
         /// </summary>
         private static AssetProcessorGlobalData GlobalData;
@@ -41,14 +46,9 @@ namespace TAssetPipeline
         private static AssetProcessorLocalData LocalData;
 
         /// <summary>
-        /// 所有预处理器列表
+        /// 所有Asset路径处理器Map<Asset路径, Asset处理器实例对象>(来源Json)
         /// </summary>
-        private static List<BasePreProcessor> AllPreProcessors;
-
-        /// <summary>
-        /// 所有后处理器列表
-        /// </summary>
-        private static List<BasePostProcessor> AllPostProcessors;
+        private static Dictionary<string, BaseProcessor> AllAssetProcessorMap;
 
         /// <summary>
         /// 全局预处理器映射Map<目标Asset管线处理类型, <目标Asset类型, 处理器列表>>
@@ -110,8 +110,88 @@ namespace TAssetPipeline
         /// </summary>
         private static void InitAllProcessors()
         {
-            AllPreProcessors = GetAllProcessors<BasePreProcessor>();
-            AllPostProcessors = GetAllProcessors<BasePostProcessor>();
+            AllAssetProcessorMap = GetAllJsonAssetProcessorMap();
+        }
+
+        /// <summary>
+        /// 获取所有Asset路径处理器Map<Asset路径, Asset处理器实例对象>(Json)
+        /// </summary>
+        /// <returns></returns>
+        private static Dictionary<string, BaseProcessor> GetAllJsonAssetProcessorMap()
+        {
+            var allAssetProcessorMap = new Dictionary<string, BaseProcessor>();
+            var assetProcessorInfoData = LoadAssetProcessorInfoData();
+            if(assetProcessorInfoData == null)
+            {
+                return allAssetProcessorMap;
+            }
+            foreach(var assetInfo in assetProcessorInfoData.AllProcessorAssetInfo)
+            {
+                var assetProcessorType = AssetPipelineConst.ASSET_PIPELINE_ASSEMBLY.GetType(assetInfo.AssetTypeFullName);
+                if(assetProcessorType == null)
+                {
+                    Debug.LogError($"找不到Asset处理器类型全名:{assetInfo.AssetTypeFullName}");
+                    continue;
+                }
+                if(allAssetProcessorMap.ContainsKey(assetInfo.AssetPath))
+                {
+                    Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetTypeFullName}的Asset类型全名:{assetInfo.AssetTypeFullName}");
+                    continue;
+                }
+                var assetProcessorInstance = Activator.CreateInstance(assetProcessorType) as BaseProcessor;
+                allAssetProcessorMap.Add(assetInfo.AssetPath, assetProcessorInstance);
+            }
+            return allAssetProcessorMap;
+        }
+
+        /// <summary>
+        /// 获取指定Asset路径的处理器
+        /// </summary>
+        /// <param name="assetPath"></param>
+        /// <returns></returns>
+        public static BaseProcessor GetProcessorByAssetPath(string assetPath)
+        {
+            BaseProcessor processor = null;
+            if(!AllAssetProcessorMap.TryGetValue(assetPath, out processor))
+            {
+                Debug.LogError($"找不到Asset路径:{assetPath}的处理器实例对象!");
+                return null;
+            }
+            return processor;
+        }
+
+        /// <summary>
+        /// 加载Asset处理器信息数据(Json)
+        /// </summary>
+        /// <returns></returns>
+        private static AssetProcessorInfoData LoadAssetProcessorInfoData()
+        {
+            var assetProcessorInfoDataSavePath = $"{AssetProcessorSystem.GetProcessorInfoDataSaveRelativePath()}.json";
+            if(!File.Exists(assetProcessorInfoDataSavePath))
+            {
+                Debug.LogError($"Asset处理器信息数据文件:{assetProcessorInfoDataSavePath}不能存在,加载失败!");
+                return null;
+            }
+            var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath);
+            AssetProcessorInfoData assetProcessorInfoData = JsonUtility.FromJson<AssetProcessorInfoData>(assetProcessorInfoDataJsonContent);
+            return assetProcessorInfoData;
+        }
+
+        /// <summary>
+        /// 保存Asset处理器信息数据(Json)
+        /// </summary>
+        /// <returns></returns>
+        public static bool SaveAssetProcessorInfoData(AssetProcessorInfoData assetProcessorInfoData)
+        {
+            if(assetProcessorInfoData == null)
+            {
+                Debug.Log($"不允许保存空的Asset处理器信息数据!");
+                return false;
+            }
+            var assetProcessorInfoDataSavePath = $"{AssetProcessorSystem.GetProcessorInfoDataSaveRelativePath()}.json";
+            var assetProcessorInfoDataJsonContent = JsonUtility.ToJson(assetProcessorInfoData, true);
+            File.WriteAllText(assetProcessorInfoDataSavePath, assetProcessorInfoDataJsonContent);
+            return true;
         }
 
         /// <summary>
@@ -292,6 +372,16 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 获取自定义Asset处理器信息数据存储相对路径
+        /// </summary>
+        /// <returns></returns>
+        public static string GetProcessorInfoDataSaveRelativePath()
+        {
+            var saveFolderRelativePath = AssetPipelineSystem.GetSaveFolderRelativePath();
+            return PathUtilities.GetRegularPath($"{saveFolderRelativePath}/AssetProcessors/{AssetProcessorInfoDataName}");
+        }
+
+        /// <summary>
         /// 获取指定策略的数据保存相对路径
         /// </summary>
         /// <param name="strategyName"></param>
@@ -308,7 +398,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static string GetGlobalDataAssetName()
         {
-            return $"{AssetProcessorGlobalDataName}.asset";
+            return $"{AssetProcessorGlobalDataName}";
         }
 
         /// <summary>
@@ -317,7 +407,16 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static string GetLocalDataAssetName()
         {
-            return $"{AssetProcessorLocalDataName}.asset";
+            return $"{AssetProcessorLocalDataName}";
+        }
+
+        /// <summary>
+        /// 获取Asset处理器信息数据Asset名
+        /// </summary>
+        /// <returns></returns>
+        public static string GetProcessorInfoDataAssetName()
+        {
+            return $"{AssetProcessorLocalDataName}";
         }
 
         /// <summary>
@@ -325,7 +424,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        private static string GetGlobalDataRelativePathByStartegy(string strategyName)
+        public static string GetGlobalDataRelativePathByStartegy(string strategyName)
         {
             var saveFolderRelativePath = GetDataSaveFolderByStrategy(strategyName);
             return $"{saveFolderRelativePath}/{GetGlobalDataAssetName()}";
@@ -336,7 +435,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        private static string GetLocalDataRelativePathByStrategy(string strategyName)
+        public static string GetLocalDataRelativePathByStrategy(string strategyName)
         {
             var saveFolderRelativePath = GetDataSaveFolderByStrategy(strategyName);
             return $"{saveFolderRelativePath}/{GetLocalDataAssetName()}";
@@ -360,13 +459,35 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static AssetProcessorGlobalData LoadGlobalDataByStrategy(string strategyName)
         {
-            var globalDataRelativePath = GetGlobalDataRelativePathByStartegy(strategyName);
+            var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.asset";
             var globalData = AssetDatabase.LoadAssetAtPath<AssetProcessorGlobalData>(globalDataRelativePath);
             if (globalData == null)
             {
-                Debug.Log($"创建新的Asset处理器全局数据!".WithColor(Color.green));
+                Debug.Log($"找不到Asset处理器全局数据:{globalDataRelativePath}!".WithColor(Color.green));
                 globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
-                AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
+                //AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
+            }
+            return globalData;
+        }
+
+        /// <summary>
+        /// 加载当前激活平台Json处理器全局数据
+        /// </summary>
+        /// <param name="strategyName"></param>
+        /// <returns></returns>
+        public static AssetProcessorGlobalData LoadJsonGlobalDataByStrategy(string strategyName)
+        {
+            var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.json";
+            AssetProcessorGlobalData globalData = null;
+            if (File.Exists(globalDataRelativePath))
+            {
+                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
+                globalData = JsonUtility.FromJson<AssetProcessorGlobalData>(globalDataJsonContent);
+            }
+            if (globalData == null)
+            {
+                Debug.Log($"找不到Asset处理器全局数据:{globalDataRelativePath}!".WithColor(Color.red));
+                globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
             }
             return globalData;
         }
@@ -378,13 +499,35 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static AssetProcessorLocalData LoadLocalDataByStrategy(string strategyName)
         {
-            var localDataRelativePath = GetLocalDataRelativePathByStrategy(strategyName);
+            var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.asset";
             var localData = AssetDatabase.LoadAssetAtPath<AssetProcessorLocalData>(localDataRelativePath);
             if (localData == null)
             {
-                Debug.Log($"创建新的Asset处理器局部数据!".WithColor(Color.green));
+                Debug.Log($"找不到Asset处理器局部数据:{localDataRelativePath}!".WithColor(Color.green));
                 localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
-                AssetDatabase.CreateAsset(localData, localDataRelativePath);
+                //AssetDatabase.CreateAsset(localData, localDataRelativePath);
+            }
+            return localData;
+        }
+
+        /// <summary>
+        /// 加载当前激活平台Json处理器局部数据
+        /// </summary>
+        /// <param name="strategyName"></param>
+        /// <returns></returns>
+        public static AssetProcessorLocalData LoadJsonLocalDataByStrategy(string strategyName)
+        {
+            var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.json";
+            AssetProcessorLocalData localData = null;
+            if (File.Exists(localDataRelativePath))
+            {
+                var localDataJsonContent = File.ReadAllText(localDataRelativePath);
+                localData = JsonUtility.FromJson<AssetProcessorLocalData>(localDataJsonContent);
+            }
+            if (localData == null)
+            {
+                Debug.Log($"找不到Asset处理器局部数据:{localDataRelativePath}!".WithColor(Color.red));
+                localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
             }
             return localData;
         }

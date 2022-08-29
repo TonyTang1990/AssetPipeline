@@ -1,0 +1,34 @@
+{
+    "ResourceFolder": "Assets/Res/",
+    "Switch": true,
+    "ProcessorSystemSwitch": true,
+    "CheckSystemSwitch": true,
+    "LogSwitch": true,
+    "StrategyList": [
+        "Default",
+        "Android",
+        "IOS"
+    ],
+    "PlatformStrategyDataList": [
+        {
+            "Target": 13,
+            "StrategyName": "Android"
+        },
+        {
+            "Target": 9,
+            "StrategyName": "IOS"
+        },
+        {
+            "Target": 5,
+            "StrategyName": "Default"
+        },
+        {
+            "Target": 19,
+            "StrategyName": "Default"
+        },
+        {
+            "Target": 2,
+            "StrategyName": "Default"
+        }
+    ]
+}

@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -330,6 +331,33 @@ namespace TAssetPipeline
             foreach (var postCheckData in PostCheckDataList)
             {
                 postCheckData.SortAllData();
+            }
+        }
+
+        /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            RefreshMemberValueByLocalDataList(PreCheckDataList);
+            RefreshMemberValueByLocalDataList(PostCheckDataList);
+        }
+
+        /// <summary>
+        /// 刷新指定检查器数据列表成员值
+        /// </summary>
+        /// <param name="checkDataList"></param>
+        private void RefreshMemberValueByLocalDataList(List<CheckLocalData> checkDataList)
+        {
+            foreach (var checkData in checkDataList)
+            {
+                foreach (var checkSettingData in checkData.CheckDataList)
+                {
+                    if (checkSettingData.Check != null)
+                    {
+                        checkSettingData.Check.TypeFullName = checkSettingData.Check.GetType().FullName;
+                    }
+                }
             }
         }
     }

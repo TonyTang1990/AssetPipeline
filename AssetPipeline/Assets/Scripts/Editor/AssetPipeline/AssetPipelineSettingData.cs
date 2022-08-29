@@ -56,6 +56,18 @@ namespace TAssetPipeline
         public bool Switch = true;
 
         /// <summary>
+        /// 处理器系统开关
+        /// </summary>
+        [Header("处理器系统开关")]
+        public bool ProcessorSystemSwitch = true;
+
+        /// <summary>
+        /// 检查器系统开关
+        /// </summary>
+        [Header("检查器系统开关")]
+        public bool CheckSystemSwitch = true;
+
+        /// <summary>
         /// Asset管线Log开关
         /// </summary>
         [Header("Asset管线Log开关")]

@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using static TAssetPipeline.AssetPipelineSettingData;
@@ -188,6 +189,9 @@ namespace TAssetPipeline
         {
             EditorUtility.SetDirty(mSettingData);
             AssetDatabase.SaveAssetIfDirty(mSettingData);
+            var settingDataJsonPath = $"{AssetPipelineSystem.GetSettingDataRelativePath()}.json";
+            var settingDataJsonContent = JsonUtility.ToJson(mSettingData, true);
+            File.WriteAllText(settingDataJsonPath, settingDataJsonContent);
         }
 
         /// <summary>
@@ -229,6 +233,7 @@ namespace TAssetPipeline
         {
             DrawConfigStrategyArea();
             DrawResourceFolderArea();
+            DrawSwitchArea();
             EditorGUILayout.Space();
             DrawStrategyArea();
             EditorGUILayout.Space();
@@ -263,6 +268,28 @@ namespace TAssetPipeline
             if (GUILayout.Button("选择资源目录", GUILayout.Width(150.0f)))
             {
                 mSettingData.ResourceFolder = EditorUtilities.ChoosenProjectFolder(mSettingData.ResourceFolder);
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        /// <summary>
+        /// 绘制开关区域
+        /// </summary>
+        private void DrawSwitchArea()
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            EditorGUILayout.LabelField("Asset管线开关", GUILayout.Width(120f));
+            EditorGUI.BeginChangeCheck();
+            mSettingData.Switch = EditorGUILayout.Toggle(mSettingData.Switch, GUILayout.Width(50f));
+            EditorGUILayout.LabelField("处理器系统开关", GUILayout.Width(120f));
+            mSettingData.ProcessorSystemSwitch = EditorGUILayout.Toggle(mSettingData.ProcessorSystemSwitch, GUILayout.Width(50f));
+            EditorGUILayout.LabelField("检查器系统开关", GUILayout.Width(120f));
+            mSettingData.CheckSystemSwitch = EditorGUILayout.Toggle(mSettingData.CheckSystemSwitch, GUILayout.Width(50f));
+            EditorGUILayout.LabelField("Asset管线Log开关", GUILayout.Width(120f));
+            mSettingData.LogSwitch = EditorGUILayout.Toggle(mSettingData.LogSwitch, GUILayout.Width(50f));
+            if(EditorGUI.EndChangeCheck())
+            {
+                GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllData();
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -316,7 +343,11 @@ namespace TAssetPipeline
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().SortAllData();
             }
-            if (GUILayout.Button("保存Asset管线数据", GUILayout.ExpandWidth(true)))
+            if (GUILayout.Button("刷新所有处理器和检查器的AssetPath字段(新增字段后确保有数据)", GUILayout.ExpandWidth(true)))
+            {
+                GetOwnerEditorWindow<AssetPipelineWindow>().RefreshMemberValue();
+            }
+            if (GUILayout.Button("保存Asset管线数据(新增或修改处理器或检查器也需要)", GUILayout.ExpandWidth(true)))
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllData();
             }

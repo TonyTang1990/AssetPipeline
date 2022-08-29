@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using static TAssetPipeline.AssetProcessorGlobalData;
@@ -178,6 +179,15 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            mGlobalData.RefreshMemberValue();
+            mLocalData.RefreshMemberValue();
+        }
+
+        /// <summary>
         /// 保存所有数据
         /// </summary>
         public override void SaveAllData()
@@ -201,17 +211,88 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetProcessorData()
         {
-            if(mGlobalData != null)
+            var currentConfigStrategy = GetOwnerEditorWindow<AssetPipelineWindow>().AssetPipelinePanel.CurrentConfigStrategy;
+            if (mGlobalData != null)
             {
                 EditorUtility.SetDirty(mGlobalData);
                 AssetDatabase.SaveAssetIfDirty(mGlobalData);
+                var globalDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(currentConfigStrategy)}.json";
+                var globalDataJsonContent = JsonUtility.ToJson(mGlobalData, true);
+                File.WriteAllText(globalDataSavePath, globalDataJsonContent);
             }
             if(mLocalData != null)
             {
                 EditorUtility.SetDirty(mLocalData);
                 AssetDatabase.SaveAssetIfDirty(mLocalData);
+                var localDataSavePath = $"{AssetProcessorSystem.GetLocalDataRelativePathByStrategy(currentConfigStrategy)}.json";
+                var localDataJsonContent = JsonUtility.ToJson(mLocalData, true);
+                File.WriteAllText(localDataSavePath, localDataJsonContent);
+            }
+            // 确保保存所有最新的
+            UpdateAllProcessor();
+            SaveAllProcessorToJson();
+            SaveAllProcessorInfoToJson();
+        }
+
+        /// <summary>
+        /// 保存所有处理器到Json
+        /// </summary>
+        private void SaveAllProcessorToJson()
+        {
+            SaveAllPreProcessorToJson();
+            SaveAllPostProcessorToJson();
+        }
+
+        /// <summary>
+        /// 保存所有预处理器到Json
+        /// </summary>
+        private void SaveAllPreProcessorToJson()
+        {
+            foreach (var preProcessor in mAllPreProcessors)
+            {
+                SaveProcessorToJson(preProcessor);
             }
         }
+
+        /// <summary>
+        /// 保存所有后处理器到Json
+        /// </summary>
+        private void SaveAllPostProcessorToJson()
+        {
+            foreach (var postProcessor in mAllPostProcessors)
+            {
+                SaveProcessorToJson(postProcessor);
+            }
+        }
+
+        /// <summary>
+        /// 保存处理器到Json
+        /// </summary>
+        /// <param name="processor"></param>
+        private void SaveProcessorToJson(BaseProcessor processor)
+        {
+            var processorAssetPath = AssetDatabase.GetAssetPath(processor);
+            var processorJsonPath = Path.ChangeExtension(processorAssetPath, "json");
+            var processorJsonContent = JsonUtility.ToJson(processor, true);
+            File.WriteAllText(processorJsonPath, processorJsonContent);
+        }
+
+        /// <summary>
+        /// 保存所有处理器信息到Json
+        /// </summary>
+        private void SaveAllProcessorInfoToJson()
+        {
+            var assetProcessorInfoData = new AssetProcessorInfoData();
+            foreach (var preProcessor in mAllPreProcessors)
+            {
+                assetProcessorInfoData.AddProcessorInfo(preProcessor);
+            }
+            foreach (var postProcessor in mAllPostProcessors)
+            {
+                assetProcessorInfoData.AddProcessorInfo(postProcessor);
+            }
+            AssetProcessorSystem.SaveAssetProcessorInfoData(assetProcessorInfoData);
+         }
 
         /// <summary>
         /// 响应绘制

@@ -1,0 +1,40 @@
+{
+    "AllProcessorAssetInfo": [
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
+            "AssetTypeFullName": "TAssetPipeline.ASTCSet"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.asset",
+            "AssetTypeFullName": "TAssetPipeline.ETC2Set"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.asset",
+            "AssetTypeFullName": "TAssetPipeline.AlphaFromSourceSet"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/DisableMipmapSet.asset",
+            "AssetTypeFullName": "TAssetPipeline.MipmapSet"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/FullRectSet.asset",
+            "AssetTypeFullName": "TAssetPipeline.SpriteMeshTypeSet"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset",
+            "AssetTypeFullName": "TAssetPipeline.SpriteMeshTypeSet"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.asset",
+            "AssetTypeFullName": "TAssetPipeline.AECopy"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.asset",
+            "AssetTypeFullName": "TAssetPipeline.AEDelete"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.asset",
+            "AssetTypeFullName": "TAssetPipeline.GenerateABName"
+        }
+    ]
+}

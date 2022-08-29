@@ -106,6 +106,18 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            var assetProcessorPanel = GetPanel<AssetProcessorPanel>();
+            assetProcessorPanel.RefreshMemberValue();
+            var assetCheckPanel = GetPanel<AssetCheckPanel>();
+            assetCheckPanel.RefreshMemberValue();
+            Debug.Log($"刷新所有Asset处理器和检查器成员值完成!");
+        }
+
+        /// <summary>
         /// 保存所有数据
         /// </summary>
         public override void SaveAllData()

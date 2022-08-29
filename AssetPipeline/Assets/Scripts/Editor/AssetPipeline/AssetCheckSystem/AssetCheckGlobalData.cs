@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -54,6 +55,30 @@ namespace TAssetPipeline
         {
             PreCheckData.CheckList.Sort(AssetPipelineUtilities.SortCheck);
             PostCheckData.CheckList.Sort(AssetPipelineUtilities.SortCheck);
+        }
+
+        /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            RefreshMemberValueByGlobalData(PreCheckData);
+            RefreshMemberValueByGlobalData(PostCheckData);
+        }
+
+        /// <summary>
+        /// 刷新指定检查器数据列表成员值
+        /// </summary>
+        /// <param name="checkGlobalData"></param>
+        private void RefreshMemberValueByGlobalData(CheckGlobalData checkGlobalData)
+        {
+            foreach (var check in checkGlobalData.CheckList)
+            {
+                if (check != null)
+                {
+                    check.TypeFullName = check.GetType().FullName;
+                }
+            }
         }
     }
 }

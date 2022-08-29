@@ -42,6 +42,7 @@ namespace TAssetPipeline
             { ".prefab", AssetType.Prefab },
             { ".asset", AssetType.ScriptableObject },
             { ".txt", AssetType.TextAsset },
+            { ".json", AssetType.TextAsset },
             { ".bytes", AssetType.TextAsset },
             { ".cginc", AssetType.TextAsset },
             { ".glslinc", AssetType.TextAsset },
@@ -126,12 +127,27 @@ namespace TAssetPipeline
             {
                 return SettingData != null ? SettingData.Switch : false;
             }
-            set
+        }
+
+        /// <summary>
+        /// 处理器系统开关
+        /// </summary>
+        public static bool ProcessorSystemSwitch
+        {
+            get
             {
-                if(SettingData != null)
-                {
-                    SettingData.Switch = value;
-                }
+                return SettingData != null ? SettingData.ProcessorSystemSwitch : false;
+            }
+        }
+
+        /// <summary>
+        /// 检查器系统开关
+        /// </summary>
+        public static bool CheckSystemSwitch
+        {
+            get
+            {
+                return SettingData != null ? SettingData.CheckSystemSwitch : false;
             }
         }
 
@@ -350,13 +366,33 @@ namespace TAssetPipeline
         /// </summary>
         public static AssetPipelineSettingData LoadSettingData()
         {
-            var settingDataRelativePath = GetSettingDataRelativePath();
+            var settingDataRelativePath = $"{GetSettingDataRelativePath()}.asset";
             var settingData = AssetDatabase.LoadAssetAtPath<AssetPipelineSettingData>(settingDataRelativePath);
             if(settingData == null)
             {
-                Debug.Log($"创建新的Asset管线配置数据!".WithColor(Color.green));
+                Debug.Log($"找不到Asset管线配置数据:{settingDataRelativePath}!".WithColor(Color.red));
                 settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
-                AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
+                //AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
+            }
+            return settingData;
+        }
+
+        /// <summary>
+        /// 加载Json设置数据
+        /// </summary>
+        public static AssetPipelineSettingData LoadJsonSettingData()
+        {
+            var settingDataRelativePath = $"{GetSettingDataRelativePath()}.json";
+            AssetPipelineSettingData settingData = null;
+            if (File.Exists(settingDataRelativePath))
+            {
+                var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
+                settingData = JsonUtility.FromJson<AssetPipelineSettingData>(settingDataJsonContent);
+            }
+            if (settingData == null)
+            {
+                Debug.Log($"找不到Asset管线配置数据:{settingDataRelativePath}!".WithColor(Color.red));
+                settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
             }
             return settingData;
         }
@@ -365,7 +401,7 @@ namespace TAssetPipeline
         /// 获取Asset管线设置数据相对路径
         /// </summary>
         /// <returns></returns>
-        private static string GetSettingDataRelativePath()
+        public static string GetSettingDataRelativePath()
         {
             var saveFolderRelativePath = GetSaveFolderRelativePath();
             return $"{saveFolderRelativePath}/{GetSettingDataAssetName()}";
@@ -377,7 +413,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         private static string GetSettingDataAssetName()
         {
-            return $"{AssetPipelineSettingDataName}.asset";
+            return $"{AssetPipelineSettingDataName}";
         }
 
         /// <summary>
@@ -483,8 +519,14 @@ namespace TAssetPipeline
                 {
                     AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 预处理先执行Asset检查系统，后执行Asset处理系统
-                    AssetCheckSystem.OnPreCheckByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
-                    AssetProcessorSystem.OnPreprocessByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                    if (CheckSystemSwitch)
+                    {
+                        AssetCheckSystem.OnPreCheckByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                    }
+                    if(ProcessorSystemSwitch)
+                    {
+                        AssetProcessorSystem.OnPreprocessByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                    }
                 }
             }
             else
@@ -508,8 +550,14 @@ namespace TAssetPipeline
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(importedAsset);
                     AssetPipelineLog.Log($"AssetPath:{importedAsset} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 后处理先执行Asset处理系统，后执行Asset检查系统
-                    AssetProcessorSystem.OnPostprocessByAssetType2(assetProcessType, assetType, importedAsset);
-                    AssetCheckSystem.OnPostCheckByAssetType2(assetProcessType, assetType, importedAsset);
+                    if (ProcessorSystemSwitch)
+                    {
+                        AssetProcessorSystem.OnPostprocessByAssetType2(assetProcessType, assetType, importedAsset);
+                    }
+                    if (CheckSystemSwitch)
+                    {
+                        AssetCheckSystem.OnPostCheckByAssetType2(assetProcessType, assetType, importedAsset);
+                    }
                 }
             }
             else
@@ -532,7 +580,10 @@ namespace TAssetPipeline
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(deletedAsset);
                     AssetPipelineLog.Log($"AssetPath:{deletedAsset} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 删除后统根据Asset路径对应类型来触发
-                    AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAsset, assetProcessType);
+                    if (ProcessorSystemSwitch)
+                    {
+                        AssetProcessorSystem.OnPostprocessDeletedByAssetPath(deletedAsset, assetProcessType);
+                    }
                 }
             }
             else
@@ -556,7 +607,10 @@ namespace TAssetPipeline
                     var assetType = AssetPipelineSystem.GetAssetTypeByPath(movedAsset);
                     AssetPipelineLog.Log($"AssetPath:{movedAsset} AssetProcessType:{assetProcessType} AssetType:{assetType}".WithColor(Color.red));
                     // 移动后统根据Asset路径对应类型来触发
-                    AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAsset, assetProcessType, paramList);
+                    if (ProcessorSystemSwitch)
+                    {
+                        AssetProcessorSystem.OnPostprocessMovedByAssetPath(movedAsset, assetProcessType, paramList);
+                    }
                     // 移动统一当做重新导入处理,确保Asset移动后Asset管线流程处理正确
                     AssetDatabase.ImportAsset(movedAsset);
                 }
@@ -583,8 +637,14 @@ namespace TAssetPipeline
                 {
                     AssetPipelineLog.Log($"AssetPath:{assetPostProcessor.assetPath} AssetType:{assetType}".WithColor(Color.red));
                     // 后处理先执行Asset处理系统，后执行Asset检查系统
-                    AssetProcessorSystem.OnPostprocessByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
-                    AssetCheckSystem.OnPostCheckByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                    if (ProcessorSystemSwitch)
+                    {
+                        AssetProcessorSystem.OnPostprocessByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                    }
+                    if (CheckSystemSwitch)
+                    {
+                        AssetCheckSystem.OnPostCheckByAssetType(assetProcessType, assetType, assetPostProcessor, paramList);
+                    }
                 }
             }
             else

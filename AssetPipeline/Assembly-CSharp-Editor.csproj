@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PreProcessor\Texture\ASTCSet.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineLog.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetConfigData.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetInfo.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineSystem.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PostProcessor\Mix\AECopy.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelineConst.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PreProcessor\Texture\AlphaFromSourceSet.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessors\PreProcessor\Texture\ETC2Set.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\PresetSystem\PresetSettingData.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorInfoData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\BaseCheck.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessorSystem\AssetProcessorGlobalData.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetProcessType.cs" />
@@ -105,6 +107,7 @@
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetPipelinePanel.cs" />
     <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\BasePreCheck.cs" />
     <Compile Include="Assets\Scripts\Editor\Utilities\FolderUtilities.cs" />
+    <Compile Include="Assets\Scripts\Editor\AssetPipeline\AssetCheckSystem\AssetCheckInfoData.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -15,6 +16,7 @@ namespace TAssetPipeline
     /// AssetProcessorGlobalData.cs
     /// Asset处理器全局数据
     /// </summary>
+    [CreateAssetMenu(fileName = "AssetProcessorGlobalData", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AssetProcessorGlobalData", order = 1)]
     public class AssetProcessorGlobalData : ScriptableObject
     {
         /// <summary>
@@ -68,6 +70,32 @@ namespace TAssetPipeline
             PostProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
             MovedProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
             DeletedProcessorData.ProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
+        }
+
+        /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            RefreshMemberValueByGlobalData(PreProcessorData);
+            RefreshMemberValueByGlobalData(PostProcessorData);
+            RefreshMemberValueByGlobalData(MovedProcessorData);
+            RefreshMemberValueByGlobalData(DeletedProcessorData);
+        }
+
+        /// <summary>
+        /// 刷新指定处理器数据列表成员值
+        /// </summary>
+        /// <param name="processorGlobalData"></param>
+        private void RefreshMemberValueByGlobalData(ProcessorGlobalData processorGlobalData)
+        {
+            foreach (var processor in processorGlobalData.ProcessorList)
+            {
+                if (processor != null)
+                {
+                    processor.TypeFullName = processor.GetType().FullName;
+                }
+            }
         }
     }
 }

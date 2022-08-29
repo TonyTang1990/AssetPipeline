@@ -1,0 +1,163 @@
+{
+    "PreProcessorDataList": [
+        {
+            "FolderPath": "Assets/Res/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15664
+                    },
+                    "BlackListFolderPathList": [
+                        "Assets/Res/a/",
+                        "Assets/Res/e/",
+                        "Assets/Res/textures/"
+                    ]
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/a/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15664
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/e/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15666
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15666
+                    },
+                    "BlackListFolderPathList": []
+                },
+                {
+                    "Processor": {
+                        "instanceID": 15668
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/AlphaFromSource/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15670
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/ASTC/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15664
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/Mipmap/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15672
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/Mix/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15664
+                    },
+                    "BlackListFolderPathList": []
+                },
+                {
+                    "Processor": {
+                        "instanceID": 15670
+                    },
+                    "BlackListFolderPathList": []
+                },
+                {
+                    "Processor": {
+                        "instanceID": 15674
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/TestBlackList/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15664
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        },
+        {
+            "FolderPath": "Assets/Res/textures/TightSet/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15674
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        }
+    ],
+    "PostProcessorDataList": [
+        {
+            "FolderPath": "Assets/Res/a/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15676
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        }
+    ],
+    "MovedProcessorDataList": [],
+    "DeletedProcessorDataList": [
+        {
+            "FolderPath": "Assets/Res/a/",
+            "ProcessorDataList": [
+                {
+                    "Processor": {
+                        "instanceID": 15678
+                    },
+                    "BlackListFolderPathList": []
+                }
+            ]
+        }
+    ]
+}

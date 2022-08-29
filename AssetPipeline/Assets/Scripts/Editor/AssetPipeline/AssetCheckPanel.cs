@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using static TAssetPipeline.AssetCheckGlobalData;
@@ -174,6 +175,15 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            mGlobalData.RefreshMemberValue();
+            mLocalData.RefreshMemberValue();
+        }
+
+        /// <summary>
         /// 保存所有数据
         /// </summary>
         public override void SaveAllData()
@@ -197,16 +207,90 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetCheckData()
         {
-            if(mGlobalData != null)
+            var currentConfigStrategy = GetOwnerEditorWindow<AssetPipelineWindow>().AssetPipelinePanel.CurrentConfigStrategy;
+            if (mGlobalData != null)
             {
                 EditorUtility.SetDirty(mGlobalData);
                 AssetDatabase.SaveAssetIfDirty(mGlobalData);
+                var globalDataSavePath = $"{AssetCheckSystem.GetGlobalDataRelativePathByStartegy(currentConfigStrategy)}.json";
+                var globalDataJsonContent = JsonUtility.ToJson(mGlobalData, true);
+                File.WriteAllText(globalDataSavePath, globalDataJsonContent);
             }
-            if(mLocalData != null)
+            if (mLocalData != null)
             {
                 EditorUtility.SetDirty(mLocalData);
                 AssetDatabase.SaveAssetIfDirty(mLocalData);
+                var localDataSavePath = $"{AssetCheckSystem.GetLocalDataRelativePathByStrategy(currentConfigStrategy)}.json";
+                var localDataJsonContent = JsonUtility.ToJson(mLocalData, true);
+                File.WriteAllText(localDataSavePath, localDataJsonContent);
             }
+            // 确保保存所有最新的
+            UpdateAllCheck();
+            SaveAllCheckToJson();
+            SaveAllCheckInfoToJson();
+        }
+
+        /// <summary>
+        /// 保存所有检查器到Json
+        /// </summary>
+        private void SaveAllCheckToJson()
+        {
+            SaveAllPreCheckToJson();
+            SaveAllPostCheckToJson();
+        }
+
+        /// <summary>
+        /// 保存所有预处理器到Json
+        /// </summary>
+        private void SaveAllPreCheckToJson()
+        {
+            foreach (var preCheck in mAllPreChecks)
+            {
+                SaveCheckToJson(preCheck);
+            }
+        }
+
+        /// <summary>
+        /// 保存所有后检查器到Json
+        /// </summary>
+        private void SaveAllPostCheckToJson()
+        {
+            foreach (var postCheck in mAllPostChecks)
+            {
+                SaveCheckToJson(postCheck);
+            }
+        }
+
+        /// <summary>
+        /// 保存检查器到Json
+        /// </summary>
+        /// <param name="check"></param>
+        private void SaveCheckToJson(BaseCheck check)
+        {
+            var checkAssetPath = AssetDatabase.GetAssetPath(check);
+            var checkJsonPath = Path.ChangeExtension(checkAssetPath, "json");
+            var checkJsonContent = JsonUtility.ToJson(check, true);
+            File.WriteAllText(checkJsonPath, checkJsonContent);
+        }
+
+
+        /// <summary>
+        /// 保存所有检查器信息到Json
+        /// </summary>
+        private void SaveAllCheckInfoToJson()
+        {
+            var assetCheckInfoData = new AssetCheckInfoData();
+            foreach (var preCheck in mAllPreChecks)
+            {
+                assetCheckInfoData.AddCheckInfo(preCheck);
+            }
+            foreach (var postCheck in mAllPostChecks)
+            {
+                assetCheckInfoData.AddCheckInfo(postCheck);
+            }
+            var assetCheckInfoDataSavePath = $"{AssetCheckSystem.GetCheckInfoDataSaveRelativePath()}.json";
+            var assetCheckInfoDataJsonContent = JsonUtility.ToJson(assetCheckInfoData, true);
+            File.WriteAllText(assetCheckInfoDataSavePath, assetCheckInfoDataJsonContent);
         }
 
         /// <summary>

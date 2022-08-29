@@ -15,6 +15,7 @@ namespace TAssetPipeline
     /// AssetProcessorLocalData.cs
     /// Asset处理器局部数据
     /// </summary>
+    [CreateAssetMenu(fileName = "AssetProcessorLocalData", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AssetProcessorLocalData", order = 2)]
     public class AssetProcessorLocalData : ScriptableObject
     {
         /// <summary>
@@ -372,6 +373,35 @@ namespace TAssetPipeline
             foreach (var deletedProcessorData in DeletedProcessorDataList)
             {
                 deletedProcessorData.SortAllData();
+            }
+        }
+
+        /// <summary>
+        /// 刷新成员值
+        /// </summary>
+        public void RefreshMemberValue()
+        {
+            RefreshMemberValueByLocalDataList(PreProcessorDataList);
+            RefreshMemberValueByLocalDataList(PostProcessorDataList);
+            RefreshMemberValueByLocalDataList(MovedProcessorDataList);
+            RefreshMemberValueByLocalDataList(DeletedProcessorDataList);
+        }
+
+        /// <summary>
+        /// 刷新指定处理器数据列表成员值
+        /// </summary>
+        /// <param name="processorDataList"></param>
+        private void RefreshMemberValueByLocalDataList(List<ProcessorLocalData> processorDataList)
+        {
+            foreach (var processorData in processorDataList)
+            {
+                foreach (var processorSettingData in processorData.ProcessorDataList)
+                {
+                    if (processorSettingData.Processor != null)
+                    {
+                        processorSettingData.Processor.TypeFullName = processorSettingData.Processor.GetType().FullName;
+                    }
+                }
             }
         }
     }

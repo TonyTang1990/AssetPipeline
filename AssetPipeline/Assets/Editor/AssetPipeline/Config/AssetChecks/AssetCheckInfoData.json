@@ -1,0 +1,12 @@
+{
+    "AllCheckAssetInfo": [
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetChecks/PreCheck/All/CheckFileName.asset",
+            "AssetTypeFullName": "TAssetPipeline.CheckFileName"
+        },
+        {
+            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetChecks/PreCheck/All/CheckFileSize.asset",
+            "AssetTypeFullName": "TAssetPipeline.CheckFileSize"
+        }
+    ]
+}
