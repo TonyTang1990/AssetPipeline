@@ -31,6 +31,12 @@ namespace TAssetPipeline
             public List<BaseProcessor> ProcessorList = new List<BaseProcessor>();
 
             /// <summary>
+            /// 处理器器Asset路径列表(保存时刷新导出，Asset管线运行时用，和ProcessorList一一对应)
+            /// </summary>
+            [Header("处理器器Asset路径列表")]
+            public List<string> ProcessorAssetPathList = new List<string>();
+
+            /// <summary>
             /// 处理器选择列表(只使用第一个)
             /// </summary>
             [NonSerialized]
@@ -89,12 +95,19 @@ namespace TAssetPipeline
         /// <param name="processorGlobalData"></param>
         private void RefreshMemberValueByGlobalData(ProcessorGlobalData processorGlobalData)
         {
+            processorGlobalData.ProcessorAssetPathList.Clear();
             foreach (var processor in processorGlobalData.ProcessorList)
             {
+                string processorAssetPath = null;
                 if (processor != null)
                 {
-                    processor.TypeFullName = processor.GetType().FullName;
+                    processorAssetPath = AssetDatabase.GetAssetPath(processor);
+                    if (string.IsNullOrEmpty(processorAssetPath))
+                    {
+                        Debug.LogError($"找不到处理器:{processor.name}的Asset路径!");
+                    }
                 }
+                processorGlobalData.ProcessorAssetPathList.Add(processorAssetPath);
             }
         }
     }

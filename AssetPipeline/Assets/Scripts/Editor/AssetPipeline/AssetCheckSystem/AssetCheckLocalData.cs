@@ -31,6 +31,12 @@ namespace TAssetPipeline
             public BaseCheck Check;
 
             /// <summary>
+            /// 检查器Asset路径(保存时刷新导出，Asset管线运行时用)
+            /// </summary>
+            [Header("检查器Asset路径")]
+            public string CheckAssetPath;
+
+            /// <summary>
             /// 黑名单路径列表
             /// </summary>
             [Header("黑名单路径列表")]
@@ -353,10 +359,16 @@ namespace TAssetPipeline
             {
                 foreach (var checkSettingData in checkData.CheckDataList)
                 {
+                    string checkAssetPath = null;
                     if (checkSettingData.Check != null)
                     {
-                        checkSettingData.Check.TypeFullName = checkSettingData.Check.GetType().FullName;
+                        checkAssetPath = AssetDatabase.GetAssetPath(checkSettingData.Check);
+                        if (string.IsNullOrEmpty(checkAssetPath))
+                        {
+                            Debug.LogError($"找不到检查器:{checkSettingData.Check.name}的Asset路径!");
+                        }
                     }
+                    checkSettingData.CheckAssetPath = checkAssetPath;
                 }
             }
         }

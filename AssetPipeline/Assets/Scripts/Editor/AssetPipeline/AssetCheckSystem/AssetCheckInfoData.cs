@@ -13,6 +13,9 @@ namespace TAssetPipeline
 {
     /// <summary>
     /// AssetCheckInfoData.cs
+    /// Asset检查器信息数据
+    /// Json记录所有检查器相关路径和类型信息
+    /// 反序列化构建所有检查器对象用
     /// </summary>
     public class AssetCheckInfoData
     {
@@ -22,15 +25,9 @@ namespace TAssetPipeline
         [Header("所有检查器Asset信息")]
         public List<AssetInfo> AllCheckAssetInfo;
 
-        /// <summary>
-        /// 所有检查器路径和类型信息Map<Asset路径, Asset类型信息>
-        /// </summary>
-        private Dictionary<string, string> mAllCheckAssetPathTypeMap;
-
         public AssetCheckInfoData()
         {
             AllCheckAssetInfo = new List<AssetInfo>();
-            mAllCheckAssetPathTypeMap = new Dictionary<string, string>();
         }
 
         /// <summary>
@@ -40,47 +37,21 @@ namespace TAssetPipeline
         /// <returns></returns>
         public bool AddCheckInfo(BaseCheck check)
         {
+            if (check == null)
+            {
+                Debug.LogWarning($"不添加空检查器信息!");
+                return false;
+            }
             var checkPath = AssetDatabase.GetAssetPath(check);
-            if (mAllCheckAssetPathTypeMap.ContainsKey(checkPath))
+            var findCheck = AllCheckAssetInfo.Find((assetInfo) => string.Equals(assetInfo.AssetPath, checkPath));
+            if (findCheck != null)
             {
                 Debug.LogError($"重复添加检查器路径:{checkPath}的Asset信息，添加失败!");
                 return false;
             }
             var checkFullName = check.GetType().FullName;
             AllCheckAssetInfo.Add(new AssetInfo(checkPath, checkFullName));
-            mAllCheckAssetPathTypeMap.Add(checkPath, checkFullName);
             return true;
-        }
-
-        /// <summary>
-        /// 初始化Asset路径和类型信息Map
-        /// </summary>
-        public void InitAssetPathTypeMap()
-        {
-            mAllCheckAssetPathTypeMap.Clear();
-            foreach (var processorAssetInfo in AllCheckAssetInfo)
-            {
-                if (mAllCheckAssetPathTypeMap.ContainsKey(processorAssetInfo.AssetPath))
-                {
-                    continue;
-                }
-                mAllCheckAssetPathTypeMap.Add(processorAssetInfo.AssetPath, processorAssetInfo.AssetTypeFullName);
-            }
-        }
-
-        /// <summary>
-        /// 获取指定Asset路径的类型信息
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <returns></returns>
-        public string GetAssetTypeByPath(string assetPath)
-        {
-            string assetTypeFullName = null;
-            if (!mAllCheckAssetPathTypeMap.TryGetValue(assetPath, out assetTypeFullName))
-            {
-                Debug.LogError($"找不到Asset检查器:{assetPath}的Asset类型信息!");
-            }
-            return assetTypeFullName;
         }
     }
 }

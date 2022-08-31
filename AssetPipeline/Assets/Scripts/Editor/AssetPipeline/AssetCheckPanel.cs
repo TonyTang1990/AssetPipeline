@@ -240,7 +240,7 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 保存所有预处理器到Json
+        /// 保存所有预检查器到Json
         /// </summary>
         private void SaveAllPreCheckToJson()
         {
@@ -267,6 +267,11 @@ namespace TAssetPipeline
         /// <param name="check"></param>
         private void SaveCheckToJson(BaseCheck check)
         {
+            if(check == null)
+            {
+                Debug.LogWarning($"不保存空检查器Json!");
+                return;
+            }
             var checkAssetPath = AssetDatabase.GetAssetPath(check);
             var checkJsonPath = Path.ChangeExtension(checkAssetPath, "json");
             var checkJsonContent = JsonUtility.ToJson(check, true);

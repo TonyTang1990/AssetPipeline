@@ -16,6 +16,7 @@ MonoBehaviour:
   - FolderPath: Assets/Res/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset
       BlackListFolderPathList:
       - Assets/Res/a/
       - Assets/Res/e/
@@ -23,53 +24,67 @@ MonoBehaviour:
   - FolderPath: Assets/Res/a/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/e/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: ae0ed7e60c9f6764fb26d211c4fa90f0, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: ae0ed7e60c9f6764fb26d211c4fa90f0, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.asset
       BlackListFolderPathList: []
     - Processor: {fileID: 11400000, guid: 73b672ff399d9f547aa8991a3d259163, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/FullRectSet.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/AlphaFromSource/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: 3c691977a8a5382429c22a658b921866, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/ASTC/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/Mipmap/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: 397c9f594cabfa44aadead6f8ed852f3, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/DisableMipmapSet.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/Mix/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset
       BlackListFolderPathList: []
     - Processor: {fileID: 11400000, guid: 3c691977a8a5382429c22a658b921866, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.asset
       BlackListFolderPathList: []
     - Processor: {fileID: 11400000, guid: f3afeb65fbec752429c69e2481e04641, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/TestBlackList/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: e3ce1bf21d4d8a242b577d663e8fdc1f, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset
       BlackListFolderPathList: []
   - FolderPath: Assets/Res/textures/TightSet/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: f3afeb65fbec752429c69e2481e04641, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset
       BlackListFolderPathList: []
   PostProcessorDataList:
   - FolderPath: Assets/Res/a/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: 862961f64f6afd443a9e51a4d3c09714, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.asset
       BlackListFolderPathList: []
   MovedProcessorDataList: []
   DeletedProcessorDataList:
   - FolderPath: Assets/Res/a/
     ProcessorDataList:
     - Processor: {fileID: 11400000, guid: da3dd1878aaebc1438828dbc6c57e3ac, type: 2}
+      ProcessorAssetPath: Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.asset
       BlackListFolderPathList: []

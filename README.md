@@ -56,6 +56,9 @@ Asset管线核心框架部分:
 - BaseCheck -- Asset检查抽象类(负责抽象Asset检查器流程和数据，继承至ScriptableObject实现自定义数据配置处理)
 - BasePreCheck -- Asset预检查抽象类(负责抽象Asset预检查器流程和数据，继承至BaseCheck )
 - BasePostCheck -- Asset后检查抽象类(负责抽象Asset后检查器流程和数据，继承至BaseCheck )
+- AssetInfo -- 用于记录处理器和检查器相关的路径信息和类型信息(用于后续Json反序列依据)
+- AssetProcessorInfoData -- 所有处理器AssetInfo信息集合(用于后续Json反序列化构造处理器依据)
+- AssetCheckInfoData -- 所有检查器AssetInfo信息集合(用于后续Json反序列化构造检查器依据)
 
 窗口部分:
 
@@ -484,6 +487,16 @@ public class GenerateABName : BasePostProcessor
 
 1. **默认Editor/AssetPipeline/Config/AssetProcessors和Editor/AssetPipeline/Config/AssetChecks目录下才会生成预览，请创建在这两个目录下**
 2. **生成AB名处理器如果设置不同AB名会导致Asset处理未保存状态，导致Asset多触发一次Post Import流程**
+
+## 重大问题更新
+
+问题:
+
+1. **原设计全部是基于ScriptableObejct作为数据存储媒介，导致各电脑同步时配置数据也处于导入状态导致无法正确加载最新的后处理配置(更坏的情况可能加载失败)。**
+
+解决方案:
+
+1. **所有ScriptableObject配置导出一份Json(基于ScritableObject的引用改存AssetPath)，保存时基于ScriptableObject配置生成最新的Json数据。Asset管线系统加载配置数据基于导出的Json，ScriptableObject只作为可视化配置读取的数据来源以及导出Json的数据依据。**
 
 ## 博客
 

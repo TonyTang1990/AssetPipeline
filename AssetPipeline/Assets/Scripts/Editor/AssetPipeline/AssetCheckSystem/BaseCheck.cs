@@ -34,12 +34,6 @@ namespace TAssetPipeline
         public string CustomDes;
 
         /// <summary>
-        /// 检查器类型名
-        /// </summary>
-        [Header("检查器类型名")]
-        public string TypeFullName;
-
-        /// <summary>
         /// 目标Asset类型(子类重定义指定)
         /// </summary>
         public abstract AssetType TargetAssetType

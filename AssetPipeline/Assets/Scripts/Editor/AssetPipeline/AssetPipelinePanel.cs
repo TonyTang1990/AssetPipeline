@@ -343,11 +343,13 @@ namespace TAssetPipeline
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().SortAllData();
             }
-            if (GUILayout.Button("刷新所有处理器和检查器的AssetPath字段(新增字段后确保有数据)", GUILayout.ExpandWidth(true)))
+            /*
+            if (GUILayout.Button("刷新所有处理器和检查器成员数据(新增字段后确保有数据)", GUILayout.ExpandWidth(true)))
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().RefreshMemberValue();
             }
-            if (GUILayout.Button("保存Asset管线数据(新增或修改处理器或检查器也需要)", GUILayout.ExpandWidth(true)))
+            */
+            if (GUILayout.Button("保存Asset管线数据(新增或修改或删除都需要保存才生效，记得上传所有Asset和Json)", GUILayout.ExpandWidth(true)))
             {
                 GetOwnerEditorWindow<AssetPipelineWindow>().SaveAllData();
             }

@@ -30,6 +30,12 @@ namespace TAssetPipeline
             public List<BaseCheck> CheckList = new List<BaseCheck>();
 
             /// <summary>
+            /// 检查器Asset路径列表(保存时刷新导出，Asset管线运行时用，和CheckList一一对应)
+            /// </summary>
+            [Header("检查器Asset路径列表")]
+            public List<string> CheckAssetPathList = new List<string>();
+
+            /// <summary>
             /// 检查器选择列表(只使用第一个)
             /// </summary>
             [NonSerialized]
@@ -72,12 +78,19 @@ namespace TAssetPipeline
         /// <param name="checkGlobalData"></param>
         private void RefreshMemberValueByGlobalData(CheckGlobalData checkGlobalData)
         {
+            checkGlobalData.CheckAssetPathList.Clear();
             foreach (var check in checkGlobalData.CheckList)
             {
+                string checkAssetPath = null;
                 if (check != null)
                 {
-                    check.TypeFullName = check.GetType().FullName;
+                    checkAssetPath = AssetDatabase.GetAssetPath(check);
+                    if (string.IsNullOrEmpty(checkAssetPath))
+                    {
+                        Debug.LogError($"找不到检查器:{check.name}的Asset路径!");
+                    }
                 }
+                checkGlobalData.CheckAssetPathList.Add(checkAssetPath);
             }
         }
     }

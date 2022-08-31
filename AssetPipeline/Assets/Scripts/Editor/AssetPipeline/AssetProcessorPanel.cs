@@ -271,6 +271,11 @@ namespace TAssetPipeline
         /// <param name="processor"></param>
         private void SaveProcessorToJson(BaseProcessor processor)
         {
+            if (processor == null)
+            {
+                Debug.LogWarning($"不保存空处理器Json!");
+                return;
+            }
             var processorAssetPath = AssetDatabase.GetAssetPath(processor);
             var processorJsonPath = Path.ChangeExtension(processorAssetPath, "json");
             var processorJsonContent = JsonUtility.ToJson(processor, true);

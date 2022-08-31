@@ -7,30 +7,41 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
-/// <summary>
-/// AssetInfo.cs
-/// Asset信息(用于记录Asset路径和对应的Asset类型信息)
-/// </summary>
-[Serializable]
-public class AssetInfo
+namespace TAssetPipeline
 {
     /// <summary>
-    /// Asset路径
+    /// AssetInfo.cs
+    /// Asset信息(记录Asset相关路径和对应的Asset类型信息)
     /// </summary>
-    [Header("Asset路径")]
-    public string AssetPath;
-
-    /// <summary>
-    /// Asset类型全名
-    /// </summary>
-    [Header("Asset类型全名")]
-    public string AssetTypeFullName;
-
-    public AssetInfo(string assetPath, string assetTypeFullName)
+    [Serializable]
+    public class AssetInfo
     {
-        AssetPath = assetPath;
-        AssetTypeFullName = assetTypeFullName;
+        /// <summary>
+        /// Asset路径
+        /// </summary>
+        [Header("Asset路径")]
+        public string AssetPath;
+
+        /// <summary>
+        /// Json Asset路径
+        /// </summary>
+        [Header("Json Asset路径")]
+        public string JsonAssetPath;
+
+        /// <summary>
+        /// Asset类型全名
+        /// </summary>
+        [Header("Asset类型全名")]
+        public string AssetTypeFullName;
+
+        public AssetInfo(string assetPath, string assetTypeFullName)
+        {
+            AssetPath = assetPath;
+            JsonAssetPath = Path.ChangeExtension(assetPath, "json");
+            AssetTypeFullName = assetTypeFullName;
+        }
     }
 }

@@ -19,6 +19,16 @@ namespace TAssetPipeline
     public static class AssetPipelineConst
     {
         /// <summary>
+        /// ScriptableObejct Asset后缀
+        /// </summary>
+        public const string SCRIPTABLE_OBJECT_ASSET_POST_FIX = "asset";
+
+        /// <summary>
+        /// Json后缀
+        /// </summary>
+        public const string JSON_POST_FIX = "json";
+
+        /// <summary>
         /// 默认策略名
         /// </summary>
         public const string DEFAULT_STRATEGY_NAME = "Default";

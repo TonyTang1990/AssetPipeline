@@ -16,5 +16,9 @@ MonoBehaviour:
     CheckList:
     - {fileID: 11400000, guid: 32c43ba9e2a0e134388703204ae9479b, type: 2}
     - {fileID: 11400000, guid: 6f45b0aa61e3309498038f61de587a81, type: 2}
+    CheckAssetPathList:
+    - Assets/Editor/AssetPipeline/Config/AssetChecks/PreCheck/All/CheckFileSize.asset
+    - Assets/Editor/AssetPipeline/Config/AssetChecks/PreCheck/All/CheckFileName.asset
   PostCheckData:
     CheckList: []
+    CheckAssetPathList: []

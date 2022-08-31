@@ -2,38 +2,47 @@
     "AllProcessorAssetInfo": [
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.json",
             "AssetTypeFullName": "TAssetPipeline.ASTCSet"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.json",
             "AssetTypeFullName": "TAssetPipeline.ETC2Set"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.json",
             "AssetTypeFullName": "TAssetPipeline.AlphaFromSourceSet"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/DisableMipmapSet.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/DisableMipmapSet.json",
             "AssetTypeFullName": "TAssetPipeline.MipmapSet"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/FullRectSet.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/FullRectSet.json",
             "AssetTypeFullName": "TAssetPipeline.SpriteMeshTypeSet"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.json",
             "AssetTypeFullName": "TAssetPipeline.SpriteMeshTypeSet"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.json",
             "AssetTypeFullName": "TAssetPipeline.AECopy"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.json",
             "AssetTypeFullName": "TAssetPipeline.AEDelete"
         },
         {
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.asset",
+            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.json",
             "AssetTypeFullName": "TAssetPipeline.GenerateABName"
         }
     ]

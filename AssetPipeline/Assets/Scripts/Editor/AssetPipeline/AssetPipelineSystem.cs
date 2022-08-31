@@ -229,7 +229,7 @@ namespace TAssetPipeline
         {
             Debug.Log($"Asset管线系统初始化".WithColor(Color.red));
             MakeSureSaveFolderExist();
-            SettingData = LoadSettingData();
+            SettingData = LoadJsonSettingData();
             LoadedTarget = EditorUserBuildSettings.activeBuildTarget;
             LoadedStrategyName = GetActiveTargetStrategyName();
             Debug.Log($"Asset管线开关:{SettingData.Switch}".WithColor(Color.red));
@@ -383,17 +383,15 @@ namespace TAssetPipeline
         public static AssetPipelineSettingData LoadJsonSettingData()
         {
             var settingDataRelativePath = $"{GetSettingDataRelativePath()}.json";
-            AssetPipelineSettingData settingData = null;
-            if (File.Exists(settingDataRelativePath))
+            AssetPipelineSettingData settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
+            if (!File.Exists(settingDataRelativePath))
             {
-                var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
-                settingData = JsonUtility.FromJson<AssetPipelineSettingData>(settingDataJsonContent);
+                Debug.LogError($"找不到Asset管线Json配置数据:{settingDataRelativePath}!".WithColor(Color.red));
+                return settingData;
             }
-            if (settingData == null)
-            {
-                Debug.Log($"找不到Asset管线配置数据:{settingDataRelativePath}!".WithColor(Color.red));
-                settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
-            }
+            var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
+            JsonUtility.FromJsonOverwrite(settingDataJsonContent, settingData);
+            Debug.Log($"加载Asset管线Json配置数据:{settingDataRelativePath}完成!".WithColor(Color.green));
             return settingData;
         }
 

@@ -1,5 +1,4 @@
 {
     "CustomDes": "检查文件大小有效性",
-    "TypeFullName": "TAssetPipeline.CheckFileSize",
     "FileSizeLimit": 8388608
 }

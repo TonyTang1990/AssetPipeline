@@ -1,18 +1,24 @@
 {
     "PreProcessorData": {
-        "ProcessorList": []
+        "ProcessorList": [],
+        "ProcessorAssetPathList": []
     },
     "PostProcessorData": {
         "ProcessorList": [
             {
-                "instanceID": 15660
+                "instanceID": 16796
             }
+        ],
+        "ProcessorAssetPathList": [
+            "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.asset"
         ]
     },
     "MovedProcessorData": {
-        "ProcessorList": []
+        "ProcessorList": [],
+        "ProcessorAssetPathList": []
     },
     "DeletedProcessorData": {
-        "ProcessorList": []
+        "ProcessorList": [],
+        "ProcessorAssetPathList": []
     }
 }

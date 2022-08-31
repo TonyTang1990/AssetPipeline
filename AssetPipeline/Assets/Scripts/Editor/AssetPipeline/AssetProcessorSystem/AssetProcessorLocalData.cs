@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 namespace TAssetPipeline
@@ -29,6 +30,12 @@ namespace TAssetPipeline
             /// </summary>
             [Header("处理器")]
             public BaseProcessor Processor;
+
+            /// <summary>
+            /// 处理器Asset路径(保存时刷新导出，Asset管线运行时用)
+            /// </summary>
+            [Header("处理器Asset路径")]
+            public string ProcessorAssetPath;
 
             /// <summary>
             /// 黑名单路径列表
@@ -397,10 +404,16 @@ namespace TAssetPipeline
             {
                 foreach (var processorSettingData in processorData.ProcessorDataList)
                 {
+                    string processorAssetPath = null;
                     if (processorSettingData.Processor != null)
                     {
-                        processorSettingData.Processor.TypeFullName = processorSettingData.Processor.GetType().FullName;
+                        processorAssetPath = AssetDatabase.GetAssetPath(processorSettingData.Processor);
+                        if(string.IsNullOrEmpty(processorAssetPath))
+                        {
+                            Debug.LogError($"找不到处理器:{processorSettingData.Processor.name}的Asset路径!");
+                        }
                     }
+                    processorSettingData.ProcessorAssetPath = processorAssetPath;
                 }
             }
         }
