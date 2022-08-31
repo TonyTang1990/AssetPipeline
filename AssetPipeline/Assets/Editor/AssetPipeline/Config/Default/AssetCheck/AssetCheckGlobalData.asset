@@ -14,5 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PreCheckData:
     CheckList: []
+    CheckAssetPathList: []
   PostCheckData:
     CheckList: []
+    CheckAssetPathList: []

@@ -46,6 +46,8 @@ namespace TAssetPipeline
             { ".bytes", AssetType.TextAsset },
             { ".cginc", AssetType.TextAsset },
             { ".glslinc", AssetType.TextAsset },
+            { ".uxml", AssetType.TextAsset },
+            { ".xml", AssetType.TextAsset },
             { ".unity", AssetType.Scene },
             { ".anim", AssetType.AnimationClip },
             { ".controller", AssetType.AnimatorController },
@@ -59,6 +61,7 @@ namespace TAssetPipeline
             { ".guiskin", AssetType.GUISkin },
             { ".preset", AssetType.Preset },
             { ".asmdef", AssetType.AssemblyDefinitionAsset },
+            { ".uss", AssetType.StyleSheet },
             { ".java", AssetType.DefaultAsset },
             { ".h", AssetType.DefaultAsset },
             { ".mm", AssetType.DefaultAsset },
@@ -67,6 +70,13 @@ namespace TAssetPipeline
             { ".dll", AssetType.DefaultAsset },
             { ".a", AssetType.DefaultAsset },
             { ".so", AssetType.DefaultAsset },
+            { ".exe", AssetType.DefaultAsset },
+            { ".prefs", AssetType.DefaultAsset },
+            { ".plist", AssetType.DefaultAsset },
+            { ".md", AssetType.DefaultAsset },
+            { ".tpsheet", AssetType.DefaultAsset },
+            { ".api", AssetType.DefaultAsset },
+            { ".unitypackage", AssetType.DefaultAsset },
         };
 
         /// <summary>
@@ -281,7 +291,7 @@ namespace TAssetPipeline
                 return assetType;
             }
             // 找不到默认当做Other类型处理
-            Debug.LogError($"找不到后缀:{postFix}的Asset类型!");
+            Debug.LogWarning($"找不到后缀:{postFix}的Asset类型,默认当做Other类型处理!");
             return AssetType.Other;
         }
 

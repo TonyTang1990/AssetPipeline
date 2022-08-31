@@ -4,14 +4,8 @@
         "ProcessorAssetPathList": []
     },
     "PostProcessorData": {
-        "ProcessorList": [
-            {
-                "instanceID": 21008
-            }
-        ],
-        "ProcessorAssetPathList": [
-            "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.asset"
-        ]
+        "ProcessorList": [],
+        "ProcessorAssetPathList": []
     },
     "MovedProcessorData": {
         "ProcessorList": [],

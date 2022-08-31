@@ -25,6 +25,7 @@ namespace TAssetPipeline
         private void OnPreprocessAsset()
         {
             AssetPipelineLog.Log($"AssetPipeline:OnPreprocessAsset()");
+            AssetPipelineLog.Log($"AssetPath:{this.assetPath}");
             var assetType = AssetPipelineSystem.GetAssetTypeByPath(this.assetPath);
             AssetPipelineSystem.OnPreprocessByAssetType(AssetProcessType.CommonPreprocess, assetType, this);
         }

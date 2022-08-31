@@ -44,8 +44,9 @@ namespace TAssetPipeline
         GUISkin = 1 << 23,                      // GUISkin
         Preset = 1 << 24,                       // Preset
         AssemblyDefinitionAsset = 1 << 25,      // AssemblyDefinitionAsset
-        DefaultAsset = 1 << 26,                 // Unity不识别的Asset类型(e.g. dll, exe, so, a......)
-        Other = 1 << 27,                        // 其他
+        StyleSheet = 1 << 26,                   // Style Sheet(e.g. .uss ......)
+        DefaultAsset = 1 << 27,                 // Unity不识别的Asset类型(e.g. dll, exe, so, a......)
+        Other = 1 << 28,                        // 其他
         All = Int32.MaxValue,                   // 所有类型
     }
 }

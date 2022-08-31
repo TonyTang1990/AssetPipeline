@@ -14,9 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PreProcessorData:
     ProcessorList: []
+    ProcessorAssetPathList: []
   PostProcessorData:
     ProcessorList: []
+    ProcessorAssetPathList: []
   MovedProcessorData:
     ProcessorList: []
+    ProcessorAssetPathList: []
   DeletedProcessorData:
     ProcessorList: []
+    ProcessorAssetPathList: []
