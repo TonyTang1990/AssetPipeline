@@ -607,7 +607,7 @@ namespace TAssetPipeline
                 Debug.LogError($"不允许保存空的Asset处理器局部配置数据，保存Asset处理器局部配置数据失败，请检查代码!");
                 return false;
             }
-            var localDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(strategyName)}.json";
+            var localDataSavePath = $"{AssetProcessorSystem.GetLocalDataRelativePathByStrategy(strategyName)}.json";
             var localDataJsonContent = JsonUtility.ToJson(localData, true);
             File.WriteAllText(localDataSavePath, localDataJsonContent);
             Debug.Log($"保存Asset处理器局部配置的Json数据:{localDataSavePath}完成!".WithColor(Color.green));

@@ -1,4 +1,20 @@
 {
-    "PreCheckDataList": [],
-    "PostCheckDataList": []
+    "PreCheckData": {
+        "CheckList": [
+            {
+                "instanceID": 15906
+            },
+            {
+                "instanceID": 15902
+            }
+        ],
+        "CheckAssetPathList": [
+            "Assets/Editor/AssetPipeline/Config/AssetChecks/PreCheck/All/CheckFileSize.asset",
+            "Assets/Editor/AssetPipeline/Config/AssetChecks/PreCheck/All/CheckFileName.asset"
+        ]
+    },
+    "PostCheckData": {
+        "CheckList": [],
+        "CheckAssetPathList": []
+    }
 }
