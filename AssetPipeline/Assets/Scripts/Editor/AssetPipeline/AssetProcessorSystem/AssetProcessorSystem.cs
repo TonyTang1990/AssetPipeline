@@ -173,14 +173,16 @@ namespace TAssetPipeline
         /// <returns></returns>
         private static AssetProcessorInfoData LoadAssetProcessorInfoJsonData()
         {
+            AssetProcessorInfoData assetProcessorInfoData;
             var assetProcessorInfoDataSavePath = $"{AssetProcessorSystem.GetProcessorInfoDataSaveRelativePath()}.json";
             if(!File.Exists(assetProcessorInfoDataSavePath))
             {
-                Debug.LogError($"Asset处理器信息数据文件:{assetProcessorInfoDataSavePath}不能存在,加载失败!");
-                return null;
+                Debug.LogWarning($"Asset处理器信息数据文件:{assetProcessorInfoDataSavePath}不存在，创建默认Asset处理器信息数据!".WithColor(Color.yellow));
+                assetProcessorInfoData = new AssetProcessorInfoData();
+                return assetProcessorInfoData;
             }
             var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath);
-            AssetProcessorInfoData assetProcessorInfoData = JsonUtility.FromJson<AssetProcessorInfoData>(assetProcessorInfoDataJsonContent);
+            assetProcessorInfoData = JsonUtility.FromJson<AssetProcessorInfoData>(assetProcessorInfoDataJsonContent);
             Debug.Log($"加载Asset处理器信息Json数据:{assetProcessorInfoDataSavePath}完成，处理器总数量:{assetProcessorInfoData.AllProcessorAssetInfo.Count}!".WithColor(Color.green));
             return assetProcessorInfoData;
         }
@@ -199,6 +201,26 @@ namespace TAssetPipeline
             var assetProcessorInfoDataSavePath = $"{AssetProcessorSystem.GetProcessorInfoDataSaveRelativePath()}.json";
             var assetProcessorInfoDataJsonContent = JsonUtility.ToJson(assetProcessorInfoData, true);
             File.WriteAllText(assetProcessorInfoDataSavePath, assetProcessorInfoDataJsonContent);
+            Debug.Log($"保存所有处理器信息的Json数据:{assetProcessorInfoDataSavePath}完成!".WithColor(Color.green));
+            return true;
+        }
+
+        /// <summary>
+        /// 保存指定处理器到Json
+        /// </summary>
+        /// <param name="processor"></param>
+        /// <returns></returns>
+        public static bool SaveProcessorToJson(BaseProcessor processor)
+        {
+            if (processor == null)
+            {
+                Debug.LogWarning($"不保存空处理器Json!");
+                return false;
+            }
+            var processorAssetPath = AssetDatabase.GetAssetPath(processor);
+            var processorJsonPath = Path.ChangeExtension(processorAssetPath, "json");
+            var processorJsonContent = JsonUtility.ToJson(processor, true);
+            File.WriteAllText(processorJsonPath, processorJsonContent);
             return true;
         }
 
@@ -487,9 +509,9 @@ namespace TAssetPipeline
             var globalData = AssetDatabase.LoadAssetAtPath<AssetProcessorGlobalData>(globalDataRelativePath);
             if (globalData == null)
             {
-                Debug.Log($"找不到Asset处理器全局数据:{globalDataRelativePath}!".WithColor(Color.green));
+                Debug.LogWarning($"找不到Asset处理器全局数据:{globalDataRelativePath}，创建默认Asset处理器全局数据!".WithColor(Color.yellow));
                 globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
-                //AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
+                AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
             }
             return globalData;
         }
@@ -505,7 +527,7 @@ namespace TAssetPipeline
             AssetProcessorGlobalData globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
             if (!File.Exists(globalDataRelativePath))
             {
-                Debug.LogError($"找不到Asset处理器全局Json数据:{globalDataRelativePath}!".WithColor(Color.red));
+                Debug.LogWarning($"找不到Asset处理器全局Json数据:{globalDataRelativePath}，创建默认Asset处理器全局数据!".WithColor(Color.yellow));
                 return globalData;
             }
             var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
@@ -525,9 +547,9 @@ namespace TAssetPipeline
             var localData = AssetDatabase.LoadAssetAtPath<AssetProcessorLocalData>(localDataRelativePath);
             if (localData == null)
             {
-                Debug.Log($"找不到Asset处理器局部数据:{localDataRelativePath}!".WithColor(Color.green));
+                Debug.LogWarning($"找不到Asset处理器局部数据:{localDataRelativePath}，创建默认Asset处理器局部数据!".WithColor(Color.yellow));
                 localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
-                //AssetDatabase.CreateAsset(localData, localDataRelativePath);
+                AssetDatabase.CreateAsset(localData, localDataRelativePath);
             }
             return localData;
         }
@@ -543,7 +565,7 @@ namespace TAssetPipeline
             AssetProcessorLocalData localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
             if (!File.Exists(localDataRelativePath))
             {
-                Debug.LogError($"找不到Asset处理器局部Json数据:{localDataRelativePath}!".WithColor(Color.red));
+                Debug.LogWarning($"找不到Asset处理器局部Json数据:{localDataRelativePath},创建默认Asset处理器局部数据!".WithColor(Color.yellow));
                 return localData;
             }
             var localDataJsonContent = File.ReadAllText(localDataRelativePath);

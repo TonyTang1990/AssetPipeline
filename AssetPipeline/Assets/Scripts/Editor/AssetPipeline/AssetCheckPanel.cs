@@ -215,6 +215,7 @@ namespace TAssetPipeline
                 var globalDataSavePath = $"{AssetCheckSystem.GetGlobalDataRelativePathByStartegy(currentConfigStrategy)}.json";
                 var globalDataJsonContent = JsonUtility.ToJson(mGlobalData, true);
                 File.WriteAllText(globalDataSavePath, globalDataJsonContent);
+                Debug.Log($"保存策略:{currentConfigStrategy}的全局检查器配置Json数据:{globalDataSavePath}完成!".WithColor(Color.green));
             }
             if (mLocalData != null)
             {
@@ -223,6 +224,7 @@ namespace TAssetPipeline
                 var localDataSavePath = $"{AssetCheckSystem.GetLocalDataRelativePathByStrategy(currentConfigStrategy)}.json";
                 var localDataJsonContent = JsonUtility.ToJson(mLocalData, true);
                 File.WriteAllText(localDataSavePath, localDataJsonContent);
+                Debug.Log($"保存策略:{currentConfigStrategy}的局部检查器配置Json数据:{localDataSavePath}完成!".WithColor(Color.green));
             }
             // 确保保存所有最新的
             UpdateAllCheck();
@@ -237,6 +239,7 @@ namespace TAssetPipeline
         {
             SaveAllPreCheckToJson();
             SaveAllPostCheckToJson();
+            Debug.Log($"保存所有检查器的Json数据完成!".WithColor(Color.green));
         }
 
         /// <summary>
@@ -267,17 +270,8 @@ namespace TAssetPipeline
         /// <param name="check"></param>
         private void SaveCheckToJson(BaseCheck check)
         {
-            if(check == null)
-            {
-                Debug.LogWarning($"不保存空检查器Json!");
-                return;
-            }
-            var checkAssetPath = AssetDatabase.GetAssetPath(check);
-            var checkJsonPath = Path.ChangeExtension(checkAssetPath, "json");
-            var checkJsonContent = JsonUtility.ToJson(check, true);
-            File.WriteAllText(checkJsonPath, checkJsonContent);
+            AssetCheckSystem.SaveCheckToJson(check);
         }
-
 
         /// <summary>
         /// 保存所有检查器信息到Json
@@ -293,9 +287,7 @@ namespace TAssetPipeline
             {
                 assetCheckInfoData.AddCheckInfo(postCheck);
             }
-            var assetCheckInfoDataSavePath = $"{AssetCheckSystem.GetCheckInfoDataSaveRelativePath()}.json";
-            var assetCheckInfoDataJsonContent = JsonUtility.ToJson(assetCheckInfoData, true);
-            File.WriteAllText(assetCheckInfoDataSavePath, assetCheckInfoDataJsonContent);
+            AssetCheckSystem.SaveAssetCheckInfoData(assetCheckInfoData);
         }
 
         /// <summary>

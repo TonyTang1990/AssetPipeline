@@ -5,7 +5,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20988
+                        "instanceID": 15914
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
                     "BlackListFolderPathList": [
@@ -21,7 +21,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20988
+                        "instanceID": 15914
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
                     "BlackListFolderPathList": []
@@ -33,7 +33,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20990
+                        "instanceID": 15918
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.asset",
                     "BlackListFolderPathList": []
@@ -45,14 +45,14 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20990
+                        "instanceID": 15918
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ETC2Set.asset",
                     "BlackListFolderPathList": []
                 },
                 {
                     "Processor": {
-                        "instanceID": 20992
+                        "instanceID": 15920
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/FullRectSet.asset",
                     "BlackListFolderPathList": []
@@ -64,7 +64,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20994
+                        "instanceID": 15912
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.asset",
                     "BlackListFolderPathList": []
@@ -76,7 +76,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20988
+                        "instanceID": 15914
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
                     "BlackListFolderPathList": []
@@ -88,7 +88,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20996
+                        "instanceID": 15916
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/DisableMipmapSet.asset",
                     "BlackListFolderPathList": []
@@ -100,21 +100,21 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20988
+                        "instanceID": 15914
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
                     "BlackListFolderPathList": []
                 },
                 {
                     "Processor": {
-                        "instanceID": 20994
+                        "instanceID": 15912
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/AlphaFromSourceSet.asset",
                     "BlackListFolderPathList": []
                 },
                 {
                     "Processor": {
-                        "instanceID": 20998
+                        "instanceID": 15922
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset",
                     "BlackListFolderPathList": []
@@ -126,7 +126,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20988
+                        "instanceID": 15914
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/ASTC4X4Set.asset",
                     "BlackListFolderPathList": []
@@ -138,7 +138,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 20998
+                        "instanceID": 15922
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset",
                     "BlackListFolderPathList": []
@@ -152,7 +152,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 21000
+                        "instanceID": 15924
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.asset",
                     "BlackListFolderPathList": []
@@ -167,7 +167,7 @@
             "ProcessorDataList": [
                 {
                     "Processor": {
-                        "instanceID": 21002
+                        "instanceID": 15926
                     },
                     "ProcessorAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.asset",
                     "BlackListFolderPathList": []

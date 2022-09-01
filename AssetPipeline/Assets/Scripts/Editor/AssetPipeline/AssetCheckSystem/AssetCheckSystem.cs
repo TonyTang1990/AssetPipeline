@@ -163,14 +163,16 @@ namespace TAssetPipeline
         /// <returns></returns>
         private static AssetCheckInfoData LoadAssetCheckInfoJsonData()
         {
+            AssetCheckInfoData assetCheckInfoData;
             var assetCheckInfoDataSavePath = $"{AssetCheckSystem.GetCheckInfoDataSaveRelativePath()}.json";
             if (!File.Exists(assetCheckInfoDataSavePath))
             {
-                Debug.LogError($"Asset检查器信息数据文件:{assetCheckInfoDataSavePath}不能存在,加载失败!");
-                return null;
+                Debug.LogWarning($"Asset检查器信息数据文件:{assetCheckInfoDataSavePath}不存在，创建默认Asset检查器信息数据!".WithColor(Color.yellow));
+                assetCheckInfoData = new AssetCheckInfoData();
+                return assetCheckInfoData;
             }
             var assetCheckInfoDataJsonContent = File.ReadAllText(assetCheckInfoDataSavePath);
-            AssetCheckInfoData assetCheckInfoData = JsonUtility.FromJson<AssetCheckInfoData>(assetCheckInfoDataJsonContent);
+            assetCheckInfoData = JsonUtility.FromJson<AssetCheckInfoData>(assetCheckInfoDataJsonContent);
             Debug.Log($"加载Asset检查器信息Json数据:{assetCheckInfoDataSavePath}完成，检查器总数量:{assetCheckInfoData.AllCheckAssetInfo.Count}!".WithColor(Color.green));
             return assetCheckInfoData;
         }
@@ -189,6 +191,26 @@ namespace TAssetPipeline
             var assetCheckInfoDataSavePath = $"{AssetCheckSystem.GetCheckInfoDataSaveRelativePath()}.json";
             var assetCheckInfoDataJsonContent = JsonUtility.ToJson(assetCheckInfoData, true);
             File.WriteAllText(assetCheckInfoDataSavePath, assetCheckInfoDataJsonContent);
+            Debug.Log($"保存所有检查器信息的Json数据:{assetCheckInfoDataSavePath}完成!".WithColor(Color.green));
+            return true;
+        }
+
+        /// <summary>
+        /// 保存指定检查器到Json
+        /// </summary>
+        /// <param name="check"></param>
+        /// <returns></returns>
+        public static bool SaveCheckToJson(BaseCheck check)
+        {
+            if (check == null)
+            {
+                Debug.LogWarning($"不保存空检查器Json!");
+                return false;
+            }
+            var checkAssetPath = AssetDatabase.GetAssetPath(check);
+            var checkJsonPath = Path.ChangeExtension(checkAssetPath, "json");
+            var checkJsonContent = JsonUtility.ToJson(check, true);
+            File.WriteAllText(checkJsonPath, checkJsonContent);
             return true;
         }
 
@@ -431,9 +453,9 @@ namespace TAssetPipeline
             var globalData = AssetDatabase.LoadAssetAtPath<AssetCheckGlobalData>(globalDataRelativePath);
             if (globalData == null)
             {
-                Debug.Log($"找不到Asset检查器全局数据:{globalDataRelativePath}!".WithColor(Color.green));
+                Debug.LogWarning($"找不到Asset检查器全局数据:{globalDataRelativePath}，创建默认Asset检查器全局数据!".WithColor(Color.yellow));
                 globalData = ScriptableObject.CreateInstance<AssetCheckGlobalData>();
-                //AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
+                AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
             }
             return globalData;
         }
@@ -449,7 +471,7 @@ namespace TAssetPipeline
             AssetCheckGlobalData globalData = ScriptableObject.CreateInstance<AssetCheckGlobalData>();
             if (!File.Exists(globalDataRelativePath))
             {
-                Debug.LogError($"找不到Asset检查器全局Json数据:{globalDataRelativePath}!".WithColor(Color.red));
+                Debug.LogWarning($"找不到Asset检查器全局Json数据:{globalDataRelativePath}，创建默认Asset检查器全局数据!".WithColor(Color.yellow));
                 return globalData;
             }
             var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
@@ -469,9 +491,9 @@ namespace TAssetPipeline
             var localData = AssetDatabase.LoadAssetAtPath<AssetCheckLocalData>(localDataRelativePath);
             if (localData == null)
             {
-                Debug.Log($"找不到Asset检查器局部数据:{localDataRelativePath}!".WithColor(Color.green));
+                Debug.LogWarning($"找不到Asset检查器局部数据:{localDataRelativePath}，创建默认Asset检查器全局数据!".WithColor(Color.yellow));
                 localData = ScriptableObject.CreateInstance<AssetCheckLocalData>();
-                //AssetDatabase.CreateAsset(localData, localDataRelativePath);
+                AssetDatabase.CreateAsset(localData, localDataRelativePath);
             }
             return localData;
         }
@@ -487,7 +509,7 @@ namespace TAssetPipeline
             AssetCheckLocalData localData = ScriptableObject.CreateInstance<AssetCheckLocalData>();
             if (!File.Exists(localDataRelativePath))
             {
-                Debug.LogError($"找不到Asset检查器局部Json数据:{localDataRelativePath}!".WithColor(Color.red));
+                Debug.LogWarning($"找不到Asset检查器局部Json数据:{localDataRelativePath},创建默认Asset检查器局部数据!".WithColor(Color.yellow));
                 return localData;
             }
             var localDataJsonContent = File.ReadAllText(localDataRelativePath);

@@ -380,9 +380,9 @@ namespace TAssetPipeline
             var settingData = AssetDatabase.LoadAssetAtPath<AssetPipelineSettingData>(settingDataRelativePath);
             if(settingData == null)
             {
-                Debug.Log($"找不到Asset管线配置数据:{settingDataRelativePath}!".WithColor(Color.red));
+                Debug.LogWarning($"找不到Asset管线配置数据:{settingDataRelativePath}，创建默认Asset管线配置数据!".WithColor(Color.yellow));
                 settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
-                //AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
+                AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
             }
             return settingData;
         }
@@ -396,13 +396,32 @@ namespace TAssetPipeline
             AssetPipelineSettingData settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
             if (!File.Exists(settingDataRelativePath))
             {
-                Debug.LogError($"找不到Asset管线Json配置数据:{settingDataRelativePath}!".WithColor(Color.red));
+                Debug.LogWarning($"找不到Asset管线Json配置数据:{settingDataRelativePath},创建默认Asset管线配置数据!".WithColor(Color.yellow));
                 return settingData;
             }
             var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
             JsonUtility.FromJsonOverwrite(settingDataJsonContent, settingData);
             Debug.Log($"加载Asset管线Json配置数据:{settingDataRelativePath}完成!".WithColor(Color.green));
             return settingData;
+        }
+
+        /// <summary>
+        /// 保存Assset管线配置数据到Json
+        /// </summary>
+        /// <param name="assetPipelineSettingData"></param>
+        /// <returns></returns>
+        public static bool SaveSettingDataToJson(AssetPipelineSettingData assetPipelineSettingData)
+        {
+            if(assetPipelineSettingData == null)
+            {
+                Debug.LogError($"不保存空Asset管线配置数据!");
+                return false;
+            }
+            var settingDataJsonPath = $"{AssetPipelineSystem.GetSettingDataRelativePath()}.json";
+            var settingDataJsonContent = JsonUtility.ToJson(assetPipelineSettingData, true);
+            File.WriteAllText(settingDataJsonPath, settingDataJsonContent);
+            Debug.Log($"保存Asset管线配置的Json数据:{settingDataJsonPath}完成!".WithColor(Color.green));
+            return true;
         }
 
         /// <summary>

@@ -189,9 +189,7 @@ namespace TAssetPipeline
         {
             EditorUtility.SetDirty(mSettingData);
             AssetDatabase.SaveAssetIfDirty(mSettingData);
-            var settingDataJsonPath = $"{AssetPipelineSystem.GetSettingDataRelativePath()}.json";
-            var settingDataJsonContent = JsonUtility.ToJson(mSettingData, true);
-            File.WriteAllText(settingDataJsonPath, settingDataJsonContent);
+            AssetPipelineSystem.SaveSettingDataToJson(mSettingData);
         }
 
         /// <summary>

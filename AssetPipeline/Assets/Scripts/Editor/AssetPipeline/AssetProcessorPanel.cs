@@ -241,6 +241,7 @@ namespace TAssetPipeline
         {
             SaveAllPreProcessorToJson();
             SaveAllPostProcessorToJson();
+            Debug.Log($"保存所有处理器的Json完成!".WithColor(Color.green));
         }
 
         /// <summary>
@@ -271,15 +272,7 @@ namespace TAssetPipeline
         /// <param name="processor"></param>
         private void SaveProcessorToJson(BaseProcessor processor)
         {
-            if (processor == null)
-            {
-                Debug.LogWarning($"不保存空处理器Json!");
-                return;
-            }
-            var processorAssetPath = AssetDatabase.GetAssetPath(processor);
-            var processorJsonPath = Path.ChangeExtension(processorAssetPath, "json");
-            var processorJsonContent = JsonUtility.ToJson(processor, true);
-            File.WriteAllText(processorJsonPath, processorJsonContent);
+            AssetProcessorSystem.SaveProcessorToJson(processor);
         }
 
         /// <summary>
@@ -297,7 +290,7 @@ namespace TAssetPipeline
                 assetProcessorInfoData.AddProcessorInfo(postProcessor);
             }
             AssetProcessorSystem.SaveAssetProcessorInfoData(assetProcessorInfoData);
-         }
+        }
 
         /// <summary>
         /// 响应绘制
