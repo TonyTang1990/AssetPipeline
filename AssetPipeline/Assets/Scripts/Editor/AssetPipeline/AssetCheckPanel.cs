@@ -212,19 +212,13 @@ namespace TAssetPipeline
             {
                 EditorUtility.SetDirty(mGlobalData);
                 AssetDatabase.SaveAssetIfDirty(mGlobalData);
-                var globalDataSavePath = $"{AssetCheckSystem.GetGlobalDataRelativePathByStartegy(currentConfigStrategy)}.json";
-                var globalDataJsonContent = JsonUtility.ToJson(mGlobalData, true);
-                File.WriteAllText(globalDataSavePath, globalDataJsonContent);
-                Debug.Log($"保存策略:{currentConfigStrategy}的全局检查器配置Json数据:{globalDataSavePath}完成!".WithColor(Color.green));
+                AssetCheckSystem.SaveGlobalDataToJsonByStrategy(mGlobalData, currentConfigStrategy);
             }
             if (mLocalData != null)
             {
                 EditorUtility.SetDirty(mLocalData);
                 AssetDatabase.SaveAssetIfDirty(mLocalData);
-                var localDataSavePath = $"{AssetCheckSystem.GetLocalDataRelativePathByStrategy(currentConfigStrategy)}.json";
-                var localDataJsonContent = JsonUtility.ToJson(mLocalData, true);
-                File.WriteAllText(localDataSavePath, localDataJsonContent);
-                Debug.Log($"保存策略:{currentConfigStrategy}的局部检查器配置Json数据:{localDataSavePath}完成!".WithColor(Color.green));
+                AssetCheckSystem.SaveLocalDataToJsonByStrategy(mLocalData, currentConfigStrategy);
             }
             // 确保保存所有最新的
             UpdateAllCheck();

@@ -195,7 +195,7 @@ namespace TAssetPipeline
         {
             if(assetProcessorInfoData == null)
             {
-                Debug.Log($"不允许保存空的Asset处理器信息数据!");
+                Debug.Log($"不允许保存空的Asset处理器信息数据，保存Asset处理器信息数据失败，请检查代码!");
                 return false;
             }
             var assetProcessorInfoDataSavePath = $"{AssetProcessorSystem.GetProcessorInfoDataSaveRelativePath()}.json";
@@ -499,7 +499,7 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 加载当前激活平台Asset处理器全局数据
+        /// 加载指定平台Asset处理器全局配置数据
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
@@ -509,7 +509,7 @@ namespace TAssetPipeline
             var globalData = AssetDatabase.LoadAssetAtPath<AssetProcessorGlobalData>(globalDataRelativePath);
             if (globalData == null)
             {
-                Debug.LogWarning($"找不到Asset处理器全局数据:{globalDataRelativePath}，创建默认Asset处理器全局数据!".WithColor(Color.yellow));
+                Debug.LogWarning($"找不到Asset处理器全局配置数据:{globalDataRelativePath}，创建默认Asset处理器全局配置数据!".WithColor(Color.yellow));
                 globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
                 AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
             }
@@ -517,7 +517,7 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 加载当前激活平台Json处理器全局数据
+        /// 加载指定策略Json处理器全局配置数据
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
@@ -527,17 +527,37 @@ namespace TAssetPipeline
             AssetProcessorGlobalData globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
             if (!File.Exists(globalDataRelativePath))
             {
-                Debug.LogWarning($"找不到Asset处理器全局Json数据:{globalDataRelativePath}，创建默认Asset处理器全局数据!".WithColor(Color.yellow));
+                Debug.LogWarning($"找不到Asset处理器全局配置Json数据:{globalDataRelativePath}，创建默认Asset处理器全局配置数据!".WithColor(Color.yellow));
                 return globalData;
             }
             var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
             JsonUtility.FromJsonOverwrite(globalDataJsonContent, globalData);
-            Debug.Log($"加载Asset处理器全局Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
+            Debug.Log($"加载Asset处理器全局配置Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
             return globalData;
         }
 
         /// <summary>
-        /// 加载当前激活平台Asset处理器局部数据
+        /// 保存指定策略的Asset处理器全局配置数据(Json)
+        /// </summary>
+        /// <param name="globalData"></param>
+        /// <param name="strategyName"></param>
+        /// <returns></returns>
+        public static bool SaveGlobalDataToJsonByStrategy(AssetProcessorGlobalData globalData, string strategyName)
+        {
+            if(globalData == null)
+            {
+                Debug.LogError($"不允许保存空的Asset处理器全局配置数据，保存Asset处理器全局配置数据失败，请检查代码!");
+                return false;
+            }
+            var globalDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(strategyName)}.json";
+            var globalDataJsonContent = JsonUtility.ToJson(globalData, true);
+            File.WriteAllText(globalDataSavePath, globalDataJsonContent);
+            Debug.Log($"保存Asset处理器全局配置的Json数据:{globalDataSavePath}完成!".WithColor(Color.green));
+            return true;
+        }
+
+        /// <summary>
+        /// 加载指定策略Asset处理器局部配置数据
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
@@ -547,7 +567,7 @@ namespace TAssetPipeline
             var localData = AssetDatabase.LoadAssetAtPath<AssetProcessorLocalData>(localDataRelativePath);
             if (localData == null)
             {
-                Debug.LogWarning($"找不到Asset处理器局部数据:{localDataRelativePath}，创建默认Asset处理器局部数据!".WithColor(Color.yellow));
+                Debug.LogWarning($"找不到Asset处理器局部配置数据:{localDataRelativePath}，创建默认Asset处理器局部配置数据!".WithColor(Color.yellow));
                 localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
                 AssetDatabase.CreateAsset(localData, localDataRelativePath);
             }
@@ -555,7 +575,7 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 加载当前激活平台Json处理器局部数据
+        /// 加载指定策略Json处理器局部配置数据
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
@@ -565,13 +585,33 @@ namespace TAssetPipeline
             AssetProcessorLocalData localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
             if (!File.Exists(localDataRelativePath))
             {
-                Debug.LogWarning($"找不到Asset处理器局部Json数据:{localDataRelativePath},创建默认Asset处理器局部数据!".WithColor(Color.yellow));
+                Debug.LogWarning($"找不到Asset处理器局部配置的Json数据:{localDataRelativePath},创建默认Asset处理器局部配置数据!".WithColor(Color.yellow));
                 return localData;
             }
             var localDataJsonContent = File.ReadAllText(localDataRelativePath);
             JsonUtility.FromJsonOverwrite(localDataJsonContent, localData);
-            Debug.Log($"加载Asset处理器局部Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
+            Debug.Log($"加载Asset处理器局部配置的Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
             return localData;
+        }
+
+        /// <summary>
+        /// 保存指定策略的Asset处理器局部配置数据(Json)
+        /// </summary>
+        /// <param name="localData"></param>
+        /// <param name="strategyName"></param>
+        /// <returns></returns>
+        public static bool SaveLocalDataToJsonByStrategy(AssetProcessorLocalData localData, string strategyName)
+        {
+            if (localData == null)
+            {
+                Debug.LogError($"不允许保存空的Asset处理器局部配置数据，保存Asset处理器局部配置数据失败，请检查代码!");
+                return false;
+            }
+            var localDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(strategyName)}.json";
+            var localDataJsonContent = JsonUtility.ToJson(localData, true);
+            File.WriteAllText(localDataSavePath, localDataJsonContent);
+            Debug.Log($"保存Asset处理器局部配置的Json数据:{localDataSavePath}完成!".WithColor(Color.green));
+            return true;
         }
 
         #region Asset管线处理器处理部分

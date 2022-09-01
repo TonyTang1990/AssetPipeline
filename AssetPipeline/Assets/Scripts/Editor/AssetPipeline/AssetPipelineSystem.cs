@@ -414,7 +414,7 @@ namespace TAssetPipeline
         {
             if(assetPipelineSettingData == null)
             {
-                Debug.LogError($"不保存空Asset管线配置数据!");
+                Debug.LogError($"不保存空Asset管线配置数据，保存Asset管线配置数据失败，请检查代码!");
                 return false;
             }
             var settingDataJsonPath = $"{AssetPipelineSystem.GetSettingDataRelativePath()}.json";

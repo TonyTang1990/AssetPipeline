@@ -4,6 +4,7 @@
  * Create Date:             2022/08/28
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -13,8 +14,11 @@ namespace TAssetPipeline
 {
     /// <summary>
     /// AssetProcessorInfoData.cs
-    /// Asset处理器信息数据(记录所有Asset处理器信息)
+    /// Asset处理器信息数据
+    /// Json记录所有处理器相关路径和类型信息
+    /// 反序列化构建所有处理器对象用
     /// </summary>
+    [Serializable]
     public class AssetProcessorInfoData
     {
         /// <summary>
@@ -41,6 +45,11 @@ namespace TAssetPipeline
                 return false;
             }
             var processorPath = AssetDatabase.GetAssetPath(processor);
+            if(string.IsNullOrEmpty(processorPath))
+            {
+                Debug.LogError($"找不到处理器:{processor.name}的Asset路径,添加处理器信息失败!");
+                return false;
+            }
             var findProcessor = AllProcessorAssetInfo.Find((assetInfo) => string.Equals(assetInfo.AssetPath, processorPath));
             if (findProcessor != null)
             {

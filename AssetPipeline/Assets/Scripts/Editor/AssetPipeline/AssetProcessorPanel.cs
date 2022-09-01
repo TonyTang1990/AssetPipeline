@@ -216,17 +216,13 @@ namespace TAssetPipeline
             {
                 EditorUtility.SetDirty(mGlobalData);
                 AssetDatabase.SaveAssetIfDirty(mGlobalData);
-                var globalDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(currentConfigStrategy)}.json";
-                var globalDataJsonContent = JsonUtility.ToJson(mGlobalData, true);
-                File.WriteAllText(globalDataSavePath, globalDataJsonContent);
+                AssetProcessorSystem.SaveGlobalDataToJsonByStrategy(mGlobalData, currentConfigStrategy);
             }
             if(mLocalData != null)
             {
                 EditorUtility.SetDirty(mLocalData);
                 AssetDatabase.SaveAssetIfDirty(mLocalData);
-                var localDataSavePath = $"{AssetProcessorSystem.GetLocalDataRelativePathByStrategy(currentConfigStrategy)}.json";
-                var localDataJsonContent = JsonUtility.ToJson(mLocalData, true);
-                File.WriteAllText(localDataSavePath, localDataJsonContent);
+                AssetProcessorSystem.SaveLocalDataToJsonByStrategy(mLocalData, currentConfigStrategy);
             }
             // 确保保存所有最新的
             UpdateAllProcessor();

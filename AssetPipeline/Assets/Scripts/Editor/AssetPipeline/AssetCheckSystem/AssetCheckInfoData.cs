@@ -4,6 +4,7 @@
  * Create Date:             2022/08/28
  */
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -17,6 +18,7 @@ namespace TAssetPipeline
     /// Json记录所有检查器相关路径和类型信息
     /// 反序列化构建所有检查器对象用
     /// </summary>
+    [Serializable]
     public class AssetCheckInfoData
     {
         /// <summary>
@@ -43,6 +45,11 @@ namespace TAssetPipeline
                 return false;
             }
             var checkPath = AssetDatabase.GetAssetPath(check);
+            if (string.IsNullOrEmpty(checkPath))
+            {
+                Debug.LogError($"找不到检查器:{check.name}的Asset路径,添加检查器信息失败!");
+                return false;
+            }
             var findCheck = AllCheckAssetInfo.Find((assetInfo) => string.Equals(assetInfo.AssetPath, checkPath));
             if (findCheck != null)
             {
