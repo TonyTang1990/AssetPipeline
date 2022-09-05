@@ -220,7 +220,7 @@ namespace TAssetPipeline
                 AssetDatabase.SaveAssetIfDirty(mLocalData);
                 AssetCheckSystem.SaveLocalDataToJsonByStrategy(mLocalData, currentConfigStrategy);
             }
-            // 确保保存所有最新的
+            // 确保保存所有最新的检查器数据
             UpdateAllCheck();
             SaveAllCheckToJson();
             SaveAllCheckInfoToJson();

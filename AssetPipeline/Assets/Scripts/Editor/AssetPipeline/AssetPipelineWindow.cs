@@ -122,6 +122,8 @@ namespace TAssetPipeline
         /// </summary>
         public override void SaveAllData()
         {
+            // 保存Asset处理器和检查器数据之前必须先把Asset相关路径信息刷新好
+            RefreshMemberValue();
             base.SaveAllData();
             Debug.Log($"保存所有Asset管线数据完成!");
             // 强制重载Assset管线数据，确保加载使用最新的Asset管线设置数据

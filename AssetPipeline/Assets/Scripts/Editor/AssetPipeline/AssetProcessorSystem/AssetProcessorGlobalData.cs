@@ -31,9 +31,9 @@ namespace TAssetPipeline
             public List<BaseProcessor> ProcessorList = new List<BaseProcessor>();
 
             /// <summary>
-            /// 处理器器Asset路径列表(保存时刷新导出，Asset管线运行时用，和ProcessorList一一对应)
+            /// 处理器Asset路径列表(保存时刷新导出，Asset管线运行时用，和ProcessorList一一对应)
             /// </summary>
-            [Header("处理器器Asset路径列表")]
+            [Header("处理器Asset路径列表")]
             public List<string> ProcessorAssetPathList = new List<string>();
 
             /// <summary>

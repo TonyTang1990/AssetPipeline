@@ -218,6 +218,11 @@ namespace TAssetPipeline
                 return false;
             }
             var processorAssetPath = AssetDatabase.GetAssetPath(processor);
+            if(string.IsNullOrEmpty(processorAssetPath))
+            {
+                Debug.LogError($"找不到处理器:{processor.name}的Asset路径,保存处理器到Json失败!");
+                return false;
+            }
             var processorJsonPath = Path.ChangeExtension(processorAssetPath, "json");
             var processorJsonContent = JsonUtility.ToJson(processor, true);
             File.WriteAllText(processorJsonPath, processorJsonContent);
@@ -308,7 +313,7 @@ namespace TAssetPipeline
                     var processor = GetProcessorByAssetPath(processorAssetPath);
                     if(processor == null)
                     {
-                        Debug.LogError($"找不到处理器路径:{processorAssetPath}的处理器对象,请检查是否上传和导出不匹配,获取全局处理器失败!");
+                        Debug.LogError($"找不到处理器路径:{processorAssetPath}的处理器实例对象,请检查是否上传和导出不匹配,获取全局处理器失败!");
                         continue;
                     }
                     if(!globalProcessorMap.TryGetValue(processor.TargetAssetProcessType, out assetTypeProcessorMap))
@@ -421,7 +426,7 @@ namespace TAssetPipeline
         /// 获取自定义Asset处理器信息数据存储相对路径
         /// </summary>
         /// <returns></returns>
-        public static string GetProcessorInfoDataSaveRelativePath()
+        private static string GetProcessorInfoDataSaveRelativePath()
         {
             var saveFolderRelativePath = AssetPipelineSystem.GetSaveFolderRelativePath();
             return PathUtilities.GetRegularPath($"{saveFolderRelativePath}/AssetProcessors/{AssetProcessorInfoDataName}");

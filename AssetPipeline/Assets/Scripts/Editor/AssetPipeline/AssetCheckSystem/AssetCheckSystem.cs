@@ -208,6 +208,11 @@ namespace TAssetPipeline
                 return false;
             }
             var checkAssetPath = AssetDatabase.GetAssetPath(check);
+            if (string.IsNullOrEmpty(checkAssetPath))
+            {
+                Debug.LogError($"找不到检查器:{check.name}的Asset路径,保存检查器到Json失败!");
+                return false;
+            }
             var checkJsonPath = Path.ChangeExtension(checkAssetPath, "json");
             var checkJsonContent = JsonUtility.ToJson(check, true);
             File.WriteAllText(checkJsonPath, checkJsonContent);
