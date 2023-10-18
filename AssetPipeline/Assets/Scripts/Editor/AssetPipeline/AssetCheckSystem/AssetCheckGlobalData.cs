@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,8 +17,20 @@ namespace TAssetPipeline
     /// AssetCheckGlobalData.cs
     /// Asset检查全局数据
     /// </summary>
-    public class AssetCheckGlobalData : ScriptableObject
+    [Serializable]
+    public class AssetCheckGlobalData
     {
+        [MenuItem("Assets/Create/ScriptableObjects/AssetPipeline/AssetCheck/AssetCheckGlobalData", false, 1)]
+        private static void CreateAssetCheckGlobalData()
+        {
+            var selectionFolderPath = AssetPipelineUtilities.GetCurrentSelectionFolderPath();
+            var assetCheckGlobalData = new AssetCheckGlobalData();
+            var assetCheckGlobalDataAssetPath = Path.Combine(selectionFolderPath, "AssetCheckGlobalData.json");
+            var assetCheckGlobalDataJsonContent = JsonUtility.ToJson(assetCheckGlobalData);
+            File.WriteAllText(assetCheckGlobalDataAssetPath, assetCheckGlobalDataJsonContent, System.Text.Encoding.UTF8);
+            Debug.Log($"在目录:{assetCheckGlobalDataAssetPath}位置创建AssetCheckGlobalData!");
+        }
+
         /// <summary>
         /// Asset检查器全局数据
         /// </summary>

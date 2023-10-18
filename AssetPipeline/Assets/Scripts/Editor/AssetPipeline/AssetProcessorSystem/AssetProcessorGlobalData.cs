@@ -7,6 +7,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -16,9 +17,20 @@ namespace TAssetPipeline
     /// AssetProcessorGlobalData.cs
     /// Asset处理器全局数据
     /// </summary>
-    [CreateAssetMenu(fileName = "AssetProcessorGlobalData", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AssetProcessorGlobalData", order = 1)]
-    public class AssetProcessorGlobalData : ScriptableObject
+    [Serializable]
+    public class AssetProcessorGlobalData
     {
+        [MenuItem("Assets/Create/ScriptableObjects/AssetPipeline/AssetProcessor/AssetProcessorGlobalData", false, 1)]
+        private static void CreateAssetProcessorGlobalData()
+        {
+            var selectionFolderPath = AssetPipelineUtilities.GetCurrentSelectionFolderPath();
+            var assetProcessorGlobalData = new AssetProcessorGlobalData();
+            var assetProcessorGlobalDataAssetPath = Path.Combine(selectionFolderPath, "AssetProcessorGlobalData.json");
+            var assetProcessorGlobalDataJsonContent = JsonUtility.ToJson(assetProcessorGlobalData);
+            File.WriteAllText(assetProcessorGlobalDataAssetPath, assetProcessorGlobalDataJsonContent, System.Text.Encoding.UTF8);
+            Debug.Log($"在目录:{assetProcessorGlobalDataAssetPath}位置创建AssetProcessorGlobalData!");
+        }
+
         /// <summary>
         /// Asset处理器全局数据
         /// </summary>

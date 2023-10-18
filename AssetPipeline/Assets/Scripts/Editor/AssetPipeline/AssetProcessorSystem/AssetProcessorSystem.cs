@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using static TAssetPipeline.AssetProcessorLocalData;
@@ -144,7 +145,7 @@ namespace TAssetPipeline
                     continue;
                 }
                 var assetProcessorInstance = ScriptableObject.CreateInstance(assetProcessorType) as BaseProcessor;
-                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath);
+                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath, Encoding.UTF8);
                 JsonUtility.FromJsonOverwrite(jsonContent, assetProcessorInstance);
                 allAssetProcessorMap.Add(assetInfo.AssetPath, assetProcessorInstance);
             }
@@ -181,7 +182,7 @@ namespace TAssetPipeline
                 assetProcessorInfoData = new AssetProcessorInfoData();
                 return assetProcessorInfoData;
             }
-            var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath);
+            var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath, Encoding.UTF8);
             assetProcessorInfoData = JsonUtility.FromJson<AssetProcessorInfoData>(assetProcessorInfoDataJsonContent);
             Debug.Log($"加载Asset处理器信息Json数据:{assetProcessorInfoDataSavePath}完成，处理器总数量:{assetProcessorInfoData.AllProcessorAssetInfo.Count}!".WithColor(Color.green));
             return assetProcessorInfoData;
@@ -510,6 +511,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static AssetProcessorGlobalData LoadGlobalDataByStrategy(string strategyName)
         {
+            /*
             var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.asset";
             var globalData = AssetDatabase.LoadAssetAtPath<AssetProcessorGlobalData>(globalDataRelativePath);
             if (globalData == null)
@@ -519,6 +521,8 @@ namespace TAssetPipeline
                 AssetDatabase.CreateAsset(globalData, globalDataRelativePath);
             }
             return globalData;
+            */
+            return null;
         }
 
         /// <summary>
@@ -529,14 +533,18 @@ namespace TAssetPipeline
         public static AssetProcessorGlobalData LoadJsonGlobalDataByStrategy(string strategyName)
         {
             var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.json";
-            AssetProcessorGlobalData globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
+            AssetProcessorGlobalData globalData;
             if (!File.Exists(globalDataRelativePath))
             {
                 Debug.LogWarning($"找不到Asset处理器全局配置Json数据:{globalDataRelativePath}，创建默认Asset处理器全局配置数据!".WithColor(Color.yellow));
-                return globalData;
+                globalData = new AssetProcessorGlobalData();
+                SaveGlobalDataToJsonByStrategy(globalData, strategyName);
             }
-            var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
-            JsonUtility.FromJsonOverwrite(globalDataJsonContent, globalData);
+            else
+            {
+                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath, Encoding.UTF8);
+                globalData = JsonUtility.FromJson<AssetProcessorGlobalData>(globalDataJsonContent);
+            }
             Debug.Log($"加载Asset处理器全局配置Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
             return globalData;
         }
@@ -556,7 +564,7 @@ namespace TAssetPipeline
             }
             var globalDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(strategyName)}.json";
             var globalDataJsonContent = JsonUtility.ToJson(globalData, true);
-            File.WriteAllText(globalDataSavePath, globalDataJsonContent);
+            File.WriteAllText(globalDataSavePath, globalDataJsonContent, Encoding.UTF8);
             Debug.Log($"保存Asset处理器全局配置的Json数据:{globalDataSavePath}完成!".WithColor(Color.green));
             return true;
         }
@@ -568,6 +576,7 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static AssetProcessorLocalData LoadLocalDataByStrategy(string strategyName)
         {
+            /*
             var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.asset";
             var localData = AssetDatabase.LoadAssetAtPath<AssetProcessorLocalData>(localDataRelativePath);
             if (localData == null)
@@ -577,6 +586,8 @@ namespace TAssetPipeline
                 AssetDatabase.CreateAsset(localData, localDataRelativePath);
             }
             return localData;
+            */
+            return null;
         }
 
         /// <summary>
@@ -587,14 +598,18 @@ namespace TAssetPipeline
         public static AssetProcessorLocalData LoadJsonLocalDataByStrategy(string strategyName)
         {
             var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.json";
-            AssetProcessorLocalData localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
+            AssetProcessorLocalData localData;
             if (!File.Exists(localDataRelativePath))
             {
                 Debug.LogWarning($"找不到Asset处理器局部配置的Json数据:{localDataRelativePath},创建默认Asset处理器局部配置数据!".WithColor(Color.yellow));
-                return localData;
+                localData = new AssetProcessorLocalData();
+                SaveLocalDataToJsonByStrategy(localData, strategyName);
             }
-            var localDataJsonContent = File.ReadAllText(localDataRelativePath);
-            JsonUtility.FromJsonOverwrite(localDataJsonContent, localData);
+            else
+            {
+                var localDataJsonContent = File.ReadAllText(localDataRelativePath, Encoding.UTF8);
+                localData = JsonUtility.FromJson<AssetProcessorLocalData>(localDataJsonContent);
+            }
             Debug.Log($"加载Asset处理器局部配置的Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
             return localData;
         }
