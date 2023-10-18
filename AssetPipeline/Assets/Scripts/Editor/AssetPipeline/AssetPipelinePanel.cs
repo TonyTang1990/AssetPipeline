@@ -118,7 +118,7 @@ namespace TAssetPipeline
         /// </summary>
         private void InitAssetPipelineData()
         {
-            mSettingData = AssetPipelineSystem.LoadJsonSettingData();
+            mSettingData = AssetPipelineSystem.LoadSettingData();
             UpdateStrategyNames();
             InitPlatformStrategySelectedInfo();
         }
@@ -187,6 +187,8 @@ namespace TAssetPipeline
         /// </summary>
         private void SaveAssetPipelineData()
         {
+            EditorUtility.SetDirty(mSettingData);
+            AssetDatabase.SaveAssetIfDirty(mSettingData);
             AssetPipelineSystem.SaveSettingDataToJson(mSettingData);
         }
 

@@ -7,9 +7,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using UnityEditor;
-using UnityEditor.Callbacks;
 using UnityEngine;
 using static TAssetPipeline.AssetPipelineSettingData;
 
@@ -19,7 +17,6 @@ namespace TAssetPipeline
     /// AssetPipelineSystem.cs
     /// Asset管线系统
     /// </summary>
-    [InitializeOnLoadAttribute]
     public static class AssetPipelineSystem
     {
         /// <summary>
@@ -234,29 +231,6 @@ namespace TAssetPipeline
         // 因此为了确保切换平台瞬间Asset管线处理正确
         // 在激活平台和Asset管线初始化平台不一致时不处理Asset管线流程
 
-        public static void OnAfterAssemblyReload()
-        {
-            Debug.Log("After Assembly Reload".WithColor(Color.red));
-            Debug.Log($"SettingData == null : {SettingData == null}".WithColor(Color.red));
-        }
-
-        [DidReloadScripts]
-        private static void Reload()
-        {
-            Debug.Log("After Reload".WithColor(Color.red));
-            Debug.Log($"SettingData == null : {SettingData == null}".WithColor(Color.red));
-        }
-
-        /// <summary>
-        /// 静态构造函数初始化
-        /// </summary>
-        static AssetPipelineSystem()
-        {
-            Debug.Log($"Asset管线静态构造函数初始化".WithColor(Color.red));
-            AssemblyReloadEvents.afterAssemblyReload -= OnAfterAssemblyReload;
-            AssemblyReloadEvents.afterAssemblyReload += OnAfterAssemblyReload;
-        }
-
         /// <summary>
         /// 初始化
         /// </summary>
@@ -402,7 +376,6 @@ namespace TAssetPipeline
         /// </summary>
         public static AssetPipelineSettingData LoadSettingData()
         {
-            /*
             var settingDataRelativePath = $"{GetSettingDataRelativePath()}.asset";
             var settingData = AssetDatabase.LoadAssetAtPath<AssetPipelineSettingData>(settingDataRelativePath);
             if(settingData == null)
@@ -412,8 +385,6 @@ namespace TAssetPipeline
                 AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
             }
             return settingData;
-            */
-            return null;
         }
 
         /// <summary>
@@ -422,18 +393,14 @@ namespace TAssetPipeline
         public static AssetPipelineSettingData LoadJsonSettingData()
         {
             var settingDataRelativePath = $"{GetSettingDataRelativePath()}.json";
-            AssetPipelineSettingData settingData;
+            AssetPipelineSettingData settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
             if (!File.Exists(settingDataRelativePath))
             {
                 Debug.LogWarning($"找不到Asset管线Json配置数据:{settingDataRelativePath},创建默认Asset管线配置数据!".WithColor(Color.yellow));
-                settingData = new AssetPipelineSettingData();
-                SaveSettingDataToJson(settingData);
+                return settingData;
             }
-            else
-            {
-                var settingDataJsonContent = File.ReadAllText(settingDataRelativePath, Encoding.UTF8);
-                settingData = JsonUtility.FromJson<AssetPipelineSettingData>(settingDataJsonContent);
-            }
+            var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
+            JsonUtility.FromJsonOverwrite(settingDataJsonContent, settingData);
             Debug.Log($"加载Asset管线Json配置数据:{settingDataRelativePath}完成!".WithColor(Color.green));
             return settingData;
         }

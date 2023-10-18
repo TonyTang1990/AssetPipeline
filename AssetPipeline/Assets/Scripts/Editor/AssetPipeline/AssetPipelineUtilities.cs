@@ -6,8 +6,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEditor;
 using UnityEngine;
 using static TAssetPipeline.AssetCheckLocalData;
 using static TAssetPipeline.AssetProcessorLocalData;
@@ -20,29 +18,6 @@ namespace TAssetPipeline
     /// </summary>
     public static class AssetPipelineUtilities
     {
-        /// <summary>
-        /// 获取当前选中Asset目录(如果选中Asset则为该Asset所在目录)
-        /// </summary>
-        /// <returns></returns>
-        public static string GetCurrentSelectionFolderPath()
-        {
-            var currentSelectionFolderPath = "Assets/";
-            if (Selection.activeObject == null)
-            {
-                return currentSelectionFolderPath;
-            }
-            var selectionAssetPath = AssetDatabase.GetAssetPath(Selection.activeObject);
-            if(string.IsNullOrEmpty(selectionAssetPath))
-            {
-                return currentSelectionFolderPath;
-            }
-            if(AssetDatabase.IsValidFolder(selectionAssetPath))
-            {
-                return selectionAssetPath;
-            }
-            return Path.GetDirectoryName(selectionAssetPath);
-        }
-
         /// <summary>
         /// 处理器排序
         /// </summary>

@@ -148,8 +148,8 @@ namespace TAssetPipeline
         {
             var currentConfigStrategy = GetOwnerEditorWindow<AssetPipelineWindow>().AssetPipelinePanel.CurrentConfigStrategy;
             AssetCheckSystem.MakeSureStrategyFolderExistByStrategy(currentConfigStrategy);
-            mGlobalData = AssetCheckSystem.LoadJsonGlobalDataByStrategy(currentConfigStrategy);
-            mLocalData = AssetCheckSystem.LoadJsonLocalDataByStrategy(currentConfigStrategy);
+            mGlobalData = AssetCheckSystem.LoadGlobalDataByStrategy(currentConfigStrategy);
+            mLocalData = AssetCheckSystem.LoadLocalDataByStrategy(currentConfigStrategy);
             mLocalData.UpdateAllCheckIconDatas();
             UpdateAllCheck();
         }
@@ -210,10 +210,14 @@ namespace TAssetPipeline
             var currentConfigStrategy = GetOwnerEditorWindow<AssetPipelineWindow>().AssetPipelinePanel.CurrentConfigStrategy;
             if (mGlobalData != null)
             {
+                EditorUtility.SetDirty(mGlobalData);
+                AssetDatabase.SaveAssetIfDirty(mGlobalData);
                 AssetCheckSystem.SaveGlobalDataToJsonByStrategy(mGlobalData, currentConfigStrategy);
             }
             if (mLocalData != null)
             {
+                EditorUtility.SetDirty(mLocalData);
+                AssetDatabase.SaveAssetIfDirty(mLocalData);
                 AssetCheckSystem.SaveLocalDataToJsonByStrategy(mLocalData, currentConfigStrategy);
             }
             // 确保保存所有最新的检查器数据

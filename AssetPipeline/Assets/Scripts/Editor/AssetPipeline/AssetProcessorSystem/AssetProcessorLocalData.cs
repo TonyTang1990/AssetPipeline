@@ -7,7 +7,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -17,20 +16,9 @@ namespace TAssetPipeline
     /// AssetProcessorLocalData.cs
     /// Asset处理器局部数据
     /// </summary>
-    [Serializable]
-    public class AssetProcessorLocalData
+    [CreateAssetMenu(fileName = "AssetProcessorLocalData", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/AssetProcessorLocalData", order = 2)]
+    public class AssetProcessorLocalData : ScriptableObject
     {
-        [MenuItem("Assets/Create/ScriptableObjects/AssetPipeline/AssetProcessor/AssetProcessorLocalData", false, 2)]
-        private static void CreateAssetProcessorLocalData()
-        {
-            var selectionFolderPath = AssetPipelineUtilities.GetCurrentSelectionFolderPath();
-            var assetProcessorLocalData = new AssetProcessorLocalData();
-            var assetProcessorLocalDataAssetPath = Path.Combine(selectionFolderPath, "AssetProcessorLocalData.json");
-            var assetProcessorLocalDataJsonContent = JsonUtility.ToJson(assetProcessorLocalData);
-            File.WriteAllText(assetProcessorLocalDataAssetPath, assetProcessorLocalDataJsonContent, System.Text.Encoding.UTF8);
-            Debug.Log($"在目录:{assetProcessorLocalDataAssetPath}位置创建AssetProcessorLocalData!");
-        }
-
         /// <summary>
         /// 处理器设置数据
         /// </summary>

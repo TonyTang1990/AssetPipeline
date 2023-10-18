@@ -16,8 +16,7 @@ namespace TAssetPipeline
     /// AssetPipelineSettingData.cs
     /// AssetPipeline配置数据
     /// </summary>
-    [Serializable]
-    public class AssetPipelineSettingData
+    public class AssetPipelineSettingData : ScriptableObject
     {
         /// <summary>
         /// 平台策略数据

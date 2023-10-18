@@ -152,8 +152,8 @@ namespace TAssetPipeline
         {
             var currentConfigStrategy = GetOwnerEditorWindow<AssetPipelineWindow>().AssetPipelinePanel.CurrentConfigStrategy;
             AssetProcessorSystem.MakeSureStrategyFolderExistByStrategy(currentConfigStrategy);
-            mGlobalData = AssetProcessorSystem.LoadJsonGlobalDataByStrategy(currentConfigStrategy);
-            mLocalData = AssetProcessorSystem.LoadJsonLocalDataByStrategy(currentConfigStrategy);
+            mGlobalData = AssetProcessorSystem.LoadGlobalDataByStrategy(currentConfigStrategy);
+            mLocalData = AssetProcessorSystem.LoadLocalDataByStrategy(currentConfigStrategy);
             mLocalData.UpdateAllProcessorIconDatas();
             UpdateAllProcessor();
         }
@@ -214,10 +214,14 @@ namespace TAssetPipeline
             var currentConfigStrategy = GetOwnerEditorWindow<AssetPipelineWindow>().AssetPipelinePanel.CurrentConfigStrategy;
             if (mGlobalData != null)
             {
+                EditorUtility.SetDirty(mGlobalData);
+                AssetDatabase.SaveAssetIfDirty(mGlobalData);
                 AssetProcessorSystem.SaveGlobalDataToJsonByStrategy(mGlobalData, currentConfigStrategy);
             }
             if(mLocalData != null)
             {
+                EditorUtility.SetDirty(mLocalData);
+                AssetDatabase.SaveAssetIfDirty(mLocalData);
                 AssetProcessorSystem.SaveLocalDataToJsonByStrategy(mLocalData, currentConfigStrategy);
             }
             // 确保保存所有最新的处理器数据
