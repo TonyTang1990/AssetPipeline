@@ -4,12 +4,11 @@
  * Create Date:             2022/06/17
  */
 
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
-using static TAssetPipeline.AssetPipelineSettingData;
 
 namespace TAssetPipeline
 {
@@ -377,7 +376,7 @@ namespace TAssetPipeline
         public static AssetPipelineSettingData LoadJsonSettingData()
         {
             var settingDataRelativePath = $"{GetSettingDataRelativePath()}.json";
-            AssetPipelineSettingData settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
+            AssetPipelineSettingData settingData;
             if (!File.Exists(settingDataRelativePath))
             {
                 Debug.LogWarning($"找不到Asset管线Json配置数据:{settingDataRelativePath},创建默认Asset管线配置数据!".WithColor(Color.yellow));
@@ -386,7 +385,7 @@ namespace TAssetPipeline
             }
             else
             {
-                var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
+                var settingDataJsonContent = File.ReadAllText(settingDataRelativePath, Encoding.UTF8);
                 settingData = JsonUtility.FromJson<AssetPipelineSettingData>(settingDataJsonContent);
             }
             Debug.Log($"加载Asset管线Json配置数据:{settingDataRelativePath}完成!".WithColor(Color.green));

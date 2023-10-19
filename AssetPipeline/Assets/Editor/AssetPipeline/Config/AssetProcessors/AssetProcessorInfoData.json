@@ -29,21 +29,6 @@
             "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.asset",
             "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PreProcessor/Texture/TightSet.json",
             "AssetTypeFullName": "TAssetPipeline.SpriteMeshTypeSet"
-        },
-        {
-            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.asset",
-            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AECopy.json",
-            "AssetTypeFullName": "TAssetPipeline.AECopy"
-        },
-        {
-            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.asset",
-            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/AEDelete.json",
-            "AssetTypeFullName": "TAssetPipeline.AEDelete"
-        },
-        {
-            "AssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.asset",
-            "JsonAssetPath": "Assets/Editor/AssetPipeline/Config/AssetProcessors/PostProcessor/All/GenerateABName.json",
-            "AssetTypeFullName": "TAssetPipeline.GenerateABName"
         }
     ]
 }

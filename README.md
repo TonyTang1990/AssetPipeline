@@ -12,7 +12,7 @@
 
 ### Asset管线设计
 
-1. 使用ScriptableObject实现自定义配置数据存储
+1. 使用ScriptableObject实现自定义配置数据存储，结合导出Json实现无需等待配置Asset导入就可读取数据进行Asset管线系统初始化
 2. 使用EditorWindow实现自定义配置窗口
 3. 使用AssetPostProcess实现Asset后处理系统流程接入
 4. 设计AssetPipeline和AssetPipelineSystem实现Asset管线系统流程初始化(利用InitializeOnLoadMethodAttribute标签实现Asset管线提前初始化)
@@ -46,19 +46,27 @@ Asset管线核心框架部分:
 - AssetPipelineSystem -- Asset管线系统(负责初始化Asset管线里各系统以及各系统调用)
 - AssetProcessorSystem -- Asset处理系统(负责Asset自动化后处理相关配置)
 - AssetCheckSystem -- Asset检查系统(负责Asset自动化检查相关配置)
+- AssetPipelineSettingData -- Asset管线系统配置相关数据(非ScriptableObject)(比如Asset管线开关，Log开关等配置)
 - ProcessorSettingData -- Asset处理器设置数据(AssetPipelineWindow 窗口配置)
 - ProcessorConfigData -- Asset处理器配置数据(AssetPipelineWindow 窗口配置)
 - AssetCheckSettingData -- Asset检查设置数据(AssetPipelineWindow 窗口配置)
 - AssetCheckConfigData -- Asset检查配置数据(AssetPipelineWindow 窗口配置)
-- BaseProcessor -- Asset处理器抽象类(负责抽象Asset处理器流程和数据，继承至ScriptableObject实现自定义数据配置处理)
-- BasePreProcessor -- Asset预处理器抽象类(负责抽象Asset预处理器流程和数据，继承至BaseProcessor )
-- BasePostProcessor -- Asset预处理器抽象类(负责抽象Asset后处理器流程和数据，继承至BaseProcessor )
-- BaseCheck -- Asset检查抽象类(负责抽象Asset检查器流程和数据，继承至ScriptableObject实现自定义数据配置处理)
-- BasePreCheck -- Asset预检查抽象类(负责抽象Asset预检查器流程和数据，继承至BaseCheck )
-- BasePostCheck -- Asset后检查抽象类(负责抽象Asset后检查器流程和数据，继承至BaseCheck )
+- BaseProcessor -- Asset处理器抽象类(负责抽象Asset数据定义，继承至ScriptableObject实现自定义数据配置处理)
+- BaseProcessorJson -- Asset处理器Json抽象类(负责抽象Asset处理器流程和数据定义(和BaseProcessor保持一致用于Json反序列化构造)，实现自定义数据配置处理)
+- BasePreProcessor -- Asset预处理器抽象类(负责抽象Asset预处理器数据定义，继承至BaseProcessor)
+- BasePreProcessorJson -- Asset预处理器Json抽象类(负责抽象Asset预处理器流程和数据定义(和BasePreProcessor保持一致用于Json反序列化构造)，继承至BaseProcessorJson)
+- BasePostProcessor -- Asset预处理器抽象类(负责抽象Asset后处理器数据定义，继承至BaseProcessor)
+- BasePostProcessJson -- Asset预处理器Json抽象类(负责抽象Asset后处理器流程和数据定义(和BasePostProcessor保持一致用于Json反序列化构造)，继承至BaseProcessorJson)
+- BaseCheck -- Asset检查器抽象类(负责抽象Asset检查器数据定义，继承至ScriptableObject实现自定义数据配置处理)
+- BaseCheckJson -- Asset检查器Json抽象类(负责抽象Asset检查器流程和数据定义(和BaseCheck保持一致用于Json反序列化构建)，实现自定义数据配置处理)
+- BasePreCheck -- Asset预检查抽象类(负责抽象Asset预检查器数据定义，继承至BaseCheck)
+- BasePreCheckJson -- Asset预检查器Json抽象类(负责抽象Asset预检查器流程和数据定义(和BasePreCheck保持一致用于Json反序列化构建)，继承至BaseCheckJson)
+- BasePostCheck -- Asset后检查抽象类(负责抽象Asset后检查器数据定义，继承至BaseCheck)
+- BasePostCheckJson -- Asset后检查器Json抽象类(负责抽象Asset后检查器流程和数据定义(和BasePostCheck保持一致用于Json反序列化构建)，继承至BaseCheckJson)
 - AssetInfo -- 用于记录处理器和检查器相关的路径信息和类型信息(用于后续Json反序列依据)
 - AssetProcessorInfoData -- 所有处理器AssetInfo信息集合(用于后续Json反序列化构造处理器依据)
 - AssetCheckInfoData -- 所有检查器AssetInfo信息集合(用于后续Json反序列化构造检查器依据)
+- 更多的数据定义这里就不一一列举了
 
 窗口部分:
 
@@ -181,7 +189,7 @@ Asset管线核心框架部分:
 
 **自定义的检查器需要通过继承BasePreProcessor或BasePostProcessor或BasePreCheck或BasePostCheck来实现的**
 
-文件名预检查器定义:
+CheckFileName.cs预检查器ScriptableObject数据定义:
 
 ```CS
 /// <summary>
@@ -223,50 +231,117 @@ public class CheckFileName : BasePreCheck
             return AssetProcessType.CommonPreprocess;
         }
     }
+}
+```
+
+CheckFileNameJson.cs预检查器Json处理流程和数据定义:
+
+```CS
+/// <summary>
+/// CheckFileSizeJson.cs
+/// 检查文件大小检查器Json
+/// </summary>
+[Serializable]
+public class CheckFileSizeJson : BasePreCheckJson
+{
+    /// <summary>
+    /// 检查器名
+    /// </summary>
+    public override string Name
+    {
+        get
+        {
+            return "检查文件大小";
+        }
+    }
 
     /// <summary>
-    /// 文件名正则匹配
+    /// 目标Asset类型
     /// </summary>
-    private Regex mFileNameRegex = new Regex("~[!@#$%^&*()_+-=|]");
+    public override AssetType TargetAssetType
+    {
+        get
+        {
+            return AssetPipelineSystem.GetAllCommonAssetType();
+        }
+    }
+
+    /// <summary>
+    /// 目标Asset管线处理类型
+    /// </summary>
+    public override AssetProcessType TargetAssetProcessType
+    {
+        get
+        {
+            return AssetProcessType.CommonPreprocess;
+        }
+    }
+
+    /// <summary>
+    /// 处理器触发排序Order
+    /// </summary>
+    public override int Order
+    {
+        get
+        {
+            return 2;
+        }
+    }
+
+    /// <summary>
+    /// 文件大小限制
+    /// </summary>
+    public int FileSizeLimit = 1024 * 1024 * 8;
 
     /// <summary>
     /// 执行检查器处理
     /// </summary>
     /// <param name="assetPostProcessor"></param>
-    /// <param name="paramList">不定长参数列表</param>
+    /// <param name="paramList">不定长参数</param>
     protected override bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
     {
-        return DoCheckFileName(assetPostProcessor.assetPath);
+        return DoCheckFileSize(assetPostProcessor.assetPath);
     }
 
     /// <summary>
     /// 执行指定路径的检查器处理
     /// </summary>
     /// <param name="assetPath"></param>
-    /// <param name="paramList">不定长参数列表</param>
     protected override bool DoCheckByPath(string assetPath, params object[] paramList)
     {
-        return DoCheckFileName(assetPath);
+        return DoCheckFileSize(assetPath);
     }
 
     /// <summary>
-    /// 检查文件名
+    /// 执行文件大小检查
     /// </summary>
     /// <param name="assetPath"></param>
     /// <returns></returns>
-    private bool DoCheckFileName(string assetPath)
+    private bool DoCheckFileSize(string assetPath)
     {
-        var fileName = Path.GetFileName(assetPath);
-        var result = mFileNameRegex.IsMatch(fileName);
-        AssetPipelineLog.Log($"检查AssetPath:{assetPath}文件名匹配结果:{result}".WithColor(Color.yellow));
-        return result;
+        var assetFullPath = PathUtilities.GetAssetFullPath(assetPath);
+        using (FileStream fs = File.Open(assetFullPath, FileMode.Open))
+        {
+            var overSize = fs.Length > FileSizeLimit;
+            if (!overSize)
+            {
+                AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
+            }
+            else
+            {
+                AssetPipelineLog.LogError($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
+            }
+            return !overSize;
+        }
     }
 }
 ```
 
-​	**从上面可以看到我们通过继承BasePreCheck表明我们是实现一个预检查器。通过声明AssetType为AssetType.All表明我们要支持的所有的Asset类型处理。通过声明TargetAssetProcessType为AssetProcessType.CommonPreprocess表示我们要支持通用预处理流程。**
+**从上面可以看到我们通过CheckFileName继承BasePreCheck表明我们是实现一个预检查器。通过声明AssetType为AssetType.All表明我们要支持的所有的Asset类型处理。通过声明TargetAssetProcessType为AssetProcessType.CommonPreprocess表示我们要支持通用预处理流程。**
 
-ASTC格式设置预处理器定义:
+**同时为了支持在InitializeOnLoadMethodAttribute方法里读取非Asset相关类型信息和数据进行初始化(后续会讲到为什么)，我们定义了对应的CheckFileNameJson类来实现处理流程和数据定义。因为CheckFileNameJson和CheckFileName的序列化数据定义一致，所以通过CheckFileName的ScriptableObject导出的Json数据是可以成功反序列化读取的。最终我们使用*Json类实现了对配置数据的反序列化从而填充到我们的Asset管线系统里作为后处理数据依据。**
+
+ASTC格式设置预处理器ScriptableObeject数据定义:
 
 ```CS
 /// <summary>
@@ -314,6 +389,67 @@ public class ASTCSet : BasePreProcessor
     /// </summary>
     [Header("目标纹理格式")]
     public TextureImporterFormat TargetTextureFormat = TextureImporterFormat.ASTC_4x4;
+}
+```
+
+ASTC格式设置预处理器对应*Json的处理流程和数据定义:
+
+```CS
+/// <summary>
+/// ASTCSetJson.cs
+/// ASTC设置预处理器Json
+/// </summary>
+[Serializable]
+public class ASTCSetJson : BasePreProcessorJson
+{
+    /// <summary>
+    /// 检查器名
+    /// </summary>
+    public override string Name
+    {
+        get
+        {
+            return "ASTC设置";
+        }
+    }
+
+    /// <summary>
+    /// 目标Asset类型
+    /// </summary>
+    public override AssetType TargetAssetType
+    {
+        get
+        {
+            return AssetType.Texture;
+        }
+    }
+
+    /// <summary>
+    /// 目标Asset管线处理类型
+    /// </summary>
+    public override AssetProcessType TargetAssetProcessType
+    {
+        get
+        {
+            return AssetProcessType.PreprocessTexture;
+        }
+    }
+
+    /// <summary>
+    /// 处理器触发排序Order
+    /// </summary>
+    public override int Order
+    {
+        get
+        {
+            return 1;
+        }
+    }
+
+    /// <summary>
+    /// 目标纹理格式
+    /// </summary>
+    public TextureImporterFormat TargetTextureFormat = TextureImporterFormat.ASTC_4x4;
 
     /// <summary>
     /// 执行处理器处理
@@ -357,102 +493,7 @@ public class ASTCSet : BasePreProcessor
 }
 ```
 
-设置AB名后处理器定义:
-
-```CS
-/// <summary>
-/// GenerateABName.cs
-/// 生成AB名处理器
-/// </summary>
-[CreateAssetMenu(fileName = "GenerateABName", menuName = "ScriptableObjects/AssetPipeline/AssetProcessor/PostProcessor/GenerateABName", order = 1101)]
-public class GenerateABName : BasePostProcessor
-{
-    /// <summary>
-    /// 检查器名
-    /// </summary>
-    public override string Name
-    {
-        get
-        {
-            return "生成AB名";
-        }
-    }
-
-    /// <summary>
-    /// 目标Asset类型
-    /// </summary>
-    public override AssetType TargetAssetType
-    {
-        get
-        {
-            return AssetPipelineSystem.GetAllCommonAssetType();
-        }
-    }
-
-    /// <summary>
-    /// 目标Asset管线处理类型
-    /// </summary>
-    public override AssetProcessType TargetAssetProcessType
-    {
-        get
-        {
-            return AssetProcessType.CommonPostprocess;
-        }
-    }
-
-    /// <summary>
-    /// 执行处理器处理
-    /// </summary>
-    /// <param name="assetPostProcessor"></param>
-    /// <param name="paramList">不定长参数列表</param>
-    protected override void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
-    {
-        MarkAssetBundleName(assetPostProcessor.assetPath);
-    }
-
-    /// <summary>
-    /// 执行指定路径的处理器处理
-    /// </summary>
-    /// <param name="assetPath"></param>
-    /// <param name="paramList">不定长参数列表</param>
-    protected override void DoProcessorByPath(string assetPath, params object[] paramList)
-    {
-        MarkAssetBundleName(assetPath);
-    }
-
-    /// <summary>
-    /// 标记指定Asset路径的AB名
-    /// </summary>
-    /// <param name="assetPath"></param>
-    private void MarkAssetBundleName(string assetPath)
-    {
-        var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(assetPath);
-        if(asset == null)
-        {
-            Debug.LogError($"AssetPath:{assetPath}的Asset不存在,标记AB名失败!");
-            return;
-        }
-        var md5 = FileUtilities.GetFilePathMD5(assetPath).ToLower();
-        var assetImporter = AssetImporter.GetAtPath(assetPath);
-        // 每次修改MD5后会导致Asset处于未保存状态
-        // 会导致再次出发PostImported导入流程
-        // 为避免不断循环触发PostImpoerted导入流程，MD5不变不触发修改
-        // Note:
-        // assetBundleName赋值后都是小写
-        if (!string.Equals(assetImporter.assetBundleName, md5))
-        {
-            AssetPipelineLog.Log($"标记AssetPath:{assetPath} MD5:{md5} 原MD5:{assetImporter.assetBundleName}".WithColor(Color.yellow));
-            assetImporter.assetBundleName = md5;
-        }
-        else
-        {
-            AssetPipelineLog.Log($"AssetPath:{assetPath} MD5相同，不需要更改!".WithColor(Color.yellow));
-        }
-    }
-}
-```
-
-​		ASTC设置预处理器和设置AB名后处理器和检查文件名预处理器类似，这里就不一一说明了。
+ASTC设置预处理器和检查文件名预处理器类似，这里就不一一说明了。
 
 但从上面都可以看到每一个处理器和检查器我们都定义了**CreateAssetMenu和一些自定义序列化属性**，这样我们就可以通过右键创建指定处理器和检查器Asset了。
 
@@ -486,17 +527,18 @@ public class GenerateABName : BasePostProcessor
 ## 注意事项
 
 1. **默认Editor/AssetPipeline/Config/AssetProcessors和Editor/AssetPipeline/Config/AssetChecks目录下才会生成预览，请创建在这两个目录下**
-2. **生成AB名处理器如果设置不同AB名会导致Asset处理未保存状态，导致Asset多触发一次Post Import流程**
 
 ## 重大问题更新
 
 问题:
 
 1. **原设计全部是基于ScriptableObejct作为数据存储媒介，导致各电脑同步时配置数据也处于导入状态导致无法正确加载最新的后处理配置(更坏的情况可能加载失败)。(2022/8/31)**
+2. **InitializeOnLoadMethodAttribute标记的方法里无法使用跟Asset相关的类型(比如ScriptableObject相关类)信息也不允许加载Asset相关资源，如果加载Asset相关类型信息会在触发后处理接口的时候发现Asset相关的类型信息发生了Type Exception(类型丢失)(2023/10/19)**
 
 解决方案:
 
 1. **所有ScriptableObject配置导出一份Json(基于ScritableObject的引用改存AssetPath)，保存时基于ScriptableObject配置生成最新的Json数据。Asset管线系统加载配置数据基于导出的Json，ScriptableObject只作为可视化配置读取的数据来源以及导出Json的数据依据。(2022/8/31)**
+2. **通过拆分配置数据(比如ASTCSet相关的ScriptableObject只负责数据定义)和处理流程(比如ASTCSetJson负责定义和ASTCSet一致的数据实现配置数据反序列化构建+处理流程定义)实现在InitializeOnLoadMethodAttribute标记的方法里读取Asset管线配置数据进行Asset管线系统数据初始化，作为我们Asset管线后处理数据依据(2023/10/19**
 
 ## 博客
 

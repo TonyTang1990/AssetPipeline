@@ -5,10 +5,8 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEditor;
+using UnityEngine;
 
 namespace TAssetPipeline
 {
@@ -66,27 +64,9 @@ namespace TAssetPipeline
         {
             get
             {
-                return this.name;
+                return this.Name;
             }
         }
-
-        /// <summary>
-        /// Asset路径(编辑器配置使用)
-        /// Note:
-        /// 仅当BaseProcessor作为ScriptableObject加载时有效，作为Json反序列化时不允许使用次接口
-        /// </summary>
-        public string AssetPath
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(mAssetPath))
-                {
-                    mAssetPath = AssetDatabase.GetAssetPath(this);
-                }
-                return mAssetPath;
-            }
-        }
-        private string mAssetPath;
 
         /// <summary>
         /// 是否是目标处理Asset类型

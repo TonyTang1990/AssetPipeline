@@ -5,15 +5,14 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using UnityEditor;
+using UnityEngine;
 
 namespace TAssetPipeline
 {
     /// <summary>
-    /// CheckFileSize.cs
+    /// CheckFileSizeJson.cs
     /// 检查文件大小检查器Json
     /// </summary>
     [Serializable]

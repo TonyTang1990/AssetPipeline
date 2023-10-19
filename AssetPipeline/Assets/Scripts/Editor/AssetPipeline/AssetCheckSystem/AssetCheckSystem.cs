@@ -4,13 +4,11 @@
  * Create Date:             2022/06/17
  */
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
-using static TAssetPipeline.AssetCheckLocalData;
 
 namespace TAssetPipeline
 {
@@ -551,7 +549,7 @@ namespace TAssetPipeline
             if (!File.Exists(localDataRelativePath))
             {
                 Debug.LogWarning($"找不到Asset检查器局部Json数据:{localDataRelativePath},请先配置Asset检查器局部配置数据!".WithColor(Color.yellow));
-                localData = new AssetCheckLocalData();
+                localData = new AssetCheckLocalDataJson();
             }
             else
             {

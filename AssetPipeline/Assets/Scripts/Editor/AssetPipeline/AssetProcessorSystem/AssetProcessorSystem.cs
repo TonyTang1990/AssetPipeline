@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using static TAssetPipeline.AssetProcessorLocalData;
@@ -144,7 +145,7 @@ namespace TAssetPipeline
                     Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetTypeFullName}的Asset Json类型全名:{jsonProcessorTypeName}");
                     continue;
                 }
-                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath, Encoding.UTC8);
+                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath, Encoding.UTF8);
                 var assetJsonProcessorInstance = JsonUtility.FromJson(jsonContent, assetJsonProcessorType) as BaseProcessorJson;
                 allAssetJsonProcessorMap.Add(assetInfo.AssetPath, assetJsonProcessorInstance);
             }
@@ -181,7 +182,7 @@ namespace TAssetPipeline
                 assetProcessorInfoData = new AssetProcessorInfoData();
                 return assetProcessorInfoData;
             }
-            var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath);
+            var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath, Encoding.UTF8);
             assetProcessorInfoData = JsonUtility.FromJson<AssetProcessorInfoData>(assetProcessorInfoDataJsonContent);
             AssetPipelineLog.Log($"加载Asset处理器信息Json数据:{assetProcessorInfoDataSavePath}完成，处理器总数量:{assetProcessorInfoData.AllProcessorAssetInfo.Count}!".WithColor(Color.green));
             return assetProcessorInfoData;
@@ -539,7 +540,7 @@ namespace TAssetPipeline
             }
             else
             {
-                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath, Encoding.UTC8);
+                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath, Encoding.UTF8);
                 globalData = JsonUtility.FromJson<AssetProcessorGlobalDataJson>(globalDataJsonContent);
             }
             AssetPipelineLog.Log($"加载Asset处理器全局配置Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));

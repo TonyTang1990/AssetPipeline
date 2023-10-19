@@ -5,15 +5,15 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
 
 namespace TAssetPipeline
 {
     /// <summary>
-    /// CheckFileName.cs
+    /// CheckFileNameJson.cs
     /// 检查文件名检查器Json
     /// </summary>
     [Serializable]
