@@ -29,6 +29,11 @@ namespace TAssetPipeline
         public const string JSON_POST_FIX = "json";
 
         /// <summary>
+        /// Json类型后缀名
+        /// </summary>
+        public const string JSON_TYPE_POST_FIX = "Json";
+
+        /// <summary>
         /// 默认策略名
         /// </summary>
         public const string DEFAULT_STRATEGY_NAME = "Default";

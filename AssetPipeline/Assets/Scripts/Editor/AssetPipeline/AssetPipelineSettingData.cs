@@ -16,33 +16,9 @@ namespace TAssetPipeline
     /// AssetPipelineSettingData.cs
     /// AssetPipeline配置数据
     /// </summary>
-    public class AssetPipelineSettingData : ScriptableObject
+    [Serializable]
+    public class AssetPipelineSettingData
     {
-        /// <summary>
-        /// 平台策略数据
-        /// </summary>
-        [Serializable]
-        public class PlatformStrategyData
-        {
-            /// <summary>
-            /// 目标平台
-            /// </summary>
-            [Header("目标平台")]
-            public BuildTarget Target;
-
-            /// <summary>
-            /// 策略名
-            /// </summary>
-            [Header("策略名")]
-            public string StrategyName;
-            
-            public PlatformStrategyData(BuildTarget buildTarget, string strategyName)
-            {
-                Target = buildTarget;
-                StrategyName = strategyName;
-            }
-        }
-
         /// <summary>
         /// 资源目录
         /// </summary

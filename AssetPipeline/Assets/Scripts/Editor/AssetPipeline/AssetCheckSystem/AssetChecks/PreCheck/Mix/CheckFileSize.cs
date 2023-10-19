@@ -14,7 +14,7 @@ namespace TAssetPipeline
 {
     /// <summary>
     /// CheckFileSize.cs
-    /// 检查文件大小
+    /// 检查文件大小检查器
     /// </summary>
     [CreateAssetMenu(fileName = "CheckFileSize", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/Mix/CheckFileSize", order = 2002)]
     public class CheckFileSize : BasePreCheck
@@ -68,47 +68,5 @@ namespace TAssetPipeline
         /// </summary>
         [Header("文件大小限制")]
         public int FileSizeLimit = 1024 * 1024 * 8;
-
-        /// <summary>
-        /// 执行检查器处理
-        /// </summary>
-        /// <param name="assetPostProcessor"></param>
-        /// <param name="paramList">不定长参数</param>
-        protected override bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
-        {
-            return DoCheckFileSize(assetPostProcessor.assetPath);
-        }
-
-        /// <summary>
-        /// 执行指定路径的检查器处理
-        /// </summary>
-        /// <param name="assetPath"></param>
-        protected override bool DoCheckByPath(string assetPath, params object[] paramList)
-        {
-            return DoCheckFileSize(assetPath);
-        }
-
-        /// <summary>
-        /// 执行文件大小检查
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <returns></returns>
-        private bool DoCheckFileSize(string assetPath)
-        {
-            var assetFullPath = PathUtilities.GetAssetFullPath(assetPath);
-            using(FileStream fs = File.Open(assetFullPath, FileMode.Open))
-            {
-                var overSize = fs.Length > FileSizeLimit;
-                if(!overSize)
-                {
-                    AssetPipelineLog.Log($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
-                }
-                else
-                {
-                    AssetPipelineLog.LogError($"AssetPath:{assetPath}文件大小检查,实际大小:{fs.Length / 1024f / 1024f}M,限制大小:{FileSizeLimit / 1024f / 1024f}M".WithColor(Color.yellow));
-                }
-                return !overSize;
-            }
-        }
     }
 }

@@ -15,7 +15,7 @@ namespace TAssetPipeline
 {
     /// <summary>
     /// CheckFileName.cs
-    /// 检查文件名
+    /// 检查文件名检查器
     /// </summary>
     [CreateAssetMenu(fileName = "CheckFileName", menuName = "ScriptableObjects/AssetPipeline/AssetCheck/PreCheck/All/CheckFileName", order = 2001)]
     public class CheckFileName : BasePreCheck
@@ -62,51 +62,6 @@ namespace TAssetPipeline
             {
                 return 1;
             }
-        }
-
-        /// <summary>
-        /// 文件名正则匹配
-        /// </summary>
-        private Regex mFileNameRegex = new Regex("~[!@#$%^&*()_+-=|]");
-
-        /// <summary>
-        /// 执行检查器处理
-        /// </summary>
-        /// <param name="assetPostProcessor"></param>
-        /// <param name="paramList">不定长参数列表</param>
-        protected override bool DoCheck(AssetPostprocessor assetPostProcessor, params object[] paramList)
-        {
-            return DoCheckFileName(assetPostProcessor.assetPath);
-        }
-
-        /// <summary>
-        /// 执行指定路径的检查器处理
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <param name="paramList">不定长参数列表</param>
-        protected override bool DoCheckByPath(string assetPath, params object[] paramList)
-        {
-            return DoCheckFileName(assetPath);
-        }
-
-        /// <summary>
-        /// 检查文件名
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <returns></returns>
-        private bool DoCheckFileName(string assetPath)
-        {
-            var fileName = Path.GetFileName(assetPath);
-            var result = mFileNameRegex.IsMatch(fileName);
-            if(!result)
-            {
-                AssetPipelineLog.Log($"检查AssetPath:{assetPath}文件名匹配结果:{result}".WithColor(Color.yellow));
-            }
-            else
-            {
-                AssetPipelineLog.LogError($"检查AssetPath:{assetPath}文件名匹配结果:{result}".WithColor(Color.yellow));
-            }
-            return result;
         }
     }
 }

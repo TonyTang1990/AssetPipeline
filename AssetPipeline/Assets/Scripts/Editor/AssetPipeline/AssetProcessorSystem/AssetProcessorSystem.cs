@@ -38,44 +38,44 @@ namespace TAssetPipeline
         /// <summary>
         /// Asset处理器全局数据
         /// </summary>
-        private static AssetProcessorGlobalData GlobalData;
+        private static AssetProcessorGlobalDataJson GlobalData;
 
         /// <summary>
         /// Asset处理器局部数据
         /// </summary>
-        private static AssetProcessorLocalData LocalData;
+        private static AssetProcessorLocalDataJson LocalData;
 
         /// <summary>
-        /// 所有Asset路径处理器Map<Asset路径, Asset处理器实例对象>(来源Json)
+        /// 所有Asset路径处理器Map<Asset路径, Json Asset处理器实例对象>
         /// </summary>
-        private static Dictionary<string, BaseProcessor> AllAssetProcessorMap;
+        private static Dictionary<string, BaseProcessorJson> AllAssetProcessorMap;
 
         /// <summary>
-        /// 全局预处理器映射Map<目标Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 全局预处理器映射Map<目标Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GlobalPreProcessorMap;
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GlobalPreProcessorMap;
 
         /// <summary>
-        /// 全局后处理器映射Map<目标Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 全局后处理器映射Map<目标Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GlobalPostProcessorMap;
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GlobalPostProcessorMap;
 
         /// <summary>
-        /// 全局移动处理器映射Map<目标Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 全局移动处理器映射Map<目标Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GlobalMovedProcessorMap;
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GlobalMovedProcessorMap;
 
         /// <summary>
-        /// 全局删除处理器映射Map<目标Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 全局删除处理器映射Map<目标Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GlobalDeletedProcessorMap;
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GlobalDeletedProcessorMap;
 
         /// <summary>
         /// 初始化
         /// </summary>
         public static void Init()
         {
-            Debug.Log($"Asset处理器系统初始化".WithColor(Color.red));
+            AssetPipelineLog.Log($"Asset处理器系统初始化".WithColor(Color.red));
             MakeSureProcessorSaveFolderExit();
             MakeSureStrategyFolderExist();
             var activeStrategyName = AssetPipelineSystem.GetActiveTargetStrategyName();
@@ -114,54 +114,54 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 获取所有Asset路径处理器Map<Asset路径, Asset处理器实例对象>(Json)
+        /// 获取所有Asset路径处理器Map<Asset路径, Asset Json处理器实例对象>
         /// </summary>
         /// <returns></returns>
-        private static Dictionary<string, BaseProcessor> GetAllJsonAssetProcessorMap()
+        private static Dictionary<string, BaseProcessorJson> GetAllJsonAssetProcessorMap()
         {
-            var allAssetProcessorMap = new Dictionary<string, BaseProcessor>();
+            var allAssetJsonProcessorMap = new Dictionary<string, BaseProcessorJson>();
             var assetProcessorInfoData = LoadAssetProcessorInfoJsonData();
             if(assetProcessorInfoData == null)
             {
-                return allAssetProcessorMap;
+                return allAssetJsonProcessorMap;
             }
             foreach (var assetInfo in assetProcessorInfoData.AllProcessorAssetInfo)
             {
-                var assetProcessorType = AssetPipelineConst.ASSET_PIPELINE_ASSEMBLY.GetType(assetInfo.AssetTypeFullName);
-                if(assetProcessorType == null)
+                var jsonProcessorTypeName = AssetPipelineUtilities.GetJsonTypeName(assetInfo.AssetTypeFullName);
+                var assetJsonProcessorType = AssetPipelineConst.ASSET_PIPELINE_ASSEMBLY.GetType(jsonProcessorTypeName);
+                if(assetJsonProcessorType == null)
                 {
-                    Debug.LogError($"找不到Asset处理器类型全名:{assetInfo.AssetTypeFullName},构建处理器类型:{assetInfo.AssetTypeFullName}失败!");
+                    Debug.LogError($"找不到Asset处理器类型全名:{jsonProcessorTypeName},构建处理器类型:{jsonProcessorTypeName}失败!");
                     continue;
                 }
                 if(!File.Exists(assetInfo.JsonAssetPath))
                 {
-                    Debug.LogError($"找不到Json Asset文件:{assetInfo.JsonAssetPath},构建处理器类型:{assetInfo.AssetTypeFullName}失败!");
+                    Debug.LogError($"找不到Json Asset文件:{assetInfo.JsonAssetPath},构建处理器类型:{jsonProcessorTypeName}失败!");
                     continue;
                 }
-                if (allAssetProcessorMap.ContainsKey(assetInfo.AssetPath))
+                if (allAssetJsonProcessorMap.ContainsKey(assetInfo.AssetPath))
                 {
-                    Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetTypeFullName}的Asset类型全名:{assetInfo.AssetTypeFullName}");
+                    Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetTypeFullName}的Asset Json类型全名:{jsonProcessorTypeName}");
                     continue;
                 }
-                var assetProcessorInstance = ScriptableObject.CreateInstance(assetProcessorType) as BaseProcessor;
-                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath);
-                JsonUtility.FromJsonOverwrite(jsonContent, assetProcessorInstance);
-                allAssetProcessorMap.Add(assetInfo.AssetPath, assetProcessorInstance);
+                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath, Encoding.UTC8);
+                var assetJsonProcessorInstance = JsonUtility.FromJson(jsonContent, assetJsonProcessorType) as BaseProcessorJson;
+                allAssetJsonProcessorMap.Add(assetInfo.AssetPath, assetJsonProcessorInstance);
             }
-            return allAssetProcessorMap;
+            return allAssetJsonProcessorMap;
         }
 
         /// <summary>
-        /// 获取指定Asset路径的处理器
+        /// 获取指定Asset路径的处理器Json
         /// </summary>
         /// <param name="assetPath"></param>
         /// <returns></returns>
-        public static BaseProcessor GetProcessorByAssetPath(string assetPath)
+        public static BaseProcessorJson GetProcessorByAssetPath(string assetPath)
         {
-            BaseProcessor processor = null;
+            BaseProcessorJson processor = null;
             if(!AllAssetProcessorMap.TryGetValue(assetPath, out processor))
             {
-                Debug.LogError($"找不到Asset路径:{assetPath}的处理器实例对象!");
+                Debug.LogError($"找不到Asset路径:{assetPath}的处理器Json实例对象!");
                 return null;
             }
             return processor;
@@ -183,7 +183,7 @@ namespace TAssetPipeline
             }
             var assetProcessorInfoDataJsonContent = File.ReadAllText(assetProcessorInfoDataSavePath);
             assetProcessorInfoData = JsonUtility.FromJson<AssetProcessorInfoData>(assetProcessorInfoDataJsonContent);
-            Debug.Log($"加载Asset处理器信息Json数据:{assetProcessorInfoDataSavePath}完成，处理器总数量:{assetProcessorInfoData.AllProcessorAssetInfo.Count}!".WithColor(Color.green));
+            AssetPipelineLog.Log($"加载Asset处理器信息Json数据:{assetProcessorInfoDataSavePath}完成，处理器总数量:{assetProcessorInfoData.AllProcessorAssetInfo.Count}!".WithColor(Color.green));
             return assetProcessorInfoData;
         }
 
@@ -195,7 +195,7 @@ namespace TAssetPipeline
         {
             if(assetProcessorInfoData == null)
             {
-                Debug.Log($"不允许保存空的Asset处理器信息数据，保存Asset处理器信息数据失败，请检查代码!");
+                Debug.LogError($"不允许保存空的Asset处理器信息数据，保存Asset处理器信息数据失败，请检查代码!");
                 return false;
             }
             var assetProcessorInfoDataSavePath = $"{AssetProcessorSystem.GetProcessorInfoDataSaveRelativePath()}.json";
@@ -225,10 +225,11 @@ namespace TAssetPipeline
             }
             var processorJsonPath = Path.ChangeExtension(processorAssetPath, "json");
             var processorJsonContent = JsonUtility.ToJson(processor, true);
-            File.WriteAllText(processorJsonPath, processorJsonContent);
+            File.WriteAllText(processorJsonPath, processorJsonContent, Encoding.UTF8);
             return true;
         }
 
+        #region 编辑器配置部分
         /// <summary>
         /// 获取所有指定类型的处理器
         /// </summary>
@@ -248,6 +249,7 @@ namespace TAssetPipeline
             allProcessorList.Sort(AssetPipelineUtilities.SortProcessor);
             return allProcessorList;
         }
+        #endregion
 
         /// <summary>
         /// 初始化所有全局处理器信息
@@ -261,55 +263,55 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 获取全局预处理器Map<Asset管线处理类型个, <目标Asset类型, 处理器列表>>
+        /// 获取全局预处理器Map<Asset管线处理类型个, <目标Asset类型, Json处理器列表>>
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GetGlobalPreProcessorMap()
+        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GetGlobalPreProcessorMap()
         {
             return GetGlobalProcessorMap(GlobalData.PreProcessorData.ProcessorAssetPathList, "预");
         }
 
         /// <summary>
-        /// 获取全局后处理器Map<Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 获取全局后处理器Map<Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GetGlobalPostProcessorMap()
+        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GetGlobalPostProcessorMap()
         {
             return GetGlobalProcessorMap(GlobalData.PostProcessorData.ProcessorAssetPathList, "后");
         }
 
         /// <summary>
-        /// 获取全局移动处理器Map<Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 获取全局移动处理器Map<Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GetGlobalMovedProcessorMap()
+        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GetGlobalMovedProcessorMap()
         {
             return GetGlobalProcessorMap(GlobalData.MovedProcessorData.ProcessorAssetPathList, "移动");
         }
 
         /// <summary>
-        /// 获取全局删除处理器Map<Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 获取全局删除处理器Map<Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GetGlobalDeletedProcessorMap()
+        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GetGlobalDeletedProcessorMap()
         {
             return GetGlobalProcessorMap(GlobalData.DeletedProcessorData.ProcessorAssetPathList, "删除");
         }
 
         /// <summary>
-        /// 获取全局指定处理器的Map<Asset管线处理类型, <目标Asset类型, 处理器列表>>
+        /// 获取全局指定处理器的Map<Asset管线处理类型, <目标Asset类型, Json处理器列表>>
         /// </summary>
         /// <param name="processorAssetPathList"></param>
         /// <param name="tip""/></param>
         /// <returns></returns>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> GetGlobalProcessorMap(List<string> processorAssetPathList, string tip = "")
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> GetGlobalProcessorMap(List<string> processorAssetPathList, string tip = "")
         {
-            Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> globalProcessorMap = new Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>>();
+            Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> globalProcessorMap = new Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>>();
             foreach(var processorAssetPath in processorAssetPathList)
             {
                 if(!string.IsNullOrEmpty(processorAssetPath))
                 {
-                    Dictionary<AssetType, List<BaseProcessor>> assetTypeProcessorMap;
+                    Dictionary<AssetType, List<BaseProcessorJson>> assetTypeProcessorMap;
                     var processor = GetProcessorByAssetPath(processorAssetPath);
                     if(processor == null)
                     {
@@ -318,7 +320,7 @@ namespace TAssetPipeline
                     }
                     if(!globalProcessorMap.TryGetValue(processor.TargetAssetProcessType, out assetTypeProcessorMap))
                     {
-                        assetTypeProcessorMap = new Dictionary<AssetType, List<BaseProcessor>>();
+                        assetTypeProcessorMap = new Dictionary<AssetType, List<BaseProcessorJson>>();
                         globalProcessorMap.Add(processor.TargetAssetProcessType, assetTypeProcessorMap);
                     }
                     foreach (var assetTypeValue in AssetPipelineConst.ASSET_TYPE_VALUES)
@@ -330,10 +332,10 @@ namespace TAssetPipeline
                         }
                         if((processor.TargetAssetType & assetType) != AssetType.None)
                         {
-                            List<BaseProcessor> assetTypeProcessorList;
+                            List<BaseProcessorJson> assetTypeProcessorList;
                             if (!assetTypeProcessorMap.TryGetValue(assetType, out assetTypeProcessorList))
                             {
-                                assetTypeProcessorList = new List<BaseProcessor>();
+                                assetTypeProcessorList = new List<BaseProcessorJson>();
                                 assetTypeProcessorMap.Add(assetType, assetTypeProcessorList);
                             }
                             assetTypeProcessorList.Add(processor);
@@ -387,24 +389,24 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 获取指定Asset处理器Map里的指定Asset类型的处理器列表
+        /// 获取指定Asset处理器Map里的指定Asset类型的Json处理器列表
         /// </summary>
         /// <param name="assetType"></param>
         /// <param name="processorMap"></param>
         /// <returns></returns>
-        private static List<BaseProcessor> GetProcessorListByAssetType(AssetProcessType assetProcessType, AssetType assetType,
-                                                                        Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> processorMap)
+        private static List<BaseProcessorJson> GetProcessorListByAssetType(AssetProcessType assetProcessType, AssetType assetType,
+                                                                        Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> processorMap)
         {
             if(processorMap == null)
             {
                 return null;
             }
-            Dictionary<AssetType, List<BaseProcessor>> assetTypeProcessorMap;
+            Dictionary<AssetType, List<BaseProcessorJson>> assetTypeProcessorMap;
             if(!processorMap.TryGetValue(assetProcessType, out assetTypeProcessorMap))
             {
                 return null;
             }
-            List<BaseProcessor> processorList;
+            List<BaseProcessorJson> processorList;
             if(!assetTypeProcessorMap.TryGetValue(assetType, out processorList))
             {
                 return null;
@@ -526,18 +528,21 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        public static AssetProcessorGlobalData LoadJsonGlobalDataByStrategy(string strategyName)
+        public static AssetProcessorGlobalDataJson LoadJsonGlobalDataByStrategy(string strategyName)
         {
             var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.json";
-            AssetProcessorGlobalData globalData = ScriptableObject.CreateInstance<AssetProcessorGlobalData>();
+            AssetProcessorGlobalDataJson globalData;
             if (!File.Exists(globalDataRelativePath))
             {
-                Debug.LogWarning($"找不到Asset处理器全局配置Json数据:{globalDataRelativePath}，创建默认Asset处理器全局配置数据!".WithColor(Color.yellow));
-                return globalData;
+                Debug.LogWarning($"找不到Asset处理器全局配置Json数据:{globalDataRelativePath}，清闲配置Asset处理器全局配置数据!".WithColor(Color.yellow));
+                globalData = new AssetProcessorGlobalDataJson();
             }
-            var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
-            JsonUtility.FromJsonOverwrite(globalDataJsonContent, globalData);
-            Debug.Log($"加载Asset处理器全局配置Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
+            else
+            {
+                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath, Encoding.UTC8);
+                globalData = JsonUtility.FromJson<AssetProcessorGlobalDataJson>(globalDataJsonContent);
+            }
+            AssetPipelineLog.Log($"加载Asset处理器全局配置Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
             return globalData;
         }
 
@@ -556,7 +561,7 @@ namespace TAssetPipeline
             }
             var globalDataSavePath = $"{AssetProcessorSystem.GetGlobalDataRelativePathByStartegy(strategyName)}.json";
             var globalDataJsonContent = JsonUtility.ToJson(globalData, true);
-            File.WriteAllText(globalDataSavePath, globalDataJsonContent);
+            File.WriteAllText(globalDataSavePath, globalDataJsonContent, Encoding.UTF8);
             Debug.Log($"保存Asset处理器全局配置的Json数据:{globalDataSavePath}完成!".WithColor(Color.green));
             return true;
         }
@@ -584,18 +589,21 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        public static AssetProcessorLocalData LoadJsonLocalDataByStrategy(string strategyName)
+        public static AssetProcessorLocalDataJson LoadJsonLocalDataByStrategy(string strategyName)
         {
             var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.json";
-            AssetProcessorLocalData localData = ScriptableObject.CreateInstance<AssetProcessorLocalData>();
+            AssetProcessorLocalDataJson localData;
             if (!File.Exists(localDataRelativePath))
             {
-                Debug.LogWarning($"找不到Asset处理器局部配置的Json数据:{localDataRelativePath},创建默认Asset处理器局部配置数据!".WithColor(Color.yellow));
-                return localData;
+                Debug.LogWarning($"找不到Asset处理器局部配置的Json数据:{localDataRelativePath},请先配置Asset处理器局部配置数据!".WithColor(Color.yellow));
+                localData = new AssetProcessorLocalDataJson();
             }
-            var localDataJsonContent = File.ReadAllText(localDataRelativePath);
-            JsonUtility.FromJsonOverwrite(localDataJsonContent, localData);
-            Debug.Log($"加载Asset处理器局部配置的Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
+            else
+            {
+                var localDataJsonContent = File.ReadAllText(localDataRelativePath, Encoding.UTF8);
+                localData = JsonUtility.FromJson<AssetProcessorLocalDataJson>(localDataJsonContent);
+            }
+            AssetPipelineLog.Log($"加载Asset处理器局部配置的Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
             return localData;
         }
 
@@ -705,7 +713,7 @@ namespace TAssetPipeline
         /// <param name="assetType"></param>
         /// <param name="assetPostProcessor"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteGlobalProcessorMapByAssetType(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> processorMap,
+        private static void ExecuteGlobalProcessorMapByAssetType(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> processorMap,
                                                                     AssetProcessType assetProcessType, AssetType assetType,
                                                                     AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
@@ -721,7 +729,7 @@ namespace TAssetPipeline
         /// <param name="assetType"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteGlobalProcessorMapByAssetType2(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> processorMap,
+        private static void ExecuteGlobalProcessorMapByAssetType2(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> processorMap,
                                                                     AssetProcessType assetProcessType, AssetType assetType,
                                                                         string assetPath, params object[] paramList)
         {
@@ -736,7 +744,7 @@ namespace TAssetPipeline
         /// <param name="assetProcessType"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteGlobalProcessorMapByAssetPath(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessor>>> processorMap,
+        private static void ExecuteGlobalProcessorMapByAssetPath(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseProcessorJson>>> processorMap,
                                                                     AssetProcessType assetProcessType, string assetPath, params object[] paramList)
         {
             var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
@@ -809,7 +817,8 @@ namespace TAssetPipeline
                     if (processorData.IsValideAssetProcessType(assetProcessType) &&
                             processorData.IsValideAssetType(assetType) && !processorData.IsInBlackList(assetPath))
                     {
-                        ExecuteProcessorByAssetPath(processorData.Processor, assetPath, paramList);
+                        var processorJson = GetProcessorByAssetPath(processorData.ProcessorAssetPath);
+                        ExecuteProcessorByAssetPath(processorJson, assetPath, paramList);
                     }
                 }
             }
@@ -835,7 +844,7 @@ namespace TAssetPipeline
         /// <param name="processorList"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteProcessorsByAssetPath(List<BaseProcessor> processorList, string assetPath, params object[] paramList)
+        private static void ExecuteProcessorsByAssetPath(List<BaseProcessorJson> processorList, string assetPath, params object[] paramList)
         {
             if (processorList != null && !string.IsNullOrEmpty(assetPath))
             {
@@ -852,7 +861,7 @@ namespace TAssetPipeline
         /// <param name="processor"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteProcessorByAssetPath(BaseProcessor processor, string assetPath, params object[] paramList)
+        private static void ExecuteProcessorByAssetPath(BaseProcessorJson processor, string assetPath, params object[] paramList)
         {
             if (processor != null && !string.IsNullOrEmpty(assetPath))
             {
@@ -866,7 +875,7 @@ namespace TAssetPipeline
         /// <param name="processorList"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteProcessorsByAssetPostprocessor(List<BaseProcessor> processorList, AssetPostprocessor assetPostProcessor, params object[] paramList)
+        private static void ExecuteProcessorsByAssetPostprocessor(List<BaseProcessorJson> processorList, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             if (processorList != null && assetPostProcessor != null)
             {
@@ -883,7 +892,7 @@ namespace TAssetPipeline
         /// <param name="processor"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static void ExecuteProcessorByAssetPostprocessor(BaseProcessor processor, AssetPostprocessor assetPostProcessor, params object[] paramList)
+        private static void ExecuteProcessorByAssetPostprocessor(BaseProcessorJson processor, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             if (processor != null && assetPostProcessor != null)
             {

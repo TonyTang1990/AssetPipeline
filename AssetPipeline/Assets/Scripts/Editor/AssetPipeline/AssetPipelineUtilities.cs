@@ -19,6 +19,27 @@ namespace TAssetPipeline
     public static class AssetPipelineUtilities
     {
         /// <summary>
+        /// 获取指定类型名的对应Json名
+        /// Note:
+        /// Json全名命名= Asset类型全名 + "Json"
+        /// </summary>
+        /// <param name="typeName"></param>
+        /// <returns></returns>
+        public static string GetJsonTypeName(string typeName)
+        {
+            if(string.IsNullOrEmpty(typeName))
+            {
+                Debug.LogError($"不允许获取空类型名的Json类型名！");
+                return null;
+            }
+            if(typeName.EndsWith(AssetPipelineConst.JSON_TYPE_POST_FIX))
+            {
+                return typeName;
+            }
+            return $"{typeName}{AssetPipelineConst.JSON_TYPE_POST_FIX}";
+        }
+
+        /// <summary>
         /// 处理器排序
         /// </summary>
         /// <param name="processor1"></param>

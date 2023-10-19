@@ -66,12 +66,14 @@ namespace TAssetPipeline
         {
             get
             {
-                return this.name;
+                return this.Name;
             }
         }
 
         /// <summary>
-        /// Asset路径
+        /// Asset路径(编辑器配置使用)
+        /// Note:
+        /// 仅当BaseProcessor作为ScriptableObject加载时有效，作为Json反序列化时不允许使用次接口
         /// </summary>
         public string AssetPath
         {
@@ -90,85 +92,5 @@ namespace TAssetPipeline
         {
 
         }
-
-        /// <summary>
-        /// 是否是目标处理Asset类型
-        /// </summary>
-        /// <param name="assetType"></param>
-        /// <returns></returns>
-        public bool IsValideAssetType(AssetType assetType)
-        {
-            return (TargetAssetType & assetType) != AssetType.None;
-        }
-
-        /// <summary>
-        /// 指定Asset路径是否是目标处理Asset类型
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <returns></returns>
-        protected bool IsValideAssetByPath(string assetPath)
-        {
-            var assetType = AssetPipelineSystem.GetAssetTypeByPath(assetPath);
-            if (!IsValideAssetType(assetType))
-            {
-                Debug.LogError($"处理器:{Name}不支持的Asset类型:{assetType},Asset:{assetPath}不应该进入这里!");
-                return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// 是否是目标处理Asset管线处理类型
-        /// </summary>
-        /// <param name="assetProcessType"></param>
-        /// <returns></returns>
-        public bool IsValideAssetProcessType(AssetProcessType assetProcessType)
-        {
-            return TargetAssetProcessType == assetProcessType;
-        }
-
-        /// <summary>
-        /// 执行处理器处理
-        /// </summary>
-        /// <param name="assetPostProcessor"></param>
-        /// <param name="paramList">不定长参数列表</param>
-        public void ExecuteProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList)
-        {
-            if(!IsValideAssetByPath(assetPostProcessor.assetPath))
-            {
-                return;
-            }
-            AssetPipelineLog.Log($"#Asset:{assetPostProcessor.assetPath}执行处理器名:{Name},处理器描述:{CustomDes}!".WithColor(Color.green));
-            DoProcessor(assetPostProcessor, paramList);
-        }
-
-        /// <summary>
-        /// 执行指定Asset路径处理器处理
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <param name="paramList">不定长参数列表</param>
-        public void ExecuteProcessorByPath(string assetPath, params object[] paramList)
-        {
-            if (!IsValideAssetByPath(assetPath))
-            {
-                return;
-            }
-            AssetPipelineLog.Log($"@Asset:{assetPath}执行处理器:{Name},处理器描述:{CustomDes}!".WithColor(Color.green));
-            DoProcessorByPath(assetPath, paramList);
-        }
-
-        /// <summary>
-        /// 执行处理器处理(子类重写实现自定义处理器)
-        /// </summary>
-        /// <param name="assetPostProcessor"></param>
-        /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
-        protected abstract void DoProcessor(AssetPostprocessor assetPostProcessor, params object[] paramList);
-
-        /// <summary>
-        /// 执行指定路径的处理器处理(子类重写实现自定义处理器)
-        /// </summary>
-        /// <param name="assetPath"></param>
-        /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
-        protected abstract void DoProcessorByPath(string assetPath, params object[] paramList);
     }
 }

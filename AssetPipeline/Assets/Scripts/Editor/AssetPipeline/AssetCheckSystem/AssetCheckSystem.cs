@@ -38,34 +38,34 @@ namespace TAssetPipeline
         /// <summary>
         /// Asset检查器全局数据
         /// </summary>
-        private static AssetCheckGlobalData GlobalData;
+        private static AssetCheckGlobalDataJson GlobalData;
 
         /// <summary>
         /// Asset检查器局部数据
         /// </summary>
-        private static AssetCheckLocalData LocalData;
+        private static AssetCheckLocalDataJson LocalData;
 
         /// <summary>
         /// 所有Asset路径检查器Map<Asset路径, Asset检查器实例对象>(来源Json)
         /// </summary>
-        private static Dictionary<string, BaseCheck> AllAssetCheckMap;
+        private static Dictionary<string, BaseCheckJson> AllAssetCheckMap;
 
         /// <summary>
         /// 全局预检查器映射Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
         /// </summary>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> GlobalPreCheckMap;
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> GlobalPreCheckMap;
 
         /// <summary>
         /// 全局后检查器映射Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
         /// </summary>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> GlobalPostCheckMap;
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> GlobalPostCheckMap;
 
         /// <summary>
         /// 初始化
         /// </summary>
         public static void Init()
         {
-            Debug.Log($"Asset检查器系统初始化".WithColor(Color.red));
+            AssetPipelineLog.Log($"Asset检查器系统初始化".WithColor(Color.red));
             MakeSureCheckSaveFolderExit();
             MakeSureStrategyFolderExist();
             var activeStrategyName = AssetPipelineSystem.GetActiveTargetStrategyName();
@@ -107,9 +107,9 @@ namespace TAssetPipeline
         /// 获取所有Asset路径处理器Map<Asset路径, Asset处理器实例对象>(Json)
         /// </summary>
         /// <returns></returns>
-        private static Dictionary<string, BaseCheck> GetAllJsonAssetCheckMap()
+        private static Dictionary<string, BaseCheckJson> GetAllJsonAssetCheckMap()
         {
-            var allAssetCheckrMap = new Dictionary<string, BaseCheck>();
+            var allAssetCheckrMap = new Dictionary<string, BaseCheckJson>();
             var assetCheckInfoData = LoadAssetCheckInfoJsonData();
             if (assetCheckInfoData == null)
             {
@@ -117,41 +117,41 @@ namespace TAssetPipeline
             }
             foreach (var assetInfo in assetCheckInfoData.AllCheckAssetInfo)
             {
-                var assetCheckType = AssetPipelineConst.ASSET_PIPELINE_ASSEMBLY.GetType(assetInfo.AssetTypeFullName);
-                if (assetCheckType == null)
+                var jsonCheckTypeFullName = AssetPipelineUtilities.GetJsonTypeName(assetInfo.AssetTypeFullName);
+                var assetJsonCheckType = AssetPipelineConst.ASSET_PIPELINE_ASSEMBLY.GetType(jsonCheckTypeFullName);
+                if (assetJsonCheckType == null)
                 {
-                    Debug.LogError($"找不到Asset检查器类型全名:{assetInfo.AssetTypeFullName},构建检查器类型:{assetInfo.AssetTypeFullName}失败!");
+                    Debug.LogError($"找不到Asset检查器类型全名:{jsonCheckTypeFullName},构建检查器类型:{jsonCheckTypeFullName}失败!");
                     continue;
                 }
                 if (!File.Exists(assetInfo.JsonAssetPath))
                 {
-                    Debug.LogError($"找不到Json Asset文件:{assetInfo.JsonAssetPath},构建检查器类型:{assetInfo.AssetTypeFullName}失败!");
+                    Debug.LogError($"找不到Json Asset文件:{assetInfo.JsonAssetPath},构建检查器类型:{jsonCheckTypeFullName}失败!");
                     continue;
                 }
                 if (allAssetCheckrMap.ContainsKey(assetInfo.AssetPath))
                 {
-                    Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetTypeFullName}的Asset类型全名:{assetInfo.AssetTypeFullName}");
+                    Debug.LogError($"不应该添加重复的Asset路径:{assetInfo.AssetPath}的Asset类型全名:{jsonCheckTypeFullName}");
                     continue;
                 }
-                var assetCheckInstance = ScriptableObject.CreateInstance(assetCheckType) as BaseCheck;
-                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath);
-                JsonUtility.FromJsonOverwrite(jsonContent, assetCheckInstance);
+                var jsonContent = File.ReadAllText(assetInfo.JsonAssetPath, Encoding.UTF8);
+                var assetCheckInstance = JsonUtility.FromJson(jsonContent, assetJsonCheckType) as BaseCheckJson;
                 allAssetCheckrMap.Add(assetInfo.AssetPath, assetCheckInstance);
             }
             return allAssetCheckrMap;
         }
 
         /// <summary>
-        /// 获取指定Asset路径的检查器
+        /// 获取指定Asset路径的检查器Json
         /// </summary>
         /// <param name="assetPath"></param>
         /// <returns></returns>
-        public static BaseCheck GetCheckByAssetPath(string assetPath)
+        public static BaseCheckJson GetCheckByAssetPath(string assetPath)
         {
-            BaseCheck check = null;
+            BaseCheckJson check = null;
             if (!AllAssetCheckMap.TryGetValue(assetPath, out check))
             {
-                Debug.LogError($"找不到Asset路径:{assetPath}的检查器实例对象!");
+                Debug.LogError($"找不到Asset路径:{assetPath}的检查器Json实例对象!");
                 return null;
             }
             return check;
@@ -171,9 +171,9 @@ namespace TAssetPipeline
                 assetCheckInfoData = new AssetCheckInfoData();
                 return assetCheckInfoData;
             }
-            var assetCheckInfoDataJsonContent = File.ReadAllText(assetCheckInfoDataSavePath);
+            var assetCheckInfoDataJsonContent = File.ReadAllText(assetCheckInfoDataSavePath, Encoding.UTF8);
             assetCheckInfoData = JsonUtility.FromJson<AssetCheckInfoData>(assetCheckInfoDataJsonContent);
-            Debug.Log($"加载Asset检查器信息Json数据:{assetCheckInfoDataSavePath}完成，检查器总数量:{assetCheckInfoData.AllCheckAssetInfo.Count}!".WithColor(Color.green));
+            AssetPipelineLog.Log($"加载Asset检查器信息Json数据:{assetCheckInfoDataSavePath}完成，检查器总数量:{assetCheckInfoData.AllCheckAssetInfo.Count}!".WithColor(Color.green));
             return assetCheckInfoData;
         }
 
@@ -215,10 +215,11 @@ namespace TAssetPipeline
             }
             var checkJsonPath = Path.ChangeExtension(checkAssetPath, "json");
             var checkJsonContent = JsonUtility.ToJson(check, true);
-            File.WriteAllText(checkJsonPath, checkJsonContent);
+            File.WriteAllText(checkJsonPath, checkJsonContent, Encoding.UTF8);
             return true;
         }
 
+        #region 编辑器配置部分
         /// <summary>
         /// 获取所有指定类型的检查器
         /// </summary>
@@ -238,6 +239,7 @@ namespace TAssetPipeline
             allCheckList.Sort(AssetPipelineUtilities.SortCheck);
             return allCheckList;
         }
+        #endregion
 
         /// <summary>
         /// 初始化所有全局检查器信息
@@ -252,37 +254,43 @@ namespace TAssetPipeline
         /// 获取全局预检查器Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> GetGlobalPreCheckMap()
+        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> GetGlobalPreCheckMap()
         {
-            return GetGlobalCheckMap(GlobalData.PreCheckData.CheckList, "预");
+            return GetGlobalCheckMap(GlobalData.PreCheckData.CheckAssetPathList, "预");
         }
 
         /// <summary>
         /// 获取全局后检查器Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
         /// </summary>
         /// <returns></returns>
-        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> GetGlobalPostCheckMap()
+        public static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> GetGlobalPostCheckMap()
         {
-            return GetGlobalCheckMap(GlobalData.PostCheckData.CheckList, "后");
+            return GetGlobalCheckMap(GlobalData.PostCheckData.CheckAssetPathList, "后");
         }
 
         /// <summary>
         /// 获取全局指定检查器的Map<Asset管线处理类型, <目标Asset类型, 检查器列表>>
         /// </summary>
-        /// <param name="checkList"></param>
+        /// <param name="checkAssetPathList"></param>
         /// <param name="tip"></param>
         /// <returns></returns>
-        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> GetGlobalCheckMap(List<BaseCheck> checkList, string tip = "")
+        private static Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> GetGlobalCheckMap(List<string> checkAssetPathList, string tip = "")
         {
-            Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> globalCheckMap = new Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>>();
-            foreach (var check in checkList)
+            Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> globalCheckMap = new Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>>();
+            foreach (var checkAssetPath in checkAssetPathList)
             {
-                if(check != null)
+                if(!string.IsNullOrEmpty(checkAssetPath))
                 {
-                    Dictionary<AssetType, List<BaseCheck>> assetTypeCheckMap;
+                    var check = GetCheckByAssetPath(checkAssetPath);
+                    if(check == null)
+                    {
+                        Debug.LogError($"找不到检查器路径:{checkAssetPath}的检查器实例对象，请检查是否上传和导出不匹配，获取全局检查器失败！");
+                        continue;
+                    }
+                    Dictionary<AssetType, List<BaseCheckJson>> assetTypeCheckMap;
                     if (!globalCheckMap.TryGetValue(check.TargetAssetProcessType, out assetTypeCheckMap))
                     {
-                        assetTypeCheckMap = new Dictionary<AssetType, List<BaseCheck>>();
+                        assetTypeCheckMap = new Dictionary<AssetType, List<BaseCheckJson>>();
                         globalCheckMap.Add(check.TargetAssetProcessType, assetTypeCheckMap);
                     }
                     foreach (var assetTypeValue in AssetPipelineConst.ASSET_TYPE_VALUES)
@@ -294,10 +302,10 @@ namespace TAssetPipeline
                         }
                         if ((check.TargetAssetType & assetType) != AssetType.None)
                         {
-                            List<BaseCheck> assetTypeCheckList;
+                            List<BaseCheckJson> assetTypeCheckList;
                             if (!assetTypeCheckMap.TryGetValue(assetType, out assetTypeCheckList))
                             {
-                                assetTypeCheckList = new List<BaseCheck>();
+                                assetTypeCheckList = new List<BaseCheckJson>();
                                 assetTypeCheckMap.Add(assetType, assetTypeCheckList);
                             }
                             assetTypeCheckList.Add(check);
@@ -329,9 +337,14 @@ namespace TAssetPipeline
             {
                 foreach (var checkData in checkLocalData.CheckDataList)
                 {
-                    if (checkData.Check != null)
+                    if(string.IsNullOrEmpty(checkData.CheckAssetPath))
                     {
-                        AssetPipelineLog.Log($"局部{tip}检查器目标目录:{checkLocalData.FolderPath},Asset管线处理类型:{checkData.Check.TargetAssetProcessType},添加局部检查器:{checkData.Check.Name}!".WithColor(Color.yellow));
+                        continue;
+                    }
+                    var check = GetCheckByAssetPath(checkData.CheckAssetPath);
+                    if (check != null)
+                    {
+                        AssetPipelineLog.Log($"局部{tip}检查器目标目录:{checkLocalData.FolderPath},Asset管线处理类型:{check.TargetAssetProcessType},添加局部检查器:{check.Name}!".WithColor(Color.yellow));
                         checkData.PrintAllBlackListFolder();
                     }
                 }
@@ -345,19 +358,19 @@ namespace TAssetPipeline
         /// <param name="assetType"></param>
         /// <param name="checkMap"></param>
         /// <returns></returns>
-        private static List<BaseCheck> GetCheckListByAssetType(AssetProcessType assetProcessType, AssetType assetType,
-                                                                Dictionary<AssetProcessType,  Dictionary<AssetType, List<BaseCheck>>> checkMap)
+        private static List<BaseCheckJson> GetCheckListByAssetType(AssetProcessType assetProcessType, AssetType assetType,
+                                                                Dictionary<AssetProcessType,  Dictionary<AssetType, List<BaseCheckJson>>> checkMap)
         {
             if (checkMap == null)
             {
                 return null;
             }
-            Dictionary<AssetType, List<BaseCheck>> assetTypeCheckMap;
+            Dictionary<AssetType, List<BaseCheckJson>> assetTypeCheckMap;
             if(!checkMap.TryGetValue(assetProcessType, out assetTypeCheckMap))
             {
                 return null;
             }
-            List<BaseCheck> checkList;
+            List<BaseCheckJson> checkList;
             if (!assetTypeCheckMap.TryGetValue(assetType, out checkList))
             {
                 return null;
@@ -470,18 +483,21 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        public static AssetCheckGlobalData LoadJsonGlobalDataByStrategy(string strategyName)
+        public static AssetCheckGlobalDataJson LoadJsonGlobalDataByStrategy(string strategyName)
         {
             var globalDataRelativePath = $"{GetGlobalDataRelativePathByStartegy(strategyName)}.json";
-            AssetCheckGlobalData globalData = ScriptableObject.CreateInstance<AssetCheckGlobalData>();
+            AssetCheckGlobalDataJson globalData;
             if (!File.Exists(globalDataRelativePath))
             {
-                Debug.LogWarning($"找不到Asset检查器全局Json数据:{globalDataRelativePath}，创建默认Asset检查器全局数据!".WithColor(Color.yellow));
-                return globalData;
+                Debug.LogWarning($"找不到Asset检查器全局Json数据:{globalDataRelativePath}，请先配置Asset检查器全局配置数据!".WithColor(Color.yellow));
+                globalData = new AssetCheckGlobalDataJson();
             }
-            var globalDataJsonContent = File.ReadAllText(globalDataRelativePath);
-            JsonUtility.FromJsonOverwrite(globalDataJsonContent, globalData);
-            Debug.Log($"加载Asset检查器全局Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
+            else
+            {
+                var globalDataJsonContent = File.ReadAllText(globalDataRelativePath, Encoding.UTF8);
+                globalData = JsonUtility.FromJson<AssetCheckGlobalDataJson>(globalDataJsonContent);
+            }
+            AssetPipelineLog.Log($"加载Asset检查器全局Json数据:{globalDataRelativePath}完成!".WithColor(Color.green));
             return globalData;
         }
 
@@ -500,7 +516,7 @@ namespace TAssetPipeline
             }
             var globalDataSavePath = $"{AssetCheckSystem.GetGlobalDataRelativePathByStartegy(strategyName)}.json";
             var globalDataJsonContent = JsonUtility.ToJson(globalData, true);
-            File.WriteAllText(globalDataSavePath, globalDataJsonContent);
+            File.WriteAllText(globalDataSavePath, globalDataJsonContent, Encoding.UTF8);
             Debug.Log($"保存Asset检查器全局配置的Json数据:{globalDataSavePath}完成!".WithColor(Color.green));
             return true;
         }
@@ -528,18 +544,21 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="strategyName"></param>
         /// <returns></returns>
-        public static AssetCheckLocalData LoadJsonLocalDataByStrategy(string strategyName)
+        public static AssetCheckLocalDataJson LoadJsonLocalDataByStrategy(string strategyName)
         {
             var localDataRelativePath = $"{GetLocalDataRelativePathByStrategy(strategyName)}.json";
-            AssetCheckLocalData localData = ScriptableObject.CreateInstance<AssetCheckLocalData>();
+            AssetCheckLocalDataJson localData;
             if (!File.Exists(localDataRelativePath))
             {
-                Debug.LogWarning($"找不到Asset检查器局部Json数据:{localDataRelativePath},创建默认Asset检查器局部数据!".WithColor(Color.yellow));
-                return localData;
+                Debug.LogWarning($"找不到Asset检查器局部Json数据:{localDataRelativePath},请先配置Asset检查器局部配置数据!".WithColor(Color.yellow));
+                localData = new AssetCheckLocalData();
             }
-            var localDataJsonContent = File.ReadAllText(localDataRelativePath);
-            JsonUtility.FromJsonOverwrite(localDataJsonContent, localData);
-            Debug.Log($"加载Asset检查器局部Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
+            else
+            {
+                var localDataJsonContent = File.ReadAllText(localDataRelativePath, Encoding.UTF8);
+                localData = JsonUtility.FromJson<AssetCheckLocalDataJson>(localDataJsonContent);
+            }
+            AssetPipelineLog.Log($"加载Asset检查器局部Json数据:{localDataRelativePath}完成!".WithColor(Color.green));
             return localData;
         }
 
@@ -642,11 +661,11 @@ namespace TAssetPipeline
         /// <param name="assetType"></param>
         /// <param name="assetPostProcessor"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static bool ExecuteGlobalCheckMapByAssetType(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> checkMap,
+        private static bool ExecuteGlobalCheckMapByAssetType(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> checkMap,
                                                                 AssetProcessType assetProcessType, AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             var checkList = GetCheckListByAssetType(assetProcessType, assetType, checkMap);
-            return ExecuteChecksByAssetPostprocessor(checkList, assetPostProcessor, paramList);
+            return ExecuteChecksByAssetPostCheck(checkList, assetPostProcessor, paramList);
         }
 
         /// <summary>
@@ -655,7 +674,7 @@ namespace TAssetPipeline
         /// <param name="checkMap"></param>
         /// <param name="assetType"></param>
         /// <param name="assetPath"></param>
-        private static bool ExecuteGlobalCheckMapByAssetType2(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheck>>> checkMap,
+        private static bool ExecuteGlobalCheckMapByAssetType2(Dictionary<AssetProcessType, Dictionary<AssetType, List<BaseCheckJson>>> checkMap,
                                                                  AssetProcessType assetProcessType, AssetType assetType, string assetPath)
         {
             var checkList = GetCheckListByAssetType(assetProcessType, assetType, checkMap);
@@ -689,7 +708,20 @@ namespace TAssetPipeline
                     if (checkData.IsValideAssetProcessType(assetProcessType) &&
                             checkData.IsValideAssetType(assetType) && !checkData.IsInBlackList(assetPath))
                     {
-                        ExecuteCheckByAssetPostprocessor(checkData.Check, assetPostProcessor, paramList);
+                        if(string.IsNullOrEmpty(checkData.CheckAssetPath))
+                        {
+                            continue;
+                        }
+                        var check = GetCheckByAssetPath(checkData.CheckAssetPath);
+                        if(check == null)
+                        {
+                            Debug.LogError($"找不到检查器路径:{checkData.CheckAssetPath}的检查器对象，请检查是否上传和导出不匹配，触发局部检查器失败!");
+                            continue;
+                        }
+                        if(!ExecuteCheckByAssetPostCheck(check, assetPostProcessor, paramList))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -719,10 +751,19 @@ namespace TAssetPipeline
                     if (checkData.IsValideAssetProcessType(assetProcessType) &&
                             checkData.IsValideAssetType(assetType) && !checkData.IsInBlackList(assetPath))
                     {
-                        if (!ExecuteCheckByAssetPath(checkData.Check, assetPath, paramList))
+                        if(string.IsNullOrEmpty(checkData.CheckAssetPath))
                         {
-                            // 未来支持检查不满足就返回的情况可以打开这里
-                            //return false;
+                            continue;
+                        }
+                        var check = GetCheckByAssetPath(checkData.CheckAssetPath);
+                        if(check == null)
+                        {
+                            Debug.LogError($"找不到检查器路径:{checkData.CheckAssetPath}的检查器对象，请检查是否上传和导出不匹配，触发局部检查器失败!");
+                            continue;
+                        }
+                        if (!ExecuteCheckByAssetPath(check, assetPath, paramList))
+                        {
+                            return false;
                         }
                     }
                 }
@@ -749,7 +790,7 @@ namespace TAssetPipeline
         /// </summary>
         /// <param name="checkList"></param>
         /// <param name="assetPath"></param>
-        private static bool ExecuteChecksByAssetPath(List<BaseCheck> checkList, string assetPath)
+        private static bool ExecuteChecksByAssetPath(List<BaseCheckJson> checkList, string assetPath)
         {
             if (checkList != null && !string.IsNullOrEmpty(assetPath))
             {
@@ -770,7 +811,7 @@ namespace TAssetPipeline
         /// <param name="check"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static bool ExecuteCheckByAssetPath(BaseCheck check, string assetPath, params object[] paramList)
+        private static bool ExecuteCheckByAssetPath(BaseCheckJson check, string assetPath, params object[] paramList)
         {
             if (check != null && !string.IsNullOrEmpty(assetPath))
             {
@@ -789,13 +830,13 @@ namespace TAssetPipeline
         /// <param name="checkList"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static bool ExecuteChecksByAssetPostprocessor(List<BaseCheck> checkList, AssetPostprocessor assetPostProcessor, params object[] paramList)
+        private static bool ExecuteChecksByAssetPostCheck(List<BaseCheckJson> checkList, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             if (checkList != null && assetPostProcessor != null)
             {
                 foreach (var check in checkList)
                 {
-                    if(!ExecuteCheckByAssetPostprocessor(check, assetPostProcessor, paramList))
+                    if(!ExecuteCheckByAssetPostCheck(check, assetPostProcessor, paramList))
                     {
                         return false;
                     }
@@ -810,7 +851,7 @@ namespace TAssetPipeline
         /// <param name="check"></param>
         /// <param name="assetPath"></param>
         /// <param name="paramList">不定长参数列表</param>
-        private static bool ExecuteCheckByAssetPostprocessor(BaseCheck check, AssetPostprocessor assetPostProcessor, params object[] paramList)
+        private static bool ExecuteCheckByAssetPostCheck(BaseCheckJson check, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
             if (check != null && assetPostProcessor != null)
             {

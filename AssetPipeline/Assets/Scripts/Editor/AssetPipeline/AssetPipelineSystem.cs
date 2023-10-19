@@ -237,15 +237,15 @@ namespace TAssetPipeline
         [InitializeOnLoadMethodAttribute]
         public static void Init()
         {
-            Debug.Log($"Asset管线系统初始化".WithColor(Color.red));
             MakeSureSaveFolderExist();
             SettingData = LoadJsonSettingData();
+            AssetPipelineLog.Switch = SettingData.LogSwitch;
             LoadedTarget = EditorUserBuildSettings.activeBuildTarget;
             LoadedStrategyName = GetActiveTargetStrategyName();
-            Debug.Log($"Asset管线开关:{SettingData.Switch}".WithColor(Color.red));
-            Debug.Log($"Asset管线Log开关:{SettingData.LogSwitch}".WithColor(Color.red));
-            Debug.Log($"加载当前激活平台:{LoadedTarget}的Asset管线策略:{LoadedStrategyName}".WithColor(Color.red));
-            AssetPipelineLog.Switch = SettingData.LogSwitch;
+            AssetPipelineLog.Log($"Asset管线系统初始化".WithColor(Color.red));
+            AssetPipelineLog.Log($"Asset管线开关:{SettingData.Switch}".WithColor(Color.red));
+            AssetPipelineLog.Log($"Asset管线Log开关:{SettingData.LogSwitch}".WithColor(Color.red));
+            AssetPipelineLog.Log($"加载当前激活平台:{LoadedTarget}的Asset管线策略:{LoadedStrategyName}".WithColor(Color.red));
             MakeActiveTargetStrategyFolderExist();
             AssetProcessorSystem.Init();
             AssetCheckSystem.Init();
@@ -372,22 +372,6 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 加载设置数据
-        /// </summary>
-        public static AssetPipelineSettingData LoadSettingData()
-        {
-            var settingDataRelativePath = $"{GetSettingDataRelativePath()}.asset";
-            var settingData = AssetDatabase.LoadAssetAtPath<AssetPipelineSettingData>(settingDataRelativePath);
-            if(settingData == null)
-            {
-                Debug.LogWarning($"找不到Asset管线配置数据:{settingDataRelativePath}，创建默认Asset管线配置数据!".WithColor(Color.yellow));
-                settingData = ScriptableObject.CreateInstance<AssetPipelineSettingData>();
-                AssetDatabase.CreateAsset(settingData, settingDataRelativePath);
-            }
-            return settingData;
-        }
-
-        /// <summary>
         /// 加载Json设置数据
         /// </summary>
         public static AssetPipelineSettingData LoadJsonSettingData()
@@ -397,10 +381,14 @@ namespace TAssetPipeline
             if (!File.Exists(settingDataRelativePath))
             {
                 Debug.LogWarning($"找不到Asset管线Json配置数据:{settingDataRelativePath},创建默认Asset管线配置数据!".WithColor(Color.yellow));
-                return settingData;
+                settingData = new AssetPipelineSettingData();
+                SaveSettingDataToJson(settingData);
             }
-            var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
-            JsonUtility.FromJsonOverwrite(settingDataJsonContent, settingData);
+            else
+            {
+                var settingDataJsonContent = File.ReadAllText(settingDataRelativePath);
+                settingData = JsonUtility.FromJson<AssetPipelineSettingData>(settingDataJsonContent);
+            }
             Debug.Log($"加载Asset管线Json配置数据:{settingDataRelativePath}完成!".WithColor(Color.green));
             return settingData;
         }
