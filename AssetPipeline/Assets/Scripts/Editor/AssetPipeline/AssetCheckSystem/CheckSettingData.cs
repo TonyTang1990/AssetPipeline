@@ -52,6 +52,15 @@ namespace TAssetPipeline
 
         #region 编辑器部分
         /// <summary>
+        /// 检查是否有无效检查器配置
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckInvalideCheckConfig()
+        {
+            return Check == null;
+        }
+
+        /// <summary>
         /// 添加黑名单列表
         /// </summary>
         /// <param name="folderPath"></param>

@@ -31,6 +31,22 @@ namespace TAssetPipeline
         public CheckGlobalData PostCheckData = new CheckGlobalData();
 
         /// <summary>
+        /// 检查是否有无效检查器配置
+        /// </summary>
+        public void CheckInvalideCheckConfigs()
+        {
+            if (PreCheckData.CheckInvalideCheckConfig())
+            {
+                Debug.LogError("全局预处理器有无效检查器配置！");
+            }
+            if (PostCheckData.CheckInvalideCheckConfig())
+            {
+                Debug.LogError("全局后处理器有无效检查器配置！");
+            }
+
+        }
+
+        /// <summary>
         /// 排序所有数据
         /// </summary>
         public void SortAllData()

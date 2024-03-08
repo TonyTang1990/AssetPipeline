@@ -191,6 +191,7 @@ namespace TAssetPipeline
             base.SaveAllData();
             SaveAssetCheckPrefDatas();
             SaveAssetCheckData();
+            CheckInvalideCheckConfigs();
             Debug.Log($"保存Asset检查器数据完成!");
         }
 
@@ -282,6 +283,15 @@ namespace TAssetPipeline
                 assetCheckInfoData.AddCheckInfo(postCheck);
             }
             AssetCheckSystem.SaveAssetCheckInfoData(assetCheckInfoData);
+        }
+
+        /// <summary>
+        /// 检查无效检查器配置
+        /// </summary>
+        private void CheckInvalideCheckConfigs()
+        {
+            mGlobalData?.CheckInvalideCheckConfigs();
+            mLocalData?.CheckInvalideCheckConfigs();
         }
 
         /// <summary>

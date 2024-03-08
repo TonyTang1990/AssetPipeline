@@ -74,6 +74,26 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 检查是否有无效检查器配置
+        /// </summary>
+        /// <param name="errorPrefix"></param>
+        /// <returns></returns>
+        public bool CheckInvalideCheckConfigs(string errorPrefix = "")
+        {
+            var result = false;
+            // 删除检查器Asset会导致引用丢失，配置检查器Asset找不到的情况
+            foreach (var checkData in CheckDataList)
+            {
+                if (checkData.CheckInvalideCheckConfig())
+                {
+                    Debug.LogError($"{errorPrefix}配置路径:{FolderPath}，有无效检查器配置！");
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 更新检查器Icon列表
         /// </summary>
         public void UpdaterCheckIcon()

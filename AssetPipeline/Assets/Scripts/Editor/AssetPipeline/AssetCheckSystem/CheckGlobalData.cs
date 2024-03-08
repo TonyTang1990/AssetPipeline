@@ -33,6 +33,23 @@ namespace TAssetPipeline
         /// </summary>
         [NonSerialized]
         public List<BaseCheck> CheckChosenList = new List<BaseCheck>(1) { null };
+
+        /// <summary>
+        /// 检查是否有无效检查器配置
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckInvalideCheckConfig()
+        {
+            // 删除检查器Asset会导致引用丢失，配置检查器Asset找不到的情况
+            foreach (var check in CheckList)
+            {
+                if (check == null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 }

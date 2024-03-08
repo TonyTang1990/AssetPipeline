@@ -31,6 +31,45 @@ namespace TAssetPipeline
         public List<CheckLocalData> PostCheckDataList = new List<CheckLocalData>();
 
         /// <summary>
+        /// 检查是否有无效检查器配置
+        /// </summary>
+        public void CheckInvalideCheckConfigs()
+        {
+            // 删除检查器Asset会导致引用丢失，配置检查器Asset找不到的情况
+            if (CheckInvalideCheckConfigByDatas(PreCheckDataList, "局部预检查器"))
+            {
+                Debug.LogError($"局部预检查器有无效处理器配置！");
+            }
+            if (CheckInvalideCheckConfigByDatas(PostCheckDataList, "局部后检查器"))
+            {
+                Debug.LogError($"局部后检查器有无效处理器配置！");
+            }
+        }
+
+        /// <summary>
+        /// 检查指定局部检查器数据列表是否有无效检查器配置
+        /// </summary>
+        /// <param name="checkLocalDatas"></param>
+        /// <param name="errorPrefix"></param>
+        /// <returns></returns>
+        private bool CheckInvalideCheckConfigByDatas(List<CheckLocalData> checkLocalDatas, string errorPrefix = "")
+        {
+            if (checkLocalDatas == null)
+            {
+                return false;
+            }
+            var result = false;
+            foreach (var checkLocalData in checkLocalDatas)
+            {
+                if (checkLocalData.CheckInvalideCheckConfigs(errorPrefix))
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 更新所有检查器数据的Icon信息
         /// </summary>
         public void UpdateAllCheckIconDatas()
