@@ -52,6 +52,14 @@ namespace TAssetPipeline
 
         #region 编辑器配置部分
         /// <summary>
+        /// 检查是否有无效处理器配置
+        /// </summary>
+        /// <returns></returns>
+        public bool CheckInvalideProecssorConfig()
+        {
+            return Processor == null;
+        }
+        /// <summary>
         /// 添加黑名单列表
         /// </summary>
         /// <param name="folderPath"></param>
@@ -110,6 +118,17 @@ namespace TAssetPipeline
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// 是否是有效处理器
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValideProcessor()
+        {
+            // 删除处理器Asset会导致引用丢失，配置处理器Asset找不到的情况
+            var processorJson = AssetProcessorSystem.GetProcessorByAssetPath(ProcessorAssetPath);
+            return processorJson != null;
         }
 
         /// <summary>

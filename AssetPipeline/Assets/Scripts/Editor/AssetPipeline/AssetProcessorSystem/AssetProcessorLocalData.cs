@@ -44,6 +44,53 @@ namespace TAssetPipeline
         public List<ProcessorLocalData> DeletedProcessorDataList = new List<ProcessorLocalData>();
 
         /// <summary>
+        /// 检查是否有无效处理器配置
+        /// </summary>
+        public void CheckInvalideProcessorConfigs()
+        {
+            // 删除处理器Asset会导致引用丢失，配置处理器Asset找不到的情况
+            if (CheckInvalideProcessorConfigByDatas(PreProcessorDataList, "局部预处理器"))
+            {
+                Debug.LogError($"局部预处理器有无效处理器配置！");
+            }
+            if (CheckInvalideProcessorConfigByDatas(PostProcessorDataList, "局部后处理器"))
+            {
+                Debug.LogError($"局部后处理器有无效处理器配置！");
+            }
+            if (CheckInvalideProcessorConfigByDatas(MovedProcessorDataList, "局部移动处理器"))
+            {
+                Debug.LogError($"局部移动处理器有无效处理器配置！");
+            }
+            if (CheckInvalideProcessorConfigByDatas(DeletedProcessorDataList, "局部删除处理器"))
+            {
+                Debug.LogError($"局部删除处理器有无效处理器配置！");
+            }
+        }
+
+        /// <summary>
+        /// 检查指定局部处理器数据列表是否有无效处理器配置
+        /// </summary>
+        /// <param name="processorLocalDatas"></param>
+        /// <param name="errorPrefix"></param>
+        /// <returns></returns>
+        private bool CheckInvalideProcessorConfigByDatas(List<ProcessorLocalData> processorLocalDatas, string errorPrefix = "")
+        {
+            if(processorLocalDatas == null)
+            {
+                return false;
+            }
+            var result = false;
+            foreach(var processorLocalData in processorLocalDatas)
+            {
+                if(processorLocalData.CheckInvalideProcessorConfigs(errorPrefix))
+                {
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 更新所有处理器数据的Icon信息
         /// </summary>
         public void UpdateAllProcessorIconDatas()

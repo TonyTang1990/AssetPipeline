@@ -195,6 +195,7 @@ namespace TAssetPipeline
             base.SaveAllData();
             SaveAssetProcessorPrefDatas();
             SaveAssetProcessorData();
+            CheckInvalideProcessorConfigs();
             Debug.Log($"保存Asset处理器数据完成!");
         }
 
@@ -286,6 +287,15 @@ namespace TAssetPipeline
                 assetProcessorInfoData.AddProcessorInfo(postProcessor);
             }
             AssetProcessorSystem.SaveAssetProcessorInfoData(assetProcessorInfoData);
+        }
+
+        /// <summary>
+        /// 检查无效处理器配置
+        /// </summary>
+        private void CheckInvalideProcessorConfigs()
+        {
+            mGlobalData?.CheckInvalideProcessorConfigs();
+            mLocalData?.CheckInvalideProcessorConfigs();
         }
 
         /// <summary>

@@ -159,6 +159,10 @@ namespace TAssetPipeline
         /// <returns></returns>
         public static BaseProcessorJson GetProcessorByAssetPath(string assetPath)
         {
+            if(string.IsNullOrEmpty(assetPath))
+            {
+                return null;
+            }
             BaseProcessorJson processor = null;
             if(!AllAssetProcessorMap.TryGetValue(assetPath, out processor))
             {
@@ -776,6 +780,10 @@ namespace TAssetPipeline
                 AssetPipelineLog.Log($"局部处理器目录:{processorLocalData.FolderPath}".WithColor(Color.red));
                 foreach (var processorData in processorLocalData.ProcessorDataList)
                 {
+                    if(!processorData.IsValideProcessor())
+                    {
+                        continue;
+                    }
                     if(processorData.IsValideAssetProcessType(assetProcessType) &&
                             processorData.IsValideAssetType(assetType) && !processorData.IsInBlackList(assetPath))
                     {
@@ -815,6 +823,10 @@ namespace TAssetPipeline
                 AssetPipelineLog.Log($"局部处理器目录:{processorLocalData.FolderPath}".WithColor(Color.red));
                 foreach (var processorData in processorLocalData.ProcessorDataList)
                 {
+                    if (!processorData.IsValideProcessor())
+                    {
+                        continue;
+                    }
                     if (processorData.IsValideAssetProcessType(assetProcessType) &&
                             processorData.IsValideAssetType(assetType) && !processorData.IsInBlackList(assetPath))
                     {

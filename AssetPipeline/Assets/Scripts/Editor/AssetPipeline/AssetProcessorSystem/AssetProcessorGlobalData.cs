@@ -44,6 +44,29 @@ namespace TAssetPipeline
         public ProcessorGlobalData DeletedProcessorData = new ProcessorGlobalData();
 
         /// <summary>
+        /// 检查是否有无效处理器配置
+        /// </summary>
+        public void CheckInvalideProcessorConfigs()
+        {
+            if (PreProcessorData.CheckInvalideProcessorConfig())
+            {
+                Debug.LogError("全局预处理器有无效处理器配置！");
+            }
+            if (PostProcessorData.CheckInvalideProcessorConfig())
+            {
+                Debug.LogError("全局后处理器有无效处理器配置！");
+            }
+            if (MovedProcessorData.CheckInvalideProcessorConfig())
+            {
+                Debug.LogError("全局移动处理器有无效处理器配置！");
+            }
+            if (DeletedProcessorData.CheckInvalideProcessorConfig())
+            {
+                Debug.LogError("全局删除处理器有无效处理器配置！");
+            }
+        }
+
+        /// <summary>
         /// 排序所有数据
         /// </summary>
         public void SortAllData()

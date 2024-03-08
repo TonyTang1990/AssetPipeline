@@ -75,6 +75,26 @@ namespace TAssetPipeline
         }
 
         /// <summary>
+        /// 检查是否有无效处理器配置
+        /// </summary>
+        /// <param name="errorPrefix"></param>
+        /// <returns></returns>
+        public bool CheckInvalideProcessorConfigs(string errorPrefix = "")
+        {
+            var result = false;
+            // 删除处理器Asset会导致引用丢失，配置处理器Asset找不到的情况
+            foreach(var processorData in ProcessorDataList)
+            {
+                if(processorData.CheckInvalideProecssorConfig())
+                {
+                    Debug.LogError($"{errorPrefix}配置路径:{FolderPath}，有无效处理器配置！");
+                    result = true;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// 更新处理器Icon列表
         /// </summary>
         public void UpdaterProcessorIcon()
