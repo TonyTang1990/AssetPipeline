@@ -16,7 +16,7 @@ namespace TAssetPipeline
     /// Asset类型
     /// </summary>
     [Flags]
-    public enum AssetType : Int32
+    public enum AssetType : Int64
     {
         None = 0,                               // 无效类型
         Texture = 1 << 0,                       // 图片
@@ -47,6 +47,6 @@ namespace TAssetPipeline
         StyleSheet = 1 << 26,                   // Style Sheet(e.g. .uss ......)
         DefaultAsset = 1 << 27,                 // Unity不识别的Asset类型(e.g. dll, exe, so, a......)
         Other = 1 << 28,                        // 其他
-        All = Int32.MaxValue,                   // 所有类型
+        All = Int64.MaxValue,                   // 所有类型
     }
 }
