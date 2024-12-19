@@ -301,8 +301,7 @@ namespace TAssetPipeline
         /// </summary>
         private static void AddAllFileWatcher()
         {
-            var saveFolderRelativePath = GetSaveFolderFullPath();
-            var saveFolderFullPath = PathUtilities.GetAssetFullPath(saveFolderRelativePath);
+            var saveFolderFullPath = GetSaveFolderFullPath();
             SaveFolderFileSystemWatcher.Path = saveFolderFullPath;
             SaveFolderFileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess | NotifyFilters.Attributes |
                                                         NotifyFilters.CreationTime | NotifyFilters.Size;
