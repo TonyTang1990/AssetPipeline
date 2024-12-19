@@ -197,16 +197,6 @@ namespace TAssetPipeline
         private static FileSystemWatcher SaveFolderFileSystemWatcher = new FileSystemWatcher();
 
         /// <summary>
-        /// UTC开始计算DateTime
-        /// </summary>
-        private static DateTime UTCStartDateTime = new DateTime(1970, 1, 1);
-
-        /// <summary>
-        /// 配置文件读取UTC时间戳
-        /// </summary>
-        private static volatile int ConfigFileReadTimestamp;
-
-        /// <summary>
         /// 配置文件改变标记(解决FileSystemWatcher多线程问题)
         /// </summary>
         private static volatile bool ConfigFileChangeFlag;
@@ -299,16 +289,6 @@ namespace TAssetPipeline
         }
 
         /// <summary>
-        /// 更新配置文件读取时间戳
-        /// </summary>
-        /// <param name="timestamp"></param>
-        private static void UpdateConfigFileReadTimestamp(int timestamp)
-        {
-            ConfigFileReadTimestamp = timestamp;
-            AssetPipelineLog.Log($"更新配置读取时间戳:{ConfigFileReadTimestamp}");
-        }
-
-        /// <summary>
         /// 移除所有文件观察器
         /// </summary>
         private static void RemoveAllFileWatcher()
@@ -340,21 +320,10 @@ namespace TAssetPipeline
         /// <param name="e"></param>
         private static void OnSaveFolderFileChange(object sender, FileSystemEventArgs e)
         {
-            var utcTimestamp = GetNowTimestamp();
-            // 避免多个Config配置文件短时间内更新触发多次重新初始化问题
-            if(!ConfigFileChangeFlag && utcTimestamp - ConfigFileReadTimestamp > AssetPipelineConst.ConfigFileChangeCheckInterval)
+            if(!ConfigFileChangeFlag)
             {
                 ConfigFileChangeFlag = true;
             }
-        }
-
-        /// <summary>
-        /// 获取当前UTC时间戳
-        /// </summary>
-        /// <returns></returns>
-        private static int GetNowTimestamp()
-        {
-            return (int)DateTime.UtcNow.Subtract(UTCStartDateTime).TotalSeconds;
         }
 
         /// <summary>
