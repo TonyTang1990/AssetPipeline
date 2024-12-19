@@ -106,6 +106,6 @@ namespace TAssetPipeline
         /// <summary>
         /// AssetPipeline配置文件改变检查间隔
         /// </summary>
-        public const float ConfigFileChangeCheckInterval = 1f;
+        public static volatile float ConfigFileChangeCheckInterval = 1f;
     }
 }
