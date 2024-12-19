@@ -4,6 +4,7 @@
  * Create Date:             2022/06/17
  */
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -190,6 +191,26 @@ namespace TAssetPipeline
             { AssetCheckSystem.GetLocalDataAssetName(), true },
         };
 
+        /// <summary>
+        /// AssetPipeline文件保存目录的文件观察器
+        /// </summary>
+        private static FileSystemWatcher SaveFolderFileSystemWatcher = new FileSystemWatcher();
+
+        /// <summary>
+        /// UTC开始计算DateTime
+        /// </summary>
+        private static DateTime UTCStartDateTime = new DateTime(1970, 1, 1);
+
+        /// <summary>
+        /// 配置文件读取UTC时间戳
+        /// </summary>
+        private static volatile int ConfigFileReadTimestamp;
+
+        /// <summary>
+        /// 配置文件改变标记(解决FileSystemWatcher多线程问题)
+        /// </summary>
+        private static volatile bool ConfigFileChangeFlag;
+
         // 存储目录结构展示:
         // -- Assets
         //    -- Editor
@@ -230,6 +251,17 @@ namespace TAssetPipeline
         // 因此为了确保切换平台瞬间Asset管线处理正确
         // 在激活平台和Asset管线初始化平台不一致时不处理Asset管线流程
 
+        // Note:
+        // InitializeOnLoadMehodAttribute无法解决只有Asset(比如AssetPipeline配置)变化时触发加载最新AssetPipeline配置的情况
+        // 这里通过FileSystemWatcher(多线程操作)监听相关文件变化决定是否重新初始化AssetPipelineSystem.Init()
+        // 解决纯Asset导入流程没有加载最新AssetPipeline配置问题
+        
+        // 问题:
+        // 协同更新时，在FileSystemWatcher还未检测到配置文件变化时就触发Asset导入(比如用户直接就待在Unity界面触发更新(虽然一般不会这样干))
+        // 导致在加载最新AssetPipeline配置文件之前就触发了部分Asset导入，这样会导致部分Asset未按最新AssetPipeline配置触发后处理
+        // 目前没找到更完美解决AssetPipeline配置文件协同更新重新初始化的方法
+        // 但InitializeOnLoadMethodAttribute+FileSystemWatcher覆盖了99.99%的使用情况
+
         /// <summary>
         /// 初始化
         /// </summary>
@@ -248,6 +280,81 @@ namespace TAssetPipeline
             MakeActiveTargetStrategyFolderExist();
             AssetProcessorSystem.Init();
             AssetCheckSystem.Init();
+            RemoveAllFileWatcher();
+            AddAllFileWatcher();
+            EditorApplication.update -= OnUpdate;
+            EditorApplication.update += OnUpdate;
+        }
+
+        /// <summary>
+        /// 更新
+        /// </summary>
+        private static void OnUpdate()
+        {
+            if(ConfigFileChangeFlag)
+            {
+                ConfigFileChangeFlag = false;
+                Init();
+            }
+        }
+
+        /// <summary>
+        /// 更新配置文件读取时间戳
+        /// </summary>
+        /// <param name="timestamp"></param>
+        private static void UpdateConfigFileReadTimestamp(int timestamp)
+        {
+            ConfigFileReadTimestamp = timestamp;
+            AssetPipelineLog.Log($"更新配置读取时间戳:{ConfigFileReadTimestamp}");
+        }
+
+        /// <summary>
+        /// 移除所有文件观察器
+        /// </summary>
+        private static void RemoveAllFileWatcher()
+        {
+            SaveFolderFileSystemWatcher.Changed -= OnSaveFolderFileChange;
+        }
+
+        /// <summary>
+        /// 添加所有文件观察器
+        /// </summary>
+        private static void AddAllFileWatcher()
+        {
+            var saveFolderRelativePath = GetSaveFolderFullPath();
+            var saveFolderFullPath = PathUtilities.GetAssetFullPath(saveFolderRelativePath);
+            SaveFolderFileSystemWatcher.Path = saveFolderFullPath;
+            SaveFolderFileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.LastAccess | NotifyFilters.Attributes |
+                                                        NotifyFilters.CreationTime | NotifyFilters.Size;
+            SaveFolderFileSystemWatcher.Filter = "*.json";
+            SaveFolderFileSystemWatcher.IncludeSubdirectories = true;
+            SaveFolderFileSystemWatcher.EnableRaisingEvents = true;
+            SaveFolderFileSystemWatcher.Changed += OnSaveFolderFileChange;
+            //AssetPipelineLog.Log($"开始监听保存目录:{saveFolderFullPath}文件变化！");
+        }
+
+        /// <summary>
+        /// 响应AssetPipeline保存目录文件变化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void OnSaveFolderFileChange(object sender, FileSystemEventArgs e)
+        {
+            var utcTimestamp = GetNowTimestamp();
+            // 避免多个Config配置文件短时间内更新触发多次重新初始化问题
+            if(!ConfigFileChangeFlag && utcTimestamp - ConfigFileReadTimestamp > AssetPipelineConst.ConfigFileChangeCheckInterval)
+            {
+                ConfigFileChangeFlag = true;
+            }
+        }
+
+        /// <summary>
+        /// 获取当前UTC时间戳
+        /// </summary>
+        /// <returns></returns>
+        private static int GetNowTimestamp()
+        {
+            return (int)DateTime.UtcNow.Subtract(UTCStartDateTime).TotalSeconds;
         }
 
         /// <summary>

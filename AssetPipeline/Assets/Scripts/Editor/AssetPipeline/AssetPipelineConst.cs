@@ -102,5 +102,10 @@ namespace TAssetPipeline
         /// AssetProcessType所有值
         /// </summary>
         public static Array ASSET_PROCESS_TYPE_VALUES = Enum.GetValues(AssetPipelineConst.ASSET_PROCESS_TYPE);
+
+        /// <summary>
+        /// AssetPipeline配置文件改变检查间隔
+        /// </summary>
+        public const float ConfigFileChangeCheckInterval = 1f;
     }
 }

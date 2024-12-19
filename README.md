@@ -534,11 +534,13 @@ ASTC设置预处理器和检查文件名预处理器类似，这里就不一一�
 
 1. **原设计全部是基于ScriptableObejct作为数据存储媒介，导致各电脑同步时配置数据也处于导入状态导致无法正确加载最新的后处理配置(更坏的情况可能加载失败)。(2022/8/31)**
 2. **InitializeOnLoadMethodAttribute标记的方法里无法使用跟Asset相关的类型(比如ScriptableObject相关类)信息也不允许加载Asset相关资源，如果加载Asset相关类型信息会在触发后处理接口的时候发现Asset相关的类型信息发生了Type Exception(类型丢失)(2023/10/19)**
+3. **InitializeOnLoadMethodAttribute标签只能确保部分流程重新初始化AssetPipeline系统，但只有Asset导入(比如协同更新AssetPipeline配置文件时)时并不会触发InitializeOnLoadMethodAttribute，导致Asset未能按最新的AssetPipeline配置执行后处理(2024/12/19)**
 
 解决方案:
 
 1. **所有ScriptableObject配置导出一份Json(基于ScritableObject的引用改存AssetPath)，保存时基于ScriptableObject配置生成最新的Json数据。Asset管线系统加载配置数据基于导出的Json，ScriptableObject只作为可视化配置读取的数据来源以及导出Json的数据依据。(2022/8/31)**
-2. **通过拆分配置数据(比如ASTCSet相关的ScriptableObject只负责数据定义)和处理流程(比如ASTCSetJson负责定义和ASTCSet一致的数据实现配置数据反序列化构建+处理流程定义)实现在InitializeOnLoadMethodAttribute标记的方法里读取Asset管线配置数据进行Asset管线系统数据初始化，作为我们Asset管线后处理数据依据(2023/10/19**
+2. **通过拆分配置数据(比如ASTCSet相关的ScriptableObject只负责数据定义)和处理流程(比如ASTCSetJson负责定义和ASTCSet一致的数据实现配置数据反序列化构建+处理流程定义)实现在InitializeOnLoadMethodAttribute标记的方法里读取Asset管线配置数据进行Asset管线系统数据初始化，作为我们Asset管线后处理数据依据(2023/10/19)**
+3. **通过FileSystemWatcher进行对AssetPipeline配置文件保存目录的json文件变化监听，实现AssetPipeline配置文件协同更新时重新初始化AssetPipeline系统(如果用户更新时直接待在Unity界面提前触发Asset导入会导致部分Asset导入时还未加载最新的AssetPipeline配置文件，这个问题暂时没有好的解决方案，欢迎提供好的解决方案)(InitializeOnLoadMethodAttribute+FileSystemWatcher解决99.99%使用情况)**
 
 ## 博客
 
