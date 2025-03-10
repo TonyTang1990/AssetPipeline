@@ -44,6 +44,7 @@ public static class EditorUtilities
         { BuildTarget.Android, "Android" },
         { BuildTarget.iOS, "iPhone" },
         { BuildTarget.StandaloneOSX, "StandaloneOS" },          // 待确定
+        { BuildTarget.WebGL, "WebGL" },
     };
 
     /// <summary>

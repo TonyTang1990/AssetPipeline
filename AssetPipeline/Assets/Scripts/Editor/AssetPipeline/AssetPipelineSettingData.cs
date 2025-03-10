@@ -65,6 +65,7 @@ namespace TAssetPipeline
             new PlatformStrategyData(BuildTarget.StandaloneWindows, AssetPipelineConst.DEFAULT_STRATEGY_NAME),
             new PlatformStrategyData(BuildTarget.StandaloneWindows64, AssetPipelineConst.DEFAULT_STRATEGY_NAME),
             new PlatformStrategyData(BuildTarget.StandaloneOSX, AssetPipelineConst.DEFAULT_STRATEGY_NAME),
+            new PlatformStrategyData(BuildTarget.WebGL, AssetPipelineConst.DEFAULT_STRATEGY_NAME),
         };
     }
 }
