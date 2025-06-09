@@ -258,6 +258,19 @@ namespace TAssetPipeline
         [InitializeOnLoadMethodAttribute]
         public static void Init()
         {
+            InitByTarget(EditorUserBuildSettings.activeBuildTarget);
+        }
+
+        /// <summary>
+        /// 初始化指定目标平台
+        /// </summary>
+        /// <param name="buildTarget"></param>
+        public static void InitByTarget(BuildTarget buildTarget)
+        {
+            if(LoadedTarget == buildTarget)
+            {
+                return;
+            }
             MakeSureSaveFolderExist();
             SettingData = LoadJsonSettingData();
             AssetPipelineLog.Switch = SettingData.LogSwitch;
@@ -274,6 +287,20 @@ namespace TAssetPipeline
             AddAllFileWatcher();
             EditorApplication.update -= OnUpdate;
             EditorApplication.update += OnUpdate;
+        }
+
+        /// <summary>
+        /// 检查当前激活平台初始化(未初始化则初始化)
+        /// </summary>
+        public static void CheckActiveBuildTargetInit()
+        {
+            var activeBuildTarget = EditorUserBuildSettings.activeBuildTarget;
+            if(LoadedTarget == activeBuildTarget)
+            {
+                return;
+            }
+            Debug.Log($"当前AssetPipeline加载平台:{LoadedTarget}和当前激活平台:{activeBuildTarget}不一致，切换初始化当前激活平台配置".WithColor(Color.red));
+            InitByTarget(activeBuildTarget);
         }
 
         /// <summary>
@@ -601,6 +628,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表</param>
         public static void OnPreprocessByAssetType(AssetProcessType assetProcessType, AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
+            CheckActiveBuildTargetInit();
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPreprocessByAssetType({assetType})");
             if (AssetPipelineSystem.IsActiveTargetLoaded())
             {
@@ -631,6 +659,7 @@ namespace TAssetPipeline
         /// <param name="importedAsset"></param>
         public static void OnPostprocessImportedAsset(AssetProcessType assetProcessType, string importedAsset)
         {
+            CheckActiveBuildTargetInit();
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessImportedAsset()");
             if (AssetPipelineSystem.IsActiveTargetLoaded())
             {
@@ -661,6 +690,7 @@ namespace TAssetPipeline
         /// <param name="deletedAsset"></param>
         public static void OnPostprocessDeletedAsset(AssetProcessType assetProcessType, string deletedAsset)
         {
+            CheckActiveBuildTargetInit();
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessDeletedAsset()");
             if (AssetPipelineSystem.IsActiveTargetLoaded())
             {
@@ -688,6 +718,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
         public static void OnPostprocessMovedAsset(AssetProcessType assetProcessType, string movedAsset, params object[] paramList)
         {
+            CheckActiveBuildTargetInit();
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessMovedAsset()");
             if (AssetPipelineSystem.IsActiveTargetLoaded())
             {
@@ -719,6 +750,7 @@ namespace TAssetPipeline
         /// <param name="paramList">不定长参数列表(未来用于支持Unity更多的AssetPostprocessor接口传参)</param>
         public static void OnPostprocessByAssetType(AssetProcessType assetProcessType, AssetType assetType, AssetPostprocessor assetPostProcessor, params object[] paramList)
         {
+            CheckActiveBuildTargetInit();
             AssetPipelineLog.Log($"AssetPipelineSystem:OnPostprocessByAssetType({assetType})");
             if (AssetPipelineSystem.IsActiveTargetLoaded())
             {
